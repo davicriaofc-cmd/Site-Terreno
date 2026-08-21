@@ -19,6 +19,12 @@
     --gold-soft:#D8BE84;
     --night:#0E1720;
     --line: rgba(27,33,22,0.14);
+    /* céu da abertura */
+    --sky-deep:#0E2233;
+    --sky-mid:#1E4A6B;
+    --sky-low:#5B8FAE;
+    --sky-haze:#9CBCCB;
+    --cloud:239,232,216;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
@@ -41,51 +47,206 @@
 
   /* NAV */
   nav{
-    position:fixed; top:0; left:0; right:0; z-index:50;
+    position:fixed; top:0; left:0; right:0; z-index:60;
     display:flex; justify-content:space-between; align-items:center;
-    padding:22px 6vw;
-    mix-blend-mode:normal;
+    padding:18px 6vw;
+    pointer-events:none;
+    transition:background 0.35s ease, padding 0.35s ease, box-shadow 0.35s ease;
+  }
+  nav .nav-left{ display:flex; align-items:center; gap:16px; }
+  nav .brand{ font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:18px; color:#fff; pointer-events:auto; letter-spacing:0.01em;}
+  nav .area-tag{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:#fff; opacity:0.85; pointer-events:auto; border:1px solid rgba(255,255,255,0.35); padding:6px 12px; border-radius:100px;}
+  /* estado sobre fundo claro (depois da abertura) */
+  nav.solid{ background:rgba(239,232,216,0.92); backdrop-filter:blur(8px); padding:14px 6vw; box-shadow:0 1px 0 var(--line); }
+  nav.solid .brand{ color:var(--ink); }
+  nav.solid .area-tag{ color:var(--olive); border-color:var(--line); opacity:1; }
+  nav.solid .menu-btn span{ background:var(--ink); }
+
+  /* BOTÃO 3 TRAÇOS */
+  .menu-btn{
+    pointer-events:auto;
+    width:42px; height:42px; border:0; background:transparent; cursor:pointer;
+    display:flex; flex-direction:column; justify-content:center; gap:6px;
+    padding:0 6px; margin-left:-6px; border-radius:6px;
+  }
+  .menu-btn span{
+    display:block; height:1.5px; width:26px; background:#fff; border-radius:2px;
+    transition:transform 0.35s cubic-bezier(.6,.05,.3,1), opacity 0.2s ease, background 0.35s ease;
+  }
+  .menu-btn span:nth-child(2){ width:18px; }
+  .menu-btn:focus-visible{ outline:1px solid var(--gold); outline-offset:3px; }
+  body.menu-open .menu-btn span{ background:var(--sand); }
+  body.menu-open .menu-btn span:nth-child(1){ transform:translateY(7.5px) rotate(45deg); }
+  body.menu-open .menu-btn span:nth-child(2){ opacity:0; }
+  body.menu-open .menu-btn span:nth-child(3){ transform:translateY(-7.5px) rotate(-45deg); width:26px; }
+
+  /* PAINEL DE MODELOS */
+  .menu-backdrop{
+    position:fixed; inset:0; z-index:55; background:rgba(14,23,32,0.55);
+    opacity:0; pointer-events:none; transition:opacity 0.4s ease; backdrop-filter:blur(2px);
+  }
+  body.menu-open .menu-backdrop{ opacity:1; pointer-events:auto; }
+  .menu-panel{
+    position:fixed; top:0; left:0; bottom:0; z-index:58;
+    width:min(380px, 86vw);
+    background:linear-gradient(180deg, var(--olive-deep) 0%, #1D2418 100%);
+    color:var(--sand);
+    padding:96px 34px 34px;
+    transform:translateX(-102%);
+    transition:transform 0.5s cubic-bezier(.6,.05,.3,1);
+    display:flex; flex-direction:column;
+    border-right:1px solid rgba(216,190,132,0.18);
+    overflow-y:auto;
+  }
+  body.menu-open .menu-panel{ transform:translateX(0); }
+  .menu-panel .eyebrow{ color:var(--gold-soft); opacity:1; }
+  .menu-panel h2{ font-size:28px; margin:10px 0 28px; color:var(--sand); }
+  .model-list{ list-style:none; display:flex; flex-direction:column; border-top:1px solid rgba(239,232,216,0.12); }
+  .model-item{
+    width:100%; display:flex; align-items:baseline; gap:14px; text-align:left;
+    background:transparent; border:0; border-bottom:1px solid rgba(239,232,216,0.12);
+    padding:18px 4px; color:var(--sand); cursor:pointer; font-family:inherit;
+    transition:padding-left 0.3s ease, background 0.3s ease;
+  }
+  .model-item:hover, .model-item:focus-visible{ padding-left:12px; background:rgba(239,232,216,0.05); outline:none; }
+  .model-item .model-n{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--gold-soft); opacity:0.85; }
+  .model-item .model-name{ font-family:'Fraunces', serif; font-size:20px; flex:1; }
+  .model-item .model-tag{
+    font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.1em;
+    color:var(--gold-soft); border:1px solid rgba(216,190,132,0.35);
+    padding:4px 8px; border-radius:100px; opacity:0.8;
+  }
+  .menu-note{
+    margin-top:28px; font-size:12.5px; line-height:1.65; opacity:0.55; max-width:34ch;
+  }
+
+  /* ===== ABERTURA: CÉU + NUVENS + SEQUÊNCIA DE SCROLL ===== */
+  .hero-scroll{ position:relative; height:520vh; padding:0; }
+  .hero-stage{
+    position:sticky; top:0;
+    height:100vh; height:100svh;
+    overflow:hidden;
+    background:
+      radial-gradient(70vw 45vh at 16% 4%, rgba(216,190,132,0.30), transparent 68%),
+      linear-gradient(180deg, var(--sky-deep) 0%, var(--sky-mid) 42%, var(--sky-low) 76%, var(--sky-haze) 100%);
+  }
+  .cloud-track{ position:absolute; left:0; right:0; top:0; height:100%; will-change:transform; }
+  .cloud-layer{
+    position:absolute; left:0; width:200vw;
+    background-repeat:repeat-x;
+    background-size:100vw 100%;
+    will-change:transform;
+  }
+  @keyframes drift{ from{ transform:translate3d(0,0,0); } to{ transform:translate3d(-100vw,0,0); } }
+
+  /* cada camada = 2 aglomerados de elipses com a mesma base,
+     para dar volume de nuvem em vez de manchas soltas */
+  .cloud-far{
+    top:3%; height:30vw; opacity:0.34; filter:blur(9px);
+    animation:drift 210s linear infinite;
+    background-image:
+      radial-gradient(7% 12% at 16% 54%, rgba(var(--cloud),0.85), rgba(var(--cloud),0.7) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(9% 18% at 23% 48%, rgba(var(--cloud),0.90), rgba(var(--cloud),0.7) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(6% 10% at 30% 56%, rgba(var(--cloud),0.80), rgba(var(--cloud),0.6) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(6% 10% at 58% 50%, rgba(var(--cloud),0.80), rgba(var(--cloud),0.6) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(8% 16% at 65% 44%, rgba(var(--cloud),0.88), rgba(var(--cloud),0.7) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(6% 8% at 72% 52%, rgba(var(--cloud),0.75), rgba(var(--cloud),0.6) 55%, rgba(var(--cloud),0) 100%);
+  }
+  .cloud-mid{
+    top:22%; height:38vw; opacity:0.52; filter:blur(6px);
+    animation:drift 130s linear infinite;
+    background-image:
+      radial-gradient(9% 18% at 22% 52%, rgba(var(--cloud),0.88), rgba(var(--cloud),0.72) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(11% 26% at 30% 44%, rgba(var(--cloud),0.94), rgba(var(--cloud),0.78) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(8% 16% at 38% 54%, rgba(var(--cloud),0.84), rgba(var(--cloud),0.68) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(8% 16% at 64% 42%, rgba(var(--cloud),0.84), rgba(var(--cloud),0.68) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(10% 24% at 72% 34%, rgba(var(--cloud),0.92), rgba(var(--cloud),0.76) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(7% 14% at 80% 44%, rgba(var(--cloud),0.80), rgba(var(--cloud),0.64) 55%, rgba(var(--cloud),0) 100%);
+  }
+  .cloud-near{
+    top:50%; height:46vw; opacity:0.72; filter:blur(3px);
+    animation:drift 80s linear infinite;
+    background-image:
+      radial-gradient(10% 18% at 18% 56%, rgba(var(--cloud),0.92), rgba(var(--cloud),0.78) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(13% 26% at 27% 48%, rgba(var(--cloud),0.97), rgba(var(--cloud),0.84) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(9% 16% at 36% 58%, rgba(var(--cloud),0.88), rgba(var(--cloud),0.74) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(9% 16% at 60% 46%, rgba(var(--cloud),0.88), rgba(var(--cloud),0.74) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(12% 24% at 69% 38%, rgba(var(--cloud),0.95), rgba(var(--cloud),0.82) 55%, rgba(var(--cloud),0) 100%),
+      radial-gradient(8% 15% at 78% 47%, rgba(var(--cloud),0.86), rgba(var(--cloud),0.72) 55%, rgba(var(--cloud),0) 100%);
+  }
+  .sky-haze{
+    position:absolute; left:0; right:0; bottom:0; height:38%;
+    background:linear-gradient(180deg, rgba(156,188,203,0) 0%, rgba(156,188,203,0.55) 55%, rgba(216,190,132,0.35) 100%);
     pointer-events:none;
   }
-  nav .brand{ font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:18px; color:var(--sand); pointer-events:auto; letter-spacing:0.01em;}
-  nav .area-tag{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--sand); opacity:0.85; pointer-events:auto; border:1px solid rgba(239,232,216,0.35); padding:6px 12px; border-radius:100px;}
-
-  /* HERO */
-  .hero{
-    position:relative;
-    min-height:100vh;
-    display:flex; flex-direction:column; justify-content:flex-end;
-    padding:0 6vw 8vh 6vw;
+  .sky-scrim{
+    position:absolute; inset:0; pointer-events:none;
     background:
-      radial-gradient(120% 90% at 15% 0%, rgba(176,141,62,0.35), transparent 55%),
-      linear-gradient(180deg, #2A3222 0%, #212A1B 45%, #171F13 100%);
-    overflow:hidden;
+      linear-gradient(90deg, rgba(14,34,51,0.55) 0%, rgba(14,34,51,0.18) 45%, rgba(14,34,51,0) 70%),
+      linear-gradient(180deg, rgba(14,34,51,0.35) 0%, rgba(14,34,51,0) 30%);
   }
-  .hero-topo{
-    position:absolute; inset:0; opacity:0.35; pointer-events:none;
+
+  /* textos da sequência */
+  .hero-content{
+    position:absolute; inset:0; z-index:4;
+    display:grid; align-content:center;
+    padding:0 6vw;
   }
-  .hero h1{
-    color:var(--sand);
-    font-size:clamp(48px, 8vw, 108px);
+  .hero-step{
+    position:relative;
+    grid-area:1 / 1; align-self:center;
+    opacity:0; will-change:opacity, transform;
+    max-width:min(920px, 88vw);
+    text-shadow:0 1px 2px rgba(14,34,51,0.35), 0 2px 34px rgba(14,34,51,0.45);
+  }
+  /* chapa suave por trás do texto — mantém o branco legível quando passa uma nuvem */
+  .hero-step::before{
+    content:''; position:absolute; z-index:-1;
+    left:-12%; right:-12%; top:-60%; bottom:-60%;
+    background:radial-gradient(closest-side ellipse at 42% 50%, rgba(14,34,51,0.58), rgba(14,34,51,0.34) 52%, rgba(14,34,51,0) 100%);
+  }
+  .hero-step h1{
+    color:#fff;
+    font-size:clamp(44px, 7.6vw, 104px);
     max-width:14ch;
     letter-spacing:-0.01em;
   }
-  .hero h1 em{ font-style:italic; color:var(--gold-soft); font-weight:500; }
-  .hero-sub{
-    display:flex; gap:48px; align-items:flex-end; flex-wrap:wrap;
-    margin-top:36px;
-    color:var(--sand);
+  .hero-step h1 em{ font-style:italic; color:#fff; font-weight:500; }
+  .hero-step .lead{
+    color:#fff; font-size:clamp(19px, 2.4vw, 30px); line-height:1.5;
+    max-width:26ch; font-weight:400;
   }
-  .hero-sub p{ max-width:38ch; font-size:15px; line-height:1.6; opacity:0.82; }
+  .hero-step .lead em{ font-style:italic; color:var(--gold-soft); }
+  .hero-stats{ display:flex; gap:clamp(28px,5vw,72px); flex-wrap:wrap; color:#fff; }
   .hero-stat{ font-family:'IBM Plex Mono', monospace; }
-  .hero-stat .n{ font-size:15px; opacity:0.6; letter-spacing:0.08em; }
-  .hero-stat .v{ font-size:15px; color:var(--gold-soft); margin-top:2px;}
-  .scroll-cue{
-    position:absolute; bottom:32px; right:6vw;
-    color:var(--sand); opacity:0.5; font-family:'IBM Plex Mono',monospace; font-size:11px;
-    display:flex; align-items:center; gap:8px; letter-spacing:0.1em;
+  .hero-stat .n{ font-size:12px; opacity:0.65; letter-spacing:0.12em; }
+  .hero-stat .v{ font-size:clamp(22px,3vw,34px); color:#fff; margin-top:8px; letter-spacing:-0.01em; }
+  .hero-step .outro{ color:#fff; font-size:clamp(30px,4.6vw,60px); max-width:16ch; }
+  .hero-step .outro em{ font-style:italic; color:#fff; }
+  .hero-step .outro-hint{
+    margin-top:22px; font-family:'IBM Plex Mono',monospace; font-size:11px;
+    letter-spacing:0.14em; color:#fff; opacity:0.7;
   }
-  .scroll-cue .bar{ width:1px; height:26px; background:var(--sand); animation:pulse 1.8s ease-in-out infinite; }
+
+  /* indicador da sequência */
+  .seq-dots{
+    position:absolute; right:6vw; top:50%; transform:translateY(-50%); z-index:5;
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .seq-dots i{
+    display:block; width:6px; height:6px; border-radius:100px;
+    background:rgba(255,255,255,0.32);
+    transition:background 0.4s ease, transform 0.4s ease;
+  }
+  .seq-dots i.on{ background:var(--gold-soft); transform:scale(1.6); }
+
+  .scroll-cue{
+    position:absolute; bottom:34px; left:6vw; z-index:5;
+    color:#fff; opacity:0.6; font-family:'IBM Plex Mono',monospace; font-size:11px;
+    display:flex; align-items:center; gap:10px; letter-spacing:0.14em;
+    transition:opacity 0.4s ease;
+  }
+  .scroll-cue .bar{ width:1px; height:26px; background:#fff; animation:pulse 1.8s ease-in-out infinite; }
   @keyframes pulse{ 0%,100%{opacity:0.15} 50%{opacity:0.8} }
 
   /* SECTION shell */
@@ -187,31 +348,90 @@
   @media (max-width:820px){
     .plot-wrap{ grid-template-columns:1fr; gap:40px; }
     .concept-grid{ grid-template-columns:1fr; }
-    .hero-sub{ gap:28px; }
+    .hero-scroll{ height:400vh; }
+    .seq-dots{ right:4vw; }
+    nav .area-tag{ display:none; }
+    .cloud-far{ filter:blur(6px); }
+    .cloud-mid{ filter:blur(4px); }
+    .cloud-near{ filter:blur(2px); }
+  }
+
+  /* sem animação: a abertura passa a ser uma secção normal, tudo visível */
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .hero-scroll{ height:auto; }
+    .hero-stage{ position:relative; height:auto; min-height:100vh; padding:22vh 0; }
+    .hero-content{ position:relative; inset:auto; }
+    .hero-step{ grid-area:auto; opacity:1 !important; transform:none !important; margin-bottom:64px; }
+    .cloud-layer{ animation:none; }
+    .seq-dots, .scroll-cue{ display:none; }
   }
 </style>
 </head>
 <body>
 
-<nav>
-  <span class="brand">O Terreno</span>
+<nav id="siteNav">
+  <div class="nav-left">
+    <button class="menu-btn" id="menuBtn" aria-label="Abrir menu" aria-expanded="false" aria-controls="menuPanel">
+      <span></span><span></span><span></span>
+    </button>
+    <span class="brand">O Terreno</span>
+  </div>
   <span class="area-tag">1.700 m² · zona a definir</span>
 </nav>
 
-<section class="hero">
-  <svg class="hero-topo" viewBox="0 0 1200 400" preserveAspectRatio="none">
-    <path d="M0,300 C150,260 300,340 450,300 C600,260 750,320 900,280 C1050,250 1150,290 1200,270" stroke="#B08D3E" stroke-width="1" fill="none"/>
-    <path d="M0,340 C150,300 300,370 450,340 C600,300 750,350 900,320 C1050,300 1150,330 1200,310" stroke="#B08D3E" stroke-width="1" fill="none"/>
-    <path d="M0,240 C150,210 300,260 450,230 C600,200 750,240 900,210 C1050,190 1150,220 1200,200" stroke="#B08D3E" stroke-width="1" fill="none"/>
-  </svg>
-  <h1>Um terreno.<br><em>Um hotel</em> por construir.</h1>
-  <div class="hero-sub">
-    <p>Um projeto para transformar 1.700 m² num pequeno hotel com moradias de apoio — pensado, medido e agora visitável em 360º antes da primeira pedra.</p>
-    <div class="hero-stat"><div class="n">ÁREA TOTAL</div><div class="v">1.700 m²</div></div>
-    <div class="hero-stat"><div class="n">CONSTRUÇÃO HOTEL</div><div class="v">até 40%</div></div>
-    <div class="hero-stat"><div class="n">MORADIAS</div><div class="v">até 20%</div></div>
+<div class="menu-backdrop" id="menuBackdrop"></div>
+
+<!--
+  PAINEL DE MODELOS
+  Os 5 modelos são placeholders. Quando existirem, basta trocar o texto de
+  .model-name, tirar o <span class="model-tag">Em breve</span> e ligar cada
+  botão ao destino (ver o handler "MODELOS" no script lá em baixo).
+-->
+<aside class="menu-panel" id="menuPanel" aria-hidden="true" aria-label="Modelos do projeto">
+  <div class="eyebrow">Modelos</div>
+  <h2>Versões do projeto</h2>
+  <ul class="model-list">
+    <li><button class="model-item" data-model="1"><span class="model-n">01</span><span class="model-name">Modelo 01</span><span class="model-tag">Em breve</span></button></li>
+    <li><button class="model-item" data-model="2"><span class="model-n">02</span><span class="model-name">Modelo 02</span><span class="model-tag">Em breve</span></button></li>
+    <li><button class="model-item" data-model="3"><span class="model-n">03</span><span class="model-name">Modelo 03</span><span class="model-tag">Em breve</span></button></li>
+    <li><button class="model-item" data-model="4"><span class="model-n">04</span><span class="model-name">Modelo 04</span><span class="model-tag">Em breve</span></button></li>
+    <li><button class="model-item" data-model="5"><span class="model-n">05</span><span class="model-name">Modelo 05</span><span class="model-tag">Em breve</span></button></li>
+  </ul>
+  <p class="menu-note">Os cinco modelos ainda estão por desenhar. Assim que existirem, cada entrada abre a respetiva versão do terreno e do hotel.</p>
+</aside>
+
+<section class="hero-scroll" id="heroScroll">
+  <div class="hero-stage">
+    <div class="cloud-track" data-depth="0.16"><div class="cloud-layer cloud-far"></div></div>
+    <div class="cloud-track" data-depth="0.46"><div class="cloud-layer cloud-mid"></div></div>
+    <div class="cloud-track" data-depth="0.92"><div class="cloud-layer cloud-near"></div></div>
+    <div class="sky-haze"></div>
+    <div class="sky-scrim"></div>
+
+    <div class="hero-content">
+      <div class="hero-step" data-step="0">
+        <h1>Um terreno.<br><em>Um hotel</em> por construir.</h1>
+      </div>
+      <div class="hero-step" data-step="1">
+        <p class="lead">Um projeto para transformar <em>1.700 m²</em> num pequeno hotel com moradias de apoio.</p>
+      </div>
+      <div class="hero-step" data-step="2">
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="n">ÁREA TOTAL</div><div class="v">1.700 m²</div></div>
+          <div class="hero-stat"><div class="n">CONSTRUÇÃO HOTEL</div><div class="v">até 40%</div></div>
+          <div class="hero-stat"><div class="n">MORADIAS</div><div class="v">até 20%</div></div>
+        </div>
+      </div>
+      <div class="hero-step" data-step="3">
+        <h2 class="outro">Pensado, medido e <em>visitável em 360º</em> antes da primeira pedra.</h2>
+        <div class="outro-hint">CONTINUE A DESCER</div>
+      </div>
+    </div>
+
+    <div class="seq-dots" id="seqDots" aria-hidden="true"></div>
+    <div class="scroll-cue" id="scrollCue"><div class="bar"></div>PERCORRER</div>
   </div>
-  <div class="scroll-cue"><div class="bar"></div>PERCORRER</div>
 </section>
 
 <section id="plot">
@@ -305,9 +525,117 @@
 </footer>
 
 <script>
+/* ---------------- MENU / MODELOS ---------------- */
+(function(){
+  const btn = document.getElementById('menuBtn');
+  const panel = document.getElementById('menuPanel');
+  const backdrop = document.getElementById('menuBackdrop');
+
+  function setMenu(open){
+    document.body.classList.toggle('menu-open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+    panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+    document.body.style.overflow = open ? 'hidden' : '';
+    if(open) panel.querySelector('.model-item').focus();
+    else btn.focus();
+  }
+
+  btn.addEventListener('click', ()=> setMenu(!document.body.classList.contains('menu-open')));
+  backdrop.addEventListener('click', ()=> setMenu(false));
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape' && document.body.classList.contains('menu-open')) setMenu(false);
+  });
+
+  /* MODELOS — ainda não existem. Quando existirem, trocar este handler pelo
+     destino real de cada modelo (link, secção do site, cena do tour 360º...). */
+  panel.addEventListener('click', (e)=>{
+    const item = e.target.closest('.model-item');
+    if(!item) return;
+    const tag = item.querySelector('.model-tag');
+    if(!tag) return;
+    const original = tag.textContent;
+    tag.textContent = 'Por criar';
+    setTimeout(()=>{ tag.textContent = original; }, 1400);
+  });
+})();
+
+/* ---------------- ABERTURA: SEQUÊNCIA DE SCROLL ---------------- */
+(function(){
+  const track = document.getElementById('heroScroll');
+  const steps = Array.from(track.querySelectorAll('.hero-step'));
+  const clouds = Array.from(track.querySelectorAll('.cloud-track'));
+  const cue = document.getElementById('scrollCue');
+  const dotsBox = document.getElementById('seqDots');
+  const nav = document.getElementById('siteNav');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  dotsBox.innerHTML = steps.map(()=> '<i></i>').join('');
+  const dots = Array.from(dotsBox.querySelectorAll('i'));
+
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+  function update(){
+    // quanto do "trilho" da abertura já foi percorrido: 0 → 1
+    const total = track.offsetHeight - window.innerHeight;
+    const p = total > 0 ? clamp(-track.getBoundingClientRect().top / total, 0, 1) : 0;
+
+    const n = steps.length;
+    const seg = 1 / n;
+
+    steps.forEach((el, i) => {
+      const local = (p - i * seg) / seg;   // 0 → 1 dentro do bloco deste texto
+      let o, y;
+      if(local < 0){ o = 0; y = 70; }
+      else if(local > 1 && i < n - 1){ o = 0; y = -70; }
+      else {
+        // entra a subir do fundo, aguenta um pouco, sai por cima
+        const inP  = i === 0 ? 1 : clamp(local / 0.30, 0, 1);
+        const outP = i === n - 1 ? 0 : clamp((local - 0.70) / 0.30, 0, 1);
+        o = inP * (1 - outP);
+        y = 70 * (1 - inP) - 70 * outP;
+      }
+      el.style.opacity = o.toFixed(3);
+      el.style.transform = 'translate3d(0,' + y.toFixed(1) + 'px,0)';
+      dots[i].classList.toggle('on', local >= 0 && (local <= 1 || i === n - 1));
+    });
+
+    // as nuvens descem a velocidades diferentes — o céu vai abrindo
+    clouds.forEach(c => {
+      const depth = parseFloat(c.dataset.depth) || 0;
+      c.style.transform = 'translate3d(0,' + (p * depth * window.innerHeight).toFixed(1) + 'px,0)';
+    });
+
+    cue.style.opacity = (1 - clamp(p / 0.08, 0, 1)) * 0.6;
+    nav.classList.toggle('solid', p >= 0.999);
+  }
+
+  if(reduced){
+    nav.classList.add('solid');
+    return;
+  }
+
+  let ticking = false;
+  function onScroll(){
+    if(ticking) return;
+    ticking = true;
+    requestAnimationFrame(()=>{ update(); ticking = false; });
+  }
+  window.addEventListener('scroll', onScroll, { passive:true });
+  window.addEventListener('resize', onScroll);
+  update();
+})();
+
 /* ---------------- 360 PANORAMA VIEWER ---------------- */
 (function(){
   const frame = document.getElementById('tourFrame');
+  if(typeof THREE === 'undefined'){
+    const warn = document.createElement('p');
+    warn.className = 'tour-hint';
+    warn.textContent = 'A VISITA 360º NÃO CARREGOU — VERIFIQUE A LIGAÇÃO À INTERNET.';
+    frame.after(warn);
+    return;
+  }
   const label = document.getElementById('tourLabel');
   const hotspotBar = document.getElementById('hotspotBar');
 
