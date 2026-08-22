@@ -25,7 +25,7 @@ html{scroll-behavior:smooth;}
 body{background:var(--sand);color:var(--ink);font-family:'Inter',sans-serif;overflow-x:hidden;}
 ::selection{background:var(--gold-soft);}
 .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--olive);opacity:0.75;}
-h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;line-height:1.05;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;line-height:1.05;text-wrap:balance;}
 
 /* ─── LOADER ─── */
 .loader{position:fixed;inset:0;z-index:200;background:#16324F;display:flex;align-items:center;justify-content:center;transition:opacity 0.6s ease;}
@@ -62,7 +62,12 @@ h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;line-height:1.05;}
 .menu-panel .eyebrow{color:var(--gold-soft);opacity:1;}
 .menu-panel h3{font-size:24px;margin:12px 0 36px;}
 .model-row{display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid rgba(239,232,216,0.12);font-size:14px;}
-.model-row .name{font-family:'Inter',sans-serif;}
+.model-row{text-decoration:none;color:var(--sand);transition:padding-left 0.25s ease;}
+.model-row:hover,.model-row:focus-visible{padding-left:8px;outline:none;}
+.model-row:hover .tag,.model-row:focus-visible .tag{opacity:1;border-color:var(--gold-soft);color:var(--gold-soft);}
+.model-row .name{font-family:'Inter',sans-serif;display:flex;align-items:baseline;gap:12px;}
+.model-row .model-i{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--gold-soft);opacity:0.8;}
+.model-row .tag{transition:opacity 0.25s,border-color 0.25s,color 0.25s;}
 .model-row .tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.06em;opacity:0.5;border:1px solid rgba(239,232,216,0.25);padding:4px 10px;border-radius:100px;}
 
 /* ─── SCROLL-LOCKED HERO ─── */
@@ -153,6 +158,56 @@ h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;line-height:1.05;}
 .site-nav .brand{font-family:'Fraunces',serif;font-style:italic;font-weight:500;font-size:18px;color:var(--sand);letter-spacing:0.01em;}
 .site-nav .area-tag{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--sand);opacity:0.85;border:1px solid rgba(239,232,216,0.35);padding:6px 12px;border-radius:100px;}
 
+/* ─── MODELOS ─── */
+.modelos-section{background:var(--olive-deep);color:var(--sand);}
+.modelos-section .section-head h2{color:var(--sand);}
+.modelos-section .section-head p{color:var(--sand);opacity:0.62;}
+.modelos-section .eyebrow{color:var(--gold-soft);opacity:1;}
+.modelos-grid{
+  display:grid;grid-template-columns:repeat(6,1fr);
+  gap:1px;background:rgba(239,232,216,0.14);
+  border:1px solid rgba(239,232,216,0.14);
+}
+.modelo-card{grid-column:span 2;}
+.modelo-card:nth-child(4),.modelo-card:nth-child(5){grid-column:span 3;}
+@media(max-width:1000px){
+  .modelos-grid{grid-template-columns:repeat(2,1fr);}
+  .modelo-card,.modelo-card:nth-child(4){grid-column:span 1;}
+  .modelo-card:nth-child(5){grid-column:span 2;}
+}
+@media(max-width:620px){
+  .modelos-grid{grid-template-columns:1fr;}
+  .modelo-card,.modelo-card:nth-child(4),.modelo-card:nth-child(5){grid-column:span 1;}
+}
+.modelo-card{background:var(--olive-deep);padding:34px 30px;display:flex;flex-direction:column;gap:16px;}
+.modelo-n{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.12em;color:var(--gold-soft);}
+.modelo-card h3{font-size:24px;color:var(--sand);display:flex;flex-direction:column;gap:4px;}
+.modelo-sub{font-family:'Inter',sans-serif;font-size:12px;font-weight:400;letter-spacing:0.04em;
+  text-transform:uppercase;color:var(--gold-soft);opacity:0.75;}
+.modelo-zonas{list-style:none;display:flex;flex-direction:column;gap:12px;margin-top:2px;}
+.modelo-zonas li{
+  font-size:13.5px;line-height:1.6;opacity:0.72;padding-left:16px;position:relative;
+}
+.modelo-zonas li::before{
+  content:'';position:absolute;left:0;top:0.62em;
+  width:6px;height:1px;background:var(--gold-soft);opacity:0.8;
+}
+.ficha-tecnica{
+  margin-top:56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:0 48px;border-top:1px solid rgba(239,232,216,0.18);
+}
+.ficha-linha{
+  display:flex;justify-content:space-between;align-items:baseline;gap:16px;
+  padding:16px 0;border-bottom:1px solid rgba(239,232,216,0.12);
+}
+.ficha-k{font-size:13px;opacity:0.6;}
+.ficha-v{font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--gold-soft);
+  font-variant-numeric:tabular-nums;white-space:nowrap;}
+.nota-areas{
+  margin-top:22px;font-family:'IBM Plex Mono',monospace;font-size:11px;
+  letter-spacing:0.06em;opacity:0.4;
+}
+
 /* ─── SECTIONS ─── */
 section{padding:120px 6vw;position:relative;}
 .section-head{max-width:640px;margin-bottom:64px;}
@@ -167,7 +222,7 @@ section{padding:120px 6vw;position:relative;}
 .plot-row{display:flex;justify-content:space-between;align-items:baseline;padding:22px 0;border-bottom:1px solid var(--line);}
 .plot-row .name{display:flex;align-items:center;gap:12px;font-size:15px;}
 .plot-row .swatch{width:11px;height:11px;border-radius:3px;display:inline-block;}
-.plot-row .pct{font-family:'IBM Plex Mono',monospace;font-size:26px;color:var(--olive);}
+.plot-row .pct{font-family:'IBM Plex Mono',monospace;font-size:26px;color:var(--olive);font-variant-numeric:tabular-nums;}
 .plot-row .m2{font-family:'IBM Plex Mono',monospace;font-size:12px;opacity:0.55;margin-left:10px;}
 
 /* 360 */
@@ -237,11 +292,11 @@ footer h2 em{font-style:italic;color:var(--gold-soft);font-weight:500;}
 <div class="menu-panel" id="menuPanel">
   <div class="eyebrow">Modelos do projeto</div>
   <h3>5 Modelos</h3>
-  <div class="model-row"><span class="name">Modelo 1</span><span class="tag">EM BREVE</span></div>
-  <div class="model-row"><span class="name">Modelo 2</span><span class="tag">EM BREVE</span></div>
-  <div class="model-row"><span class="name">Modelo 3</span><span class="tag">EM BREVE</span></div>
-  <div class="model-row"><span class="name">Modelo 4</span><span class="tag">EM BREVE</span></div>
-  <div class="model-row"><span class="name">Modelo 5</span><span class="tag">EM BREVE</span></div>
+  <a class="model-row" href="#modelos"><span class="name"><span class="model-i">01</span>U-Resort</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#modelos"><span class="name"><span class="model-i">02</span>Terraço Linear</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#modelos"><span class="name"><span class="model-i">03</span>Vila Alentejana</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#modelos"><span class="name"><span class="model-i">04</span>Edifício Integrado</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#modelos"><span class="name"><span class="model-i">05</span>Oásis de Eventos</span><span class="tag">VER</span></a>
 </div>
 
 <!-- SCROLL-LOCKED HERO -->
@@ -264,17 +319,17 @@ footer h2 em{font-style:italic;color:var(--gold-soft);font-weight:500;}
     </div>
     <div class="hero-panel" data-panel="1">
       <div class="step-num">02 — DIMENSÃO</div>
-      <h1>1.700 m²<br>de <em>possibilidade</em>.</h1>
+      <h1>1.700&nbsp;m²<br>de <em>possibilidade</em>.</h1>
     </div>
     <div class="hero-panel" data-panel="2">
       <div class="step-num">03 — HOTEL</div>
       <h1>40% para<br>o <em>hotel</em>.</h1>
-      <p class="hero-sub-text">680 m² de construção para o edifício principal — orientado para a melhor exposição solar e vistas.</p>
+      <p class="hero-sub-text">Até 680&nbsp;m² de implantação para o edifício principal — orientado para a melhor exposição solar e vistas.</p>
     </div>
     <div class="hero-panel" data-panel="3">
       <div class="step-num">04 — MORADIAS</div>
       <h1>20% para<br><em>moradias</em>.</h1>
-      <p class="hero-sub-text">340 m² reservados a moradias de apoio — alojamento adicional ou unidades autónomas.</p>
+      <p class="hero-sub-text">Até 340&nbsp;m² de implantação para as moradias — cada uma com 100&nbsp;m² em dois pisos e rooftop.</p>
     </div>
     <div class="hero-panel" data-panel="4">
       <div class="step-num">05 — VISÃO</div>
@@ -292,14 +347,14 @@ footer h2 em{font-style:italic;color:var(--gold-soft);font-weight:500;}
 
 <div class="site-nav">
   <span class="brand">O Terreno</span>
-  <span class="area-tag">1.700 m² · zona a definir</span>
+  <span class="area-tag">1.700&nbsp;m² · zona a definir</span>
 </div>
 
 <section id="plot" class="reveal">
   <div class="section-head">
     <div class="eyebrow">Ocupação do solo</div>
     <h2>Como o terreno se reparte</h2>
-    <p>1.700 m² divididos por regulamento: até 40% para o hotel, até 20% para moradias, e o restante mantido como área livre.</p>
+    <p>1.700&nbsp;m² divididos por regulamento: até 40% para o hotel, até 20% para moradias, e o restante mantido como área livre — logradouro, acessos e enquadramento verde. As percentagens são limites de implantação; cada proposta usa-os de maneira diferente.</p>
   </div>
   <div class="plot-wrap">
     <svg class="plot-map" viewBox="0 0 400 400">
@@ -314,11 +369,77 @@ footer h2 em{font-style:italic;color:var(--gold-soft);font-weight:500;}
       <text x="270" y="92" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2116" opacity="0.55">40%</text>
     </svg>
     <div class="plot-legend">
-      <div class="plot-row"><div class="name"><span class="swatch" style="background:#3F4A32"></span>Hotel</div><div><span class="pct">40%</span><span class="m2">680 m²</span></div></div>
-      <div class="plot-row"><div class="name"><span class="swatch" style="background:#B08D3E"></span>Moradias</div><div><span class="pct">20%</span><span class="m2">340 m²</span></div></div>
-      <div class="plot-row"><div class="name"><span class="swatch" style="background:#E4DBC6;border:1px solid #1B2116"></span>Área livre</div><div><span class="pct">40%</span><span class="m2">680 m²</span></div></div>
+      <div class="plot-row"><div class="name"><span class="swatch" style="background:#3F4A32"></span>Hotel</div><div><span class="pct">40%</span><span class="m2">até 680&nbsp;m²</span></div></div>
+      <div class="plot-row"><div class="name"><span class="swatch" style="background:#B08D3E"></span>Moradias</div><div><span class="pct">20%</span><span class="m2">até 340&nbsp;m²</span></div></div>
+      <div class="plot-row"><div class="name"><span class="swatch" style="background:#E4DBC6;border:1px solid #1B2116"></span>Área livre</div><div><span class="pct">40%</span><span class="m2">no mínimo 680&nbsp;m²</span></div></div>
     </div>
   </div>
+</section>
+
+<section id="modelos" class="modelos-section reveal">
+  <div class="section-head">
+    <div class="eyebrow">Cinco propostas</div>
+    <h2>O mesmo terreno, cinco caminhos</h2>
+    <p>Cinco maneiras de ocupar os mesmos 1.700&nbsp;m². Muda a posição do hotel, a forma da piscina e o modo como as dez moradias se arrumam no lote — o programa é o mesmo, a experiência não.</p>
+  </div>
+
+  <div class="modelos-grid">
+      <article class="modelo-card">
+        <div class="modelo-n">01</div>
+        <h3>U-Resort<span class="modelo-sub">Centralizado</span></h3>
+        <ul class="modelo-zonas">
+          <li>Hotel a sul com estacionamento em cave, recepção, três salas de reunião modulares e restaurante de eventos no R/C.</li>
+          <li>Duas linhas de cinco moradias a nascente e poente, voltadas para o interior.</li>
+          <li>Piscina retangular ao centro, com deck, bar de apoio e pomar em redor.</li>
+        </ul>
+      </article>
+      <article class="modelo-card">
+        <div class="modelo-n">02</div>
+        <h3>Terraço Linear<span class="modelo-sub">com cascata</span></h3>
+        <ul class="modelo-zonas">
+          <li>Hotel em linha ao longo da fronteira norte — recepção e spa no R/C, quartos nos pisos de cima.</li>
+          <li>Piscina de borda infinita numa plataforma sobreelevada, com cascata a desaguar na zona verde.</li>
+          <li>Dez moradias em banda curva a sul, com o pomar a servir de barreira verde.</li>
+        </ul>
+      </article>
+      <article class="modelo-card">
+        <div class="modelo-n">03</div>
+        <h3>Vila Alentejana<span class="modelo-sub">desconstruída</span></h3>
+        <ul class="modelo-zonas">
+          <li>Quatro edifícios baixos espalhados pelo pomar: recepção e lounge, spa, e o bloco das três salas de reunião.</li>
+          <li>Piscina de formato orgânico, estilo lagoa, com ilha central e bar de madeira.</li>
+          <li>Dez moradias em três núcleos, com pátios de pedra entre elas.</li>
+        </ul>
+      </article>
+      <article class="modelo-card">
+        <div class="modelo-n">04</div>
+        <h3>Edifício Integrado<span class="modelo-sub">de uso misto</span></h3>
+        <ul class="modelo-zonas">
+          <li>Hotel único a poente, com cave de garagem e serviços, R/C de recepção, spa, restaurante e salas de reunião.</li>
+          <li>Linha contínua de dez moradias geminadas a nascente, paralela ao hotel.</li>
+          <li>Corredor verde aberto ao centro a separar a zona residencial da zona do hotel.</li>
+        </ul>
+      </article>
+      <article class="modelo-card">
+        <div class="modelo-n">05</div>
+        <h3>Oásis de Eventos<span class="modelo-sub">com relvado de cerimónias</span></h3>
+        <ul class="modelo-zonas">
+          <li>Pavilhão de eventos e restaurante a sul, com caixilharia de vidro dobrável sobre o relvado de cerimónias.</li>
+          <li>Piscina ao lado do relvado, com cocktail bar e iluminação noturna.</li>
+          <li>Hotel e moradias concentrados a norte — zona silenciosa, resguardada dos eventos.</li>
+        </ul>
+      </article>
+  </div>
+
+  <div class="ficha-tecnica">
+    <div class="ficha-linha"><span class="ficha-k">Área do lote</span><span class="ficha-v">1.700&nbsp;m²</span></div>
+    <div class="ficha-linha"><span class="ficha-k">Implantação do hotel</span><span class="ficha-v">até 40%</span></div>
+    <div class="ficha-linha"><span class="ficha-k">Implantação das moradias</span><span class="ficha-v">até 20%</span></div>
+    <div class="ficha-linha"><span class="ficha-k">Moradia duplex</span><span class="ficha-v">100&nbsp;m² · 2 pisos</span></div>
+    <div class="ficha-linha"><span class="ficha-k">Rooftop por moradia</span><span class="ficha-v">30&nbsp;m² · jacuzzi</span></div>
+    <div class="ficha-linha"><span class="ficha-k">Piscina</span><span class="ficha-v">200&nbsp;m²</span></div>
+  </div>
+  <p class="nota-areas">Áreas indicativas, sujeitas a projeto de licenciamento.</p>
 </section>
 
 <section class="tour-section reveal" id="tour">
@@ -346,9 +467,9 @@ footer h2 em{font-style:italic;color:var(--gold-soft);font-weight:500;}
     <h2>O que o projeto propõe</h2>
   </div>
   <div class="concept-grid">
-    <div class="concept-card"><div class="num">01</div><h3>Hotel de escala pequena</h3><p>Volume principal até 40% do terreno, com a melhor orientação solar e vistas.</p></div>
-    <div class="concept-card"><div class="num">02</div><h3>Moradias de apoio</h3><p>Até 20% para moradias — alojamento adicional, gestão ou unidades autónomas.</p></div>
-    <div class="concept-card"><div class="num">03</div><h3>Área livre preservada</h3><p>40% de logradouro, acessos e zona verde — respiração entre a construção e o limite do terreno.</p></div>
+    <div class="concept-card"><div class="num">01</div><h3>Hotel de escala pequena</h3><p>Volume principal até 40% de implantação, com a melhor orientação solar e vistas. Recepção, spa, salas de reunião e quartos.</p></div>
+    <div class="concept-card"><div class="num">02</div><h3>Moradias de apoio</h3><p>Moradias duplex de 100&nbsp;m² — 50&nbsp;m² por piso, mais 30&nbsp;m² de rooftop com jacuzzi.</p></div>
+    <div class="concept-card"><div class="num">03</div><h3>Área livre preservada</h3><p>Logradouro, pomar e zona verde, com a piscina de 200&nbsp;m² como centro de estar do conjunto.</p></div>
   </div>
 </section>
 
@@ -356,7 +477,7 @@ footer h2 em{font-style:italic;color:var(--gold-soft);font-weight:500;}
   <h2>Do terreno vazio<br>ao <em>primeiro hóspede</em>.</h2>
   <div class="footer-bottom">
     <span>O TERRENO — PROJETO HOTELEIRO</span>
-    <span>1.700 M² · ÁREA A DEFINIR</span>
+    <span>1.700&nbsp;M² · ÁREA A DEFINIR</span>
   </div>
 </footer>
 
@@ -373,6 +494,12 @@ const menuBtn=document.getElementById('menuBtn'),menuPanel=document.getElementBy
 function toggleMenu(){const o=menuPanel.classList.toggle('open');menuOverlay.classList.toggle('open',o);menuBtn.classList.toggle('open',o);}
 menuBtn.addEventListener('click',toggleMenu);
 menuOverlay.addEventListener('click',toggleMenu);
+menuPanel.addEventListener('click',(e)=>{
+  if(e.target.closest('.model-row')) toggleMenu();   // fecha antes de saltar para a secção
+});
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='Escape'&&menuPanel.classList.contains('open')) toggleMenu();
+});
 
 /* ════════ SCROLL-LOCKED HERO ════════ */
 (function(){
