@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
   :root{
     --sand:#EFE8D8;
@@ -80,6 +79,57 @@
   .model-row .model-i{ font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--gold-soft); opacity:0.8; }
   .model-row .tag{ transition:opacity 0.25s, border-color 0.25s, color 0.25s; font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.06em; opacity:0.5; border:1px solid rgba(239,232,216,0.25); padding:4px 10px; border-radius:100px; }
 
+  /* submenu "Modelos" dentro do painel do menu */
+  .model-row--toggle{ width:100%; background:none; border:none; border-bottom:1px solid rgba(239,232,216,0.12); font-size:14px; cursor:pointer; text-align:left; font-family:inherit; }
+  .model-row--toggle .chev{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--gold-soft); opacity:0.7; transition:transform 0.3s ease; }
+  .model-row--toggle.open .chev{ transform:rotate(90deg); }
+  .submenu{ overflow:hidden; max-height:0; transition:max-height 0.4s cubic-bezier(.6,0,.2,1); }
+  .submenu.open{ max-height:320px; }
+  .submenu a{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 0 14px 22px; border-bottom:1px solid rgba(239,232,216,0.08);
+    font-size:13.5px; text-decoration:none; color:var(--sand); opacity:0.78;
+    transition:padding-left 0.25s ease, opacity 0.25s ease;
+  }
+  .submenu a:hover, .submenu a:focus-visible{ padding-left:30px; opacity:1; outline:none; }
+  .submenu a .sub-i{ font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--gold-soft); opacity:0.8; margin-right:10px; }
+
+  /* VISTA DE MODELO (desliza a partir do lado) */
+  .modelo-view{
+    position:fixed; inset:0; z-index:150;
+    background:var(--olive-deep); color:var(--sand);
+    transform:translateX(100%);
+    transition:transform 0.55s cubic-bezier(.6,0,.2,1);
+    display:flex; flex-direction:column;
+    overflow-y:auto;
+  }
+  .modelo-view.open{ transform:translateX(0); }
+  .modelo-view-top{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:26px 6vw; border-bottom:1px solid rgba(239,232,216,0.14);
+  }
+  .modelo-back{
+    display:flex; align-items:center; gap:10px;
+    background:none; border:1px solid rgba(239,232,216,0.3); border-radius:100px;
+    color:var(--sand); font-family:'IBM Plex Mono', monospace; font-size:11px;
+    letter-spacing:0.08em; padding:9px 16px; cursor:pointer;
+    transition:background 0.25s, border-color 0.25s;
+  }
+  .modelo-back:hover{ background:rgba(239,232,216,0.1); border-color:var(--gold-soft); }
+  .modelo-view-tag{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.1em; color:var(--gold-soft); opacity:0.85; }
+  .modelo-view-body{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:80px 6vw 100px; gap:22px;
+  }
+  .modelo-view-body h2{ font-size:clamp(34px,5vw,60px); }
+  .modelo-view-body h2 em{ font-style:italic; color:var(--gold-soft); font-weight:500; }
+  .em-breve{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.14em;
+    text-transform:uppercase; color:var(--night); background:var(--gold-soft);
+    padding:8px 18px; border-radius:100px;
+  }
+  .modelo-view-body p{ max-width:52ch; font-size:15px; line-height:1.7; opacity:0.68; }
+
   /* TAGS / STATUS */
   .tag{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:6px 12px; border-radius:100px; white-space:nowrap; }
   .tag-ok{ background:var(--olive); color:var(--sand); }
@@ -111,17 +161,6 @@
   .roadmap-item h3{ font-size:19px; margin-bottom:8px; font-weight:600; }
   .roadmap-item p{ font-size:14px; line-height:1.65; opacity:0.72; max-width:60ch; }
 
-  /* EVOLUÇÃO DA CONSTRUÇÃO (crossfade ligado ao scroll, sem prender o rato) */
-  .evolucao-track{ position:relative; height:480vh; }
-  .evolucao-sticky{ position:sticky; top:0; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; }
-  .evolucao-frame{ position:relative; width:min(1100px,88vw); aspect-ratio:16/10; border-radius:6px; overflow:hidden; border:1px solid var(--line); background:var(--sand-dim); }
-  .evolucao-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .evolucao-caption{ display:flex; flex-direction:column; align-items:center; gap:14px; }
-  .evolucao-label{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.1em; color:var(--ink); opacity:0.7; }
-  .evolucao-dots{ display:flex; gap:10px; }
-  .evolucao-dot{ width:9px; height:9px; border-radius:50%; background:var(--line); border:none; padding:0; cursor:pointer; transition:background 0.2s, transform 0.2s; }
-  .evolucao-dot.active{ background:var(--gold); transform:scale(1.35); }
-
   /* SCROLL-LOCKED HERO */
   /* O trilho dá a altura de scroll; o hero fica colado (sticky) dentro dele. */
   .scroll-track{ position:relative; height:500vh; }
@@ -151,6 +190,7 @@
   }
   .hero-panel.active{ opacity:1; transform:translateY(0); }
   .hero-panel.done{ opacity:0; transform:translateY(-40px); }
+  .hero-panel .step-num{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.12em; color:var(--gold-soft); opacity:0.8; margin-bottom:20px; }
   .hero-panel h1{ color:white; font-size:clamp(38px,7vw,88px); letter-spacing:-0.01em; max-width:14ch; line-height:1.08; }
   .hero-panel h1 em{ font-style:italic; color:var(--gold-soft); font-weight:500; }
   .hero-panel .hero-sub-text{ margin-top:20px; color:rgba(239,232,216,0.7); font-size:clamp(14px,1.6vw,17px); max-width:44ch; line-height:1.6; }
@@ -227,60 +267,6 @@
   .ficha-v{ font-family:'IBM Plex Mono', monospace; font-size:14px; color:var(--gold-soft); font-variant-numeric:tabular-nums; white-space:nowrap; }
   .nota-areas{ margin-top:22px; font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; opacity:0.4; }
 
-  /* 360 SECTION */
-  .tour-section{ background:var(--night); padding-bottom:100px; }
-  .tour-section .section-head h2, .tour-section .section-head p{ color:var(--sand); }
-  .tour-section .section-head p{ opacity:0.6; }
-  .tour-section .eyebrow{ color:var(--gold-soft); opacity:1;}
-  .tour-frame{
-    position:relative;
-    width:100%;
-    aspect-ratio:16/9;
-    border-radius:6px;
-    overflow:hidden;
-    border:1px solid rgba(239,232,216,0.12);
-    cursor:grab;
-    background:#000;
-  }
-  .tour-frame.dragging{ cursor:grabbing; }
-  .tour-frame canvas{ display:block; width:100%; height:100%; }
-  .tour-ui{
-    position:absolute; inset:0; pointer-events:none;
-    display:flex; flex-direction:column; justify-content:space-between;
-  }
-  .tour-top{ display:flex; justify-content:space-between; padding:20px; }
-  .tour-badge{
-    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.08em;
-    color:var(--sand); background:rgba(0,0,0,0.35); border:1px solid rgba(239,232,216,0.2);
-    padding:6px 10px; border-radius:100px; backdrop-filter:blur(4px);
-  }
-  .tour-zoom{
-    display:flex; flex-direction:column; gap:6px; pointer-events:auto;
-  }
-  .tour-zoom button{
-    width:30px; height:30px; border-radius:100px; border:1px solid rgba(239,232,216,0.25);
-    background:rgba(0,0,0,0.35); color:var(--sand); font-size:15px; cursor:pointer;
-    backdrop-filter:blur(4px);
-  }
-  .tour-zoom button:hover{ background:rgba(0,0,0,0.55); }
-  .tour-bottom{
-    display:flex; gap:8px; padding:18px 20px; flex-wrap:wrap; pointer-events:auto;
-  }
-  .hotspot-btn{
-    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.05em;
-    color:var(--sand); background:rgba(0,0,0,0.35); border:1px solid rgba(239,232,216,0.2);
-    padding:8px 14px; border-radius:100px; cursor:pointer; backdrop-filter:blur(4px);
-    transition:background 0.2s, border-color 0.2s;
-  }
-  .hotspot-btn:hover, .hotspot-btn.active{ background:var(--gold); color:var(--night); border-color:var(--gold); }
-  .tour-hint{
-    font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--sand); opacity:0.45;
-    margin-top:16px; letter-spacing:0.02em;
-  }
-  .tour-note{
-    margin-top:20px; font-size:13px; color:var(--sand); opacity:0.5; max-width:60ch; line-height:1.6;
-  }
-
   /* CONCEPT */
   .concept-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:2px; background:var(--line); border:1px solid var(--line); }
   .concept-card{ background:var(--sand); padding:40px 32px; }
@@ -342,9 +328,30 @@
   <a class="model-row" href="#expansao"><span class="name"><span class="model-i">03</span>Índice alargado + mista</span><span class="tag">VER</span></a>
   <a class="model-row" href="#modelos"><span class="name"><span class="model-i">04</span>5 estudos volumétricos</span><span class="tag">VER</span></a>
   <a class="model-row" href="#proximos-passos"><span class="name"><span class="model-i">05</span>Próximos passos</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#evolucao"><span class="name"><span class="model-i">06</span>Evolução da construção</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#tour"><span class="name"><span class="model-i">07</span>Visita 360º</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#concept"><span class="name"><span class="model-i">08</span>Regulamento atual</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#concept"><span class="name"><span class="model-i">06</span>Regulamento atual</span><span class="tag">VER</span></a>
+  <button class="model-row model-row--toggle" id="modelosToggle" aria-expanded="false" aria-controls="modelosSubmenu">
+    <span class="name"><span class="model-i">07</span>Modelos</span><span class="chev">›</span>
+  </button>
+  <div class="submenu" id="modelosSubmenu">
+    <a href="#" data-modelo="1"><span><span class="sub-i">01</span>Modelo 1</span><span class="tag">ABRIR</span></a>
+    <a href="#" data-modelo="2"><span><span class="sub-i">02</span>Modelo 2</span><span class="tag">ABRIR</span></a>
+    <a href="#" data-modelo="3"><span><span class="sub-i">03</span>Modelo 3</span><span class="tag">ABRIR</span></a>
+    <a href="#" data-modelo="4"><span><span class="sub-i">04</span>Modelo 4</span><span class="tag">ABRIR</span></a>
+    <a href="#" data-modelo="5"><span><span class="sub-i">05</span>Modelo 5</span><span class="tag">ABRIR</span></a>
+  </div>
+</div>
+
+<!-- VISTA DE MODELO (desliza a partir do lado) -->
+<div class="modelo-view" id="modeloView" aria-hidden="true">
+  <div class="modelo-view-top">
+    <button class="modelo-back" id="modeloBack">‹ VOLTAR AO TERRENO</button>
+    <span class="modelo-view-tag" id="modeloViewTag">MODELO 1</span>
+  </div>
+  <div class="modelo-view-body">
+    <h2 id="modeloViewTitle">Modelo <em>1</em></h2>
+    <span class="em-breve">Em breve</span>
+    <p>Este modelo vai mostrar o terreno construído — hotel, casas, jardim e piscina — com a construção a montar-se à medida que percorres a página, e cada edifício clicável para ver o conceito por dentro.</p>
+  </div>
 </div>
 
 <!-- SCROLL-LOCKED HERO -->
@@ -362,20 +369,25 @@
 
   <div class="hero-panels" id="heroPanels">
     <div class="hero-panel active" data-panel="0">
+      <div class="step-num">O TERRENO</div>
       <h1>Um terreno.<br><em>Um hotel</em> por construir.</h1>
     </div>
     <div class="hero-panel" data-panel="1">
+      <div class="step-num">DIMENSÃO</div>
       <h1>17.500&nbsp;m²<br>de <em>possibilidade</em>.</h1>
     </div>
     <div class="hero-panel" data-panel="2">
+      <div class="step-num">ÍNDICE ATUAL</div>
       <h1>40% para<br>o <em>hotel</em>.</h1>
       <p class="hero-sub-text">Até 7.000&nbsp;m² de implantação, em três pisos acima do solo — fachada até 12&nbsp;m, subsolo sem limite de pisos.</p>
     </div>
     <div class="hero-panel" data-panel="3">
+      <div class="step-num">PROCESSO</div>
       <h1>PDM em<br><em>revisão</em>.</h1>
       <p class="hero-sub-text">A classificação está a mudar de Equipamento para Serviços e Turismo. Índice alargado e tipologia mista em avaliação junto da Câmara.</p>
     </div>
     <div class="hero-panel" data-panel="4">
+      <div class="step-num">VISÃO</div>
       <h1>Do terreno vazio<br>ao primeiro <em>hóspede</em>.</h1>
       <p class="hero-sub-text">Percorre o projeto antes de ele existir.</p>
     </div>
@@ -592,53 +604,6 @@
   </div>
 </section>
 
-<section id="evolucao" class="reveal">
-  <div class="section-head">
-    <div class="eyebrow">Evolução da construção</div>
-    <h2>Do terreno vazio ao hotel pronto</h2>
-    <p>Ilustrações provisórias, ligadas ao scroll — assim que a obra avançar, estas imagens são substituídas pelas fotos reais de cada fase, mantendo a mesma passagem entre estágios.</p>
-  </div>
-  <div class="evolucao-track" id="evolucaoTrack">
-    <div class="evolucao-sticky">
-      <div class="evolucao-frame">
-        <img class="evolucao-img" data-stage="0" src="images/evolucao/00-terreno-ilustrativo.svg" alt="Terreno ilustrativo">
-        <img class="evolucao-img" data-stage="1" src="images/evolucao/01-terreno-limpo.svg" alt="Terreno limpo">
-        <img class="evolucao-img" data-stage="2" src="images/evolucao/02-25pc.svg" alt="25% construído">
-        <img class="evolucao-img" data-stage="3" src="images/evolucao/03-50pc.svg" alt="50% construído">
-        <img class="evolucao-img" data-stage="4" src="images/evolucao/04-75pc.svg" alt="75% construído">
-        <img class="evolucao-img" data-stage="5" src="images/evolucao/05-100pc.svg" alt="100% construído">
-      </div>
-      <div class="evolucao-caption">
-        <div class="evolucao-label" id="evolucaoLabel">TERRENO · ILUSTRATIVO</div>
-        <div class="evolucao-dots" id="evolucaoDots"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="tour-section reveal" id="tour">
-  <div class="section-head">
-    <div class="eyebrow">Visita virtual · 360º</div>
-    <h2>Percorrer o projeto antes de o construir</h2>
-    <p>Uma pré-visualização do tipo de tour que o hotel terá quando estiver de pé: arraste ou use a roda do rato para olhar em redor, e aproxime para ver detalhe. Esta cena é ilustrativa — será substituída pelas renderizações 3D reais ou fotografias 360º do projeto final.</p>
-  </div>
-
-  <div class="tour-frame" id="tourFrame">
-    <div class="tour-ui">
-      <div class="tour-top">
-        <span class="tour-badge" id="tourLabel">VISTA · AÉREA DO TERRENO</span>
-        <div class="tour-zoom">
-          <button id="zoomIn">+</button>
-          <button id="zoomOut">–</button>
-        </div>
-      </div>
-      <div class="tour-bottom" id="hotspotBar"></div>
-    </div>
-  </div>
-  <p class="tour-hint">ARRASTAR PARA OLHAR · RODA DO RATO PARA PERCORRER · BOTÕES PARA AMPLIAR</p>
-  <p class="tour-note">Nota: como o hotel ainda não foi construído, esta demonstração usa uma cena gerada para mostrar a interação (percurso 360º + zoom). Assim que existirem fotografias 360º reais ou renders 3D do projeto, substituem-se diretamente por estas.</p>
-</section>
-
 <section id="concept" class="reveal">
   <div class="section-head">
     <div class="eyebrow">Parâmetros confirmados</div>
@@ -692,10 +657,52 @@
   menuBtn.addEventListener('click', toggleMenu);
   menuOverlay.addEventListener('click', toggleMenu);
   menuPanel.addEventListener('click', (e)=>{
-    if(e.target.closest('.model-row')) toggleMenu();
+    // o botão "Modelos" abre o submenu — não fecha o menu
+    if(e.target.closest('.model-row--toggle')) return;
+    if(e.target.closest('a.model-row')) toggleMenu();
   });
   document.addEventListener('keydown', (e)=>{
     if(e.key==='Escape' && menuPanel.classList.contains('open')) toggleMenu();
+  });
+
+  /* --- submenu "Modelos" --- */
+  const modelosToggle = document.getElementById('modelosToggle');
+  const modelosSubmenu = document.getElementById('modelosSubmenu');
+  modelosToggle.addEventListener('click', ()=>{
+    const open = modelosSubmenu.classList.toggle('open');
+    modelosToggle.classList.toggle('open', open);
+    modelosToggle.setAttribute('aria-expanded', String(open));
+  });
+
+  /* --- vista de modelo (desliza a partir do lado) --- */
+  const modeloView = document.getElementById('modeloView');
+  const modeloBack = document.getElementById('modeloBack');
+  const modeloTag = document.getElementById('modeloViewTag');
+  const modeloTitle = document.getElementById('modeloViewTitle');
+
+  function openModelo(n){
+    modeloTag.textContent = 'MODELO ' + n;
+    modeloTitle.innerHTML = 'Modelo <em>' + n + '</em>';
+    modeloView.classList.add('open');
+    modeloView.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+    if(menuPanel.classList.contains('open')) toggleMenu();
+  }
+  function closeModelo(){
+    modeloView.classList.remove('open');
+    modeloView.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+  }
+
+  modelosSubmenu.addEventListener('click', (e)=>{
+    const link = e.target.closest('a[data-modelo]');
+    if(!link) return;
+    e.preventDefault();
+    openModelo(link.dataset.modelo);
+  });
+  modeloBack.addEventListener('click', closeModelo);
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Escape' && modeloView.classList.contains('open')) closeModelo();
   });
 })();
 
@@ -804,57 +811,6 @@
   window.addEventListener('resize', ()=>{ setTrackHeight(); setPanel(stop); });
 })();
 
-/* ---------------- EVOLUÇÃO DA CONSTRUÇÃO (crossfade ligado ao scroll) ---------------- */
-(function(){
-  const track = document.getElementById('evolucaoTrack');
-  if(!track) return;
-  const imgs = Array.from(document.querySelectorAll('.evolucao-img'));
-  const label = document.getElementById('evolucaoLabel');
-  const dotsWrap = document.getElementById('evolucaoDots');
-  const STAGE_LABELS = ['TERRENO · ILUSTRATIVO','TERRENO · LIMPO','25% CONSTRUÍDO','50% CONSTRUÍDO','75% CONSTRUÍDO','100% CONSTRUÍDO'];
-  const N = imgs.length;
-
-  dotsWrap.innerHTML = STAGE_LABELS.map((_,i)=>
-    `<button class="evolucao-dot${i===0?' active':''}" data-i="${i}" aria-label="Fase ${i+1}"></button>`
-  ).join('');
-
-  function stageTop(i){
-    const total = track.offsetHeight - window.innerHeight;
-    const trackTop = track.getBoundingClientRect().top + window.scrollY;
-    return trackTop + (total * i/(N-1));
-  }
-
-  dotsWrap.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.evolucao-dot');
-    if(!btn) return;
-    window.scrollTo({ top: stageTop(parseInt(btn.dataset.i,10)), behavior:'smooth' });
-  });
-
-  let ticking = false;
-  function update(){
-    ticking = false;
-    const rect = track.getBoundingClientRect();
-    const total = track.offsetHeight - window.innerHeight;
-    const raw = total>0 ? -rect.top/total : 0;
-    const p = Math.min(Math.max(raw,0),1) * (N-1);
-    const idx = Math.min(Math.floor(p), N-2);
-    const frac = p - idx;
-
-    imgs.forEach((img,i)=>{
-      if(i===idx) img.style.opacity = String(1-frac);
-      else if(i===idx+1) img.style.opacity = String(frac);
-      else img.style.opacity = '0';
-    });
-
-    const nearest = Math.min(Math.round(p), N-1);
-    label.textContent = STAGE_LABELS[nearest];
-    dotsWrap.querySelectorAll('.evolucao-dot').forEach((d,i)=> d.classList.toggle('active', i===nearest));
-  }
-  window.addEventListener('scroll', ()=>{ if(!ticking){ ticking=true; requestAnimationFrame(update); } }, { passive:true });
-  window.addEventListener('resize', update);
-  update();
-})();
-
 /* ---------------- REVEAL ON SCROLL ---------------- */
 (function(){
   const els = document.querySelectorAll('.reveal');
@@ -864,268 +820,6 @@
   els.forEach(el=> obs.observe(el));
 })();
 
-/* ---------------- 360 PANORAMA VIEWER ---------------- */
-(function(){
-  const frame = document.getElementById('tourFrame');
-  const label = document.getElementById('tourLabel');
-  const hotspotBar = document.getElementById('hotspotBar');
-  if(!frame) return;
-  if(typeof THREE === 'undefined'){
-    const aviso = document.createElement('p');
-    aviso.className = 'tour-hint';
-    aviso.textContent = 'A VISITA 360º NÃO CARREGOU — VERIFIQUE A LIGAÇÃO À INTERNET.';
-    frame.after(aviso);
-    return;
-  }
-
-  // Assim que houver fotos/renders 360º reais, troca cada cena para
-  // { name:'...', lon:0, img:'images/tour/nome-do-ficheiro.jpg' } —
-  // sem "mode", a cena processual deixa de ser usada para essa entrada.
-  const scenes = [
-    { name:'VISTA · AÉREA DO TERRENO', lon: 0,   mode:'day' },
-    { name:'HOTEL · FACHADA PRINCIPAL', lon: 95,  mode:'day' },
-    { name:'CASAS · ZONA POENTE',    lon: 210, mode:'day' },
-    { name:'ÁREA VERDE · LOGRADOURO',   lon: 300, mode:'night' },
-  ];
-  let currentSceneIdx = 0;
-
-  hotspotBar.innerHTML = scenes.map((s,i)=>
-    `<button class="hotspot-btn${i===0?' active':''}" data-i="${i}">${s.name.split(' · ')[0]}</button>`
-  ).join('');
-
-  // ---- procedural equirectangular texture ----
-  function makePanoTexture(mode){
-    const w = 2048, h = 1024;
-    const c = document.createElement('canvas');
-    c.width = w; c.height = h;
-    const ctx = c.getContext('2d');
-
-    const skyTop = mode==='night' ? '#0a0f16' : '#cfe0dd';
-    const skyMid = mode==='night' ? '#131c26' : '#e9d9b0';
-    const skyLow = mode==='night' ? '#1c2a33' : '#e7b16a';
-    const g = ctx.createLinearGradient(0,0,0,h*0.62);
-    g.addColorStop(0, skyTop);
-    g.addColorStop(0.6, skyMid);
-    g.addColorStop(1, skyLow);
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,w,h*0.62);
-
-    // sun / moon glow, placed away from seam
-    const glowX = w*0.28;
-    const glowY = h*0.42;
-    const glow = ctx.createRadialGradient(glowX,glowY,0,glowX,glowY, mode==='night'?90:220);
-    glow.addColorStop(0, mode==='night' ? 'rgba(216,190,132,0.9)' : 'rgba(255,240,210,0.95)');
-    glow.addColorStop(1, 'rgba(255,240,210,0)');
-    ctx.fillStyle = glow;
-    ctx.fillRect(0,0,w,h*0.62);
-
-    if(mode==='night'){
-      ctx.fillStyle = 'rgba(239,232,216,0.7)';
-      for(let i=0;i<220;i++){
-        const x = Math.random()*w, y = Math.random()*h*0.5;
-        const r = Math.random()*1.2;
-        ctx.globalAlpha = Math.random()*0.8+0.2;
-        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-    }
-
-    // ground
-    const groundG = ctx.createLinearGradient(0,h*0.6,0,h);
-    groundG.addColorStop(0, mode==='night' ? '#232c22' : '#5f6b3e');
-    groundG.addColorStop(1, mode==='night' ? '#141a13' : '#39432a');
-    ctx.fillStyle = groundG;
-    ctx.fillRect(0,h*0.6,w,h*0.4);
-
-    // rolling hills — periodic so left/right seam matches
-    function hillLayer(baseY, amp, freq, color, alpha){
-      ctx.beginPath();
-      ctx.moveTo(0,h);
-      for(let x=0;x<=w;x+=8){
-        const y = baseY + Math.sin((x/w)*Math.PI*2*freq)*amp + Math.sin((x/w)*Math.PI*2*freq*2.3)*amp*0.35;
-        ctx.lineTo(x,y);
-      }
-      ctx.lineTo(w,h); ctx.closePath();
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = color;
-      ctx.fill();
-      ctx.globalAlpha = 1;
-    }
-    hillLayer(h*0.66, 26, 3, mode==='night' ? '#1a2118' : '#7d8a52', 0.9);
-    hillLayer(h*0.61, 18, 5, mode==='night' ? '#141a13' : '#67723f', 0.9);
-
-    // simple hotel + villa silhouettes, kept away from x=0 / x=w seam
-    function building(x, y, wdt, hgt, color){
-      ctx.fillStyle = color;
-      ctx.fillRect(x, y-hgt, wdt, hgt);
-      // roofline
-      ctx.beginPath();
-      ctx.moveTo(x-6,y-hgt);
-      ctx.lineTo(x+wdt/2,y-hgt-18);
-      ctx.lineTo(x+wdt+6,y-hgt);
-      ctx.closePath();
-      ctx.fill();
-      // windows
-      ctx.fillStyle = mode==='night' ? 'rgba(216,190,132,0.85)' : 'rgba(20,20,15,0.35)';
-      for(let wx=x+10; wx<x+wdt-10; wx+=18){
-        for(let wy=y-hgt+14; wy<y-14; wy+=20){
-          ctx.fillRect(wx,wy,7,10);
-        }
-      }
-    }
-    const groundY = h*0.63;
-    building(w*0.36, groundY, 190, 120, mode==='night' ? '#2a231a' : '#4a4030'); // hotel
-    building(w*0.62, groundY, 70, 60, mode==='night' ? '#241f18' : '#403626');  // villa 1
-    building(w*0.70, groundY, 60, 48, mode==='night' ? '#241f18' : '#403626');  // villa 2
-
-    // trees
-    ctx.fillStyle = mode==='night' ? '#101b10' : '#2f3d20';
-    for(let i=0;i<26;i++){
-      const tx = (i*77 + 40) % w;
-      const ty = groundY + (i%5)*3;
-      ctx.beginPath(); ctx.arc(tx,ty-14,10,0,Math.PI*2); ctx.fill();
-      ctx.fillRect(tx-2,ty-6,4,10);
-    }
-
-    const tex = new THREE.CanvasTexture(c);
-    tex.wrapS = THREE.RepeatWrapping;
-    tex.needsUpdate = true;
-    return tex;
-  }
-
-  // ---- three.js scene ----
-  const width = frame.clientWidth, height = frame.clientHeight;
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, width/height, 1, 1100);
-  const renderer = new THREE.WebGLRenderer({ antialias:true });
-  renderer.setSize(width, height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-  frame.appendChild(renderer.domElement);
-
-  const geometry = new THREE.SphereGeometry(500, 60, 40);
-  geometry.scale(-1,1,1);
-  const dayTex = makePanoTexture('day');
-  const nightTex = makePanoTexture('night');
-  const material = new THREE.MeshBasicMaterial({ map: dayTex });
-  const mesh = new THREE.Mesh(geometry, material);
-  scene.add(mesh);
-
-  let lon = 0, lat = 0, targetLon = 0, targetLat = 0;
-  let isDragging = false, prevX = 0, prevY = 0;
-  const FOV_MIN = 32, FOV_MAX = 92;
-
-  // Cada cena pode ter uma foto/render 360º real (campo "img", equirretangular
-  // 2:1) em vez da cena processual — basta acrescentar `img:'caminho.jpg'` à
-  // cena em `scenes`, sem tocar em mais nada. Fica em cache depois de carregada.
-  const textureLoader = new THREE.TextureLoader();
-  const realTexCache = {};
-
-  function setScene(idx){
-    currentSceneIdx = idx;
-    const s = scenes[idx];
-    targetLon = s.lon;
-    label.textContent = s.name;
-    document.querySelectorAll('.hotspot-btn').forEach((b,i)=> b.classList.toggle('active', i===idx));
-
-    if(s.img){
-      if(realTexCache[s.img]){
-        material.map = realTexCache[s.img];
-        material.needsUpdate = true;
-      } else {
-        textureLoader.load(s.img, (tex)=>{
-          realTexCache[s.img] = tex;
-          if(currentSceneIdx === idx){ material.map = tex; material.needsUpdate = true; }
-        });
-      }
-    } else {
-      material.map = s.mode === 'night' ? nightTex : dayTex;
-      material.needsUpdate = true;
-    }
-  }
-
-  hotspotBar.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.hotspot-btn');
-    if(!btn) return;
-    setScene(parseInt(btn.dataset.i,10));
-  });
-
-  frame.addEventListener('pointerdown', (e)=>{
-    isDragging = true;
-    frame.classList.add('dragging');
-    prevX = e.clientX; prevY = e.clientY;
-  });
-  window.addEventListener('pointerup', ()=>{ isDragging = false; frame.classList.remove('dragging'); });
-  window.addEventListener('pointermove', (e)=>{
-    if(!isDragging) return;
-    const dx = e.clientX - prevX, dy = e.clientY - prevY;
-    prevX = e.clientX; prevY = e.clientY;
-    targetLon -= dx * 0.18;
-    targetLat = Math.max(-70, Math.min(70, targetLat + dy * 0.14));
-  });
-
-  // wheel = percorrer o 360 (rotate)
-  frame.addEventListener('wheel', (e)=>{
-    e.preventDefault();
-    targetLon += e.deltaY * 0.12;
-  }, { passive:false });
-
-  function zoom(delta){
-    camera.fov = Math.max(FOV_MIN, Math.min(FOV_MAX, camera.fov + delta));
-    camera.updateProjectionMatrix();
-  }
-  document.getElementById('zoomIn').addEventListener('click', ()=> zoom(-8));
-  document.getElementById('zoomOut').addEventListener('click', ()=> zoom(8));
-
-  // pinch to zoom (touch)
-  let pinchDist = null;
-  frame.addEventListener('touchstart', (e)=>{
-    if(e.touches.length===2){
-      const [a,b] = e.touches;
-      pinchDist = Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
-    } else if(e.touches.length===1){
-      isDragging = true; prevX = e.touches[0].clientX; prevY = e.touches[0].clientY;
-    }
-  }, { passive:true });
-  frame.addEventListener('touchmove', (e)=>{
-    if(e.touches.length===2 && pinchDist!==null){
-      const [a,b] = e.touches;
-      const d = Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
-      zoom((pinchDist-d)*0.15);
-      pinchDist = d;
-    } else if(e.touches.length===1 && isDragging){
-      const dx = e.touches[0].clientX - prevX, dy = e.touches[0].clientY - prevY;
-      prevX = e.touches[0].clientX; prevY = e.touches[0].clientY;
-      targetLon -= dx * 0.18;
-      targetLat = Math.max(-70, Math.min(70, targetLat + dy * 0.14));
-    }
-  }, { passive:true });
-  frame.addEventListener('touchend', ()=>{ isDragging=false; pinchDist=null; });
-
-  function animate(){
-    requestAnimationFrame(animate);
-    lon += (targetLon - lon) * 0.08;
-    lat += (targetLat - lat) * 0.08;
-    const phi = THREE.MathUtils.degToRad(90 - lat);
-    const theta = THREE.MathUtils.degToRad(lon);
-    camera.position.x = 0;
-    camera.position.y = 0;
-    camera.position.z = 0;
-    const target = new THREE.Vector3(
-      500 * Math.sin(phi) * Math.cos(theta),
-      500 * Math.cos(phi),
-      500 * Math.sin(phi) * Math.sin(theta)
-    );
-    camera.lookAt(target);
-    renderer.render(scene, camera);
-  }
-  window.addEventListener('resize', ()=>{
-    const w = frame.clientWidth, h = frame.clientHeight;
-    camera.aspect = w/h; camera.updateProjectionMatrix();
-    renderer.setSize(w,h);
-  });
-  setScene(0);
-  animate();
-})();
 </script>
 </body>
 </html>
