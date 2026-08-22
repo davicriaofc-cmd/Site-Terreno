@@ -111,6 +111,17 @@
   .roadmap-item h3{ font-size:19px; margin-bottom:8px; font-weight:600; }
   .roadmap-item p{ font-size:14px; line-height:1.65; opacity:0.72; max-width:60ch; }
 
+  /* EVOLUÇÃO DA CONSTRUÇÃO (crossfade ligado ao scroll, sem prender o rato) */
+  .evolucao-track{ position:relative; height:480vh; }
+  .evolucao-sticky{ position:sticky; top:0; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; }
+  .evolucao-frame{ position:relative; width:min(1100px,88vw); aspect-ratio:16/10; border-radius:6px; overflow:hidden; border:1px solid var(--line); background:var(--sand-dim); }
+  .evolucao-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .evolucao-caption{ display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .evolucao-label{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.1em; color:var(--ink); opacity:0.7; }
+  .evolucao-dots{ display:flex; gap:10px; }
+  .evolucao-dot{ width:9px; height:9px; border-radius:50%; background:var(--line); border:none; padding:0; cursor:pointer; transition:background 0.2s, transform 0.2s; }
+  .evolucao-dot.active{ background:var(--gold); transform:scale(1.35); }
+
   /* SCROLL-LOCKED HERO */
   /* O trilho dá a altura de scroll; o hero fica colado (sticky) dentro dele. */
   .scroll-track{ position:relative; height:500vh; }
@@ -140,7 +151,6 @@
   }
   .hero-panel.active{ opacity:1; transform:translateY(0); }
   .hero-panel.done{ opacity:0; transform:translateY(-40px); }
-  .hero-panel .step-num{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.12em; color:var(--gold-soft); opacity:0.8; margin-bottom:20px; }
   .hero-panel h1{ color:white; font-size:clamp(38px,7vw,88px); letter-spacing:-0.01em; max-width:14ch; line-height:1.08; }
   .hero-panel h1 em{ font-style:italic; color:var(--gold-soft); font-weight:500; }
   .hero-panel .hero-sub-text{ margin-top:20px; color:rgba(239,232,216,0.7); font-size:clamp(14px,1.6vw,17px); max-width:44ch; line-height:1.6; }
@@ -332,8 +342,9 @@
   <a class="model-row" href="#expansao"><span class="name"><span class="model-i">03</span>Índice alargado + mista</span><span class="tag">VER</span></a>
   <a class="model-row" href="#modelos"><span class="name"><span class="model-i">04</span>5 estudos volumétricos</span><span class="tag">VER</span></a>
   <a class="model-row" href="#proximos-passos"><span class="name"><span class="model-i">05</span>Próximos passos</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#tour"><span class="name"><span class="model-i">06</span>Visita 360º</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#concept"><span class="name"><span class="model-i">07</span>Regulamento atual</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#evolucao"><span class="name"><span class="model-i">06</span>Evolução da construção</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#tour"><span class="name"><span class="model-i">07</span>Visita 360º</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#concept"><span class="name"><span class="model-i">08</span>Regulamento atual</span><span class="tag">VER</span></a>
 </div>
 
 <!-- SCROLL-LOCKED HERO -->
@@ -351,25 +362,20 @@
 
   <div class="hero-panels" id="heroPanels">
     <div class="hero-panel active" data-panel="0">
-      <div class="step-num">01 — O TERRENO</div>
       <h1>Um terreno.<br><em>Um hotel</em> por construir.</h1>
     </div>
     <div class="hero-panel" data-panel="1">
-      <div class="step-num">02 — DIMENSÃO</div>
       <h1>17.500&nbsp;m²<br>de <em>possibilidade</em>.</h1>
     </div>
     <div class="hero-panel" data-panel="2">
-      <div class="step-num">03 — ÍNDICE ATUAL</div>
       <h1>40% para<br>o <em>hotel</em>.</h1>
       <p class="hero-sub-text">Até 7.000&nbsp;m² de implantação, em três pisos acima do solo — fachada até 12&nbsp;m, subsolo sem limite de pisos.</p>
     </div>
     <div class="hero-panel" data-panel="3">
-      <div class="step-num">04 — PROCESSO</div>
       <h1>PDM em<br><em>revisão</em>.</h1>
       <p class="hero-sub-text">A classificação está a mudar de Equipamento para Serviços e Turismo. Índice alargado e tipologia mista em avaliação junto da Câmara.</p>
     </div>
     <div class="hero-panel" data-panel="4">
-      <div class="step-num">05 — VISÃO</div>
       <h1>Do terreno vazio<br>ao primeiro <em>hóspede</em>.</h1>
       <p class="hero-sub-text">Percorre o projeto antes de ele existir.</p>
     </div>
@@ -586,6 +592,30 @@
   </div>
 </section>
 
+<section id="evolucao" class="reveal">
+  <div class="section-head">
+    <div class="eyebrow">Evolução da construção</div>
+    <h2>Do terreno vazio ao hotel pronto</h2>
+    <p>Ilustrações provisórias, ligadas ao scroll — assim que a obra avançar, estas imagens são substituídas pelas fotos reais de cada fase, mantendo a mesma passagem entre estágios.</p>
+  </div>
+  <div class="evolucao-track" id="evolucaoTrack">
+    <div class="evolucao-sticky">
+      <div class="evolucao-frame">
+        <img class="evolucao-img" data-stage="0" src="images/evolucao/00-terreno-ilustrativo.svg" alt="Terreno ilustrativo">
+        <img class="evolucao-img" data-stage="1" src="images/evolucao/01-terreno-limpo.svg" alt="Terreno limpo">
+        <img class="evolucao-img" data-stage="2" src="images/evolucao/02-25pc.svg" alt="25% construído">
+        <img class="evolucao-img" data-stage="3" src="images/evolucao/03-50pc.svg" alt="50% construído">
+        <img class="evolucao-img" data-stage="4" src="images/evolucao/04-75pc.svg" alt="75% construído">
+        <img class="evolucao-img" data-stage="5" src="images/evolucao/05-100pc.svg" alt="100% construído">
+      </div>
+      <div class="evolucao-caption">
+        <div class="evolucao-label" id="evolucaoLabel">TERRENO · ILUSTRATIVO</div>
+        <div class="evolucao-dots" id="evolucaoDots"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="tour-section reveal" id="tour">
   <div class="section-head">
     <div class="eyebrow">Visita virtual · 360º</div>
@@ -774,6 +804,57 @@
   window.addEventListener('resize', ()=>{ setTrackHeight(); setPanel(stop); });
 })();
 
+/* ---------------- EVOLUÇÃO DA CONSTRUÇÃO (crossfade ligado ao scroll) ---------------- */
+(function(){
+  const track = document.getElementById('evolucaoTrack');
+  if(!track) return;
+  const imgs = Array.from(document.querySelectorAll('.evolucao-img'));
+  const label = document.getElementById('evolucaoLabel');
+  const dotsWrap = document.getElementById('evolucaoDots');
+  const STAGE_LABELS = ['TERRENO · ILUSTRATIVO','TERRENO · LIMPO','25% CONSTRUÍDO','50% CONSTRUÍDO','75% CONSTRUÍDO','100% CONSTRUÍDO'];
+  const N = imgs.length;
+
+  dotsWrap.innerHTML = STAGE_LABELS.map((_,i)=>
+    `<button class="evolucao-dot${i===0?' active':''}" data-i="${i}" aria-label="Fase ${i+1}"></button>`
+  ).join('');
+
+  function stageTop(i){
+    const total = track.offsetHeight - window.innerHeight;
+    const trackTop = track.getBoundingClientRect().top + window.scrollY;
+    return trackTop + (total * i/(N-1));
+  }
+
+  dotsWrap.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.evolucao-dot');
+    if(!btn) return;
+    window.scrollTo({ top: stageTop(parseInt(btn.dataset.i,10)), behavior:'smooth' });
+  });
+
+  let ticking = false;
+  function update(){
+    ticking = false;
+    const rect = track.getBoundingClientRect();
+    const total = track.offsetHeight - window.innerHeight;
+    const raw = total>0 ? -rect.top/total : 0;
+    const p = Math.min(Math.max(raw,0),1) * (N-1);
+    const idx = Math.min(Math.floor(p), N-2);
+    const frac = p - idx;
+
+    imgs.forEach((img,i)=>{
+      if(i===idx) img.style.opacity = String(1-frac);
+      else if(i===idx+1) img.style.opacity = String(frac);
+      else img.style.opacity = '0';
+    });
+
+    const nearest = Math.min(Math.round(p), N-1);
+    label.textContent = STAGE_LABELS[nearest];
+    dotsWrap.querySelectorAll('.evolucao-dot').forEach((d,i)=> d.classList.toggle('active', i===nearest));
+  }
+  window.addEventListener('scroll', ()=>{ if(!ticking){ ticking=true; requestAnimationFrame(update); } }, { passive:true });
+  window.addEventListener('resize', update);
+  update();
+})();
+
 /* ---------------- REVEAL ON SCROLL ---------------- */
 (function(){
   const els = document.querySelectorAll('.reveal');
@@ -797,6 +878,9 @@
     return;
   }
 
+  // Assim que houver fotos/renders 360º reais, troca cada cena para
+  // { name:'...', lon:0, img:'images/tour/nome-do-ficheiro.jpg' } —
+  // sem "mode", a cena processual deixa de ser usada para essa entrada.
   const scenes = [
     { name:'VISTA · AÉREA DO TERRENO', lon: 0,   mode:'day' },
     { name:'HOTEL · FACHADA PRINCIPAL', lon: 95,  mode:'day' },
@@ -930,14 +1014,33 @@
   let isDragging = false, prevX = 0, prevY = 0;
   const FOV_MIN = 32, FOV_MAX = 92;
 
+  // Cada cena pode ter uma foto/render 360º real (campo "img", equirretangular
+  // 2:1) em vez da cena processual — basta acrescentar `img:'caminho.jpg'` à
+  // cena em `scenes`, sem tocar em mais nada. Fica em cache depois de carregada.
+  const textureLoader = new THREE.TextureLoader();
+  const realTexCache = {};
+
   function setScene(idx){
     currentSceneIdx = idx;
     const s = scenes[idx];
     targetLon = s.lon;
-    material.map = s.mode === 'night' ? nightTex : dayTex;
-    material.needsUpdate = true;
     label.textContent = s.name;
     document.querySelectorAll('.hotspot-btn').forEach((b,i)=> b.classList.toggle('active', i===idx));
+
+    if(s.img){
+      if(realTexCache[s.img]){
+        material.map = realTexCache[s.img];
+        material.needsUpdate = true;
+      } else {
+        textureLoader.load(s.img, (tex)=>{
+          realTexCache[s.img] = tex;
+          if(currentSceneIdx === idx){ material.map = tex; material.needsUpdate = true; }
+        });
+      }
+    } else {
+      material.map = s.mode === 'night' ? nightTex : dayTex;
+      material.needsUpdate = true;
+    }
   }
 
   hotspotBar.addEventListener('click', (e)=>{
