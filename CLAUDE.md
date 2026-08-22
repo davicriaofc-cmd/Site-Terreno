@@ -56,10 +56,43 @@ tipologia mista). Não apresentar o cenário pendente como decidido.
 6. `#modelos` — 5 estudos volumétricos ilustrativos (hipotéticos, dependem
    da aprovação do cenário acima)
 7. `#proximos-passos` — roteiro
-8. `#tour` — visita virtual 360º (Three.js, cena processual gerada em
+8. `#evolucao` — evolução da construção (crossfade ligado ao scroll normal,
+   6 fases: terreno ilustrativo, terreno limpo, 25%, 50%, 75%, 100%)
+9. `#tour` — visita virtual 360º (Three.js, cena processual gerada em
    canvas — ainda não são fotos/renders reais)
-9. `#concept` — parâmetros confirmados (subsolo, explanada/piscinas, postes)
-10. `footer`
+10. `#concept` — parâmetros confirmados (subsolo, explanada/piscinas, postes)
+11. `footer`
+
+## Evolução da construção (`#evolucao`)
+
+Crossfade entre 6 imagens ligado ao **scroll normal** (sem prender o rato —
+ao contrário do hero, aqui não há `preventDefault`, é só opacidade a mudar
+com a posição de scroll, com pontos clicáveis para saltar direto a uma
+fase). Script: `/* EVOLUÇÃO DA CONSTRUÇÃO (crossfade ligado ao scroll) */`.
+
+As imagens atuais em `images/evolucao/` (`00-terreno-ilustrativo.svg` até
+`05-100pc.svg`) são **placeholders ilustrativos** (diagramas gerados,
+estilo arquitetónico simples) — quando o utilizador mandar fotos reais de
+cada fase, basta substituir os ficheiros com o mesmo nome (ou atualizar os
+`src=` no HTML se os nomes/formatos forem diferentes). Não regenerar os
+SVGs a partir de código sem pedir — foram feitos à mão para este efeito.
+
+## Visita 360º — pronta para fotos reais
+
+O array `scenes` no script do tour aceita um campo opcional `img` (caminho
+para uma foto/render equirretangular 2:1). Se presente, carrega essa
+textura via `THREE.TextureLoader` em vez de gerar a cena processual em
+canvas. Basta acrescentar `img:'images/tour/nome.jpg'` a uma cena quando
+houver material real — não é preciso mexer no resto do código.
+
+## Modelos 3D reais (pendente)
+
+O utilizador vai mandar fotos reais em fases (terreno ilustrativo, terreno
+limpo, 25/50/75/100% construído) para alimentar a secção `#evolucao`, e
+mais tarde fotos/renders 360º reais do interior (hotel, casas, piscina)
+para o `#tour`. "Andar por dentro" em 3D navegável só é possível com um
+ficheiro 3D real (`.glb`/`.gltf` do arquiteto) — não é algo derivável só de
+fotos 2D. Não prometer isso sem esse ficheiro.
 
 ## Mecânica do hero (scroll-lock por passos)
 
@@ -69,7 +102,9 @@ de "largar"). A versão atual avança **um painel por pequena rotação da roda*
 com cooldown (~650ms) para não saltar vários de uma vez numa rajada, e liberta
 o scroll normal ao passar do último painel. Ver o script
 `/* SCROLL-LOCKED HERO (por passos) */` em `index.html`. Não voltar ao modelo
-de scroll contínuo sem pedir confirmação.
+de scroll contínuo sem pedir confirmação. Os painéis não têm rótulo numerado
+(tipo "01 — O TERRENO") — foi removido a pedido do utilizador; só o `<h1>`
+(e por vezes um `<p class="hero-sub-text">`) por painel.
 
 ## Estilo visual (não redesenhar sem pedir)
 
