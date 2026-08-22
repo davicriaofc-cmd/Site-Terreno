@@ -50,6 +50,37 @@
   nav .brand{ font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:18px; color:var(--sand); pointer-events:auto; letter-spacing:0.01em;}
   nav .area-tag{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--sand); opacity:0.85; pointer-events:auto; border:1px solid rgba(239,232,216,0.35); padding:6px 12px; border-radius:100px;}
 
+  /* TAGS / STATUS */
+  .tag{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:6px 12px; border-radius:100px; white-space:nowrap; }
+  .tag-ok{ background:var(--olive); color:var(--sand); }
+  .tag-progress{ background:var(--gold-soft); color:var(--ink); }
+  .tag-pending{ border:1px solid var(--olive); color:var(--olive); }
+
+  /* STATUS LIST */
+  .status-list{ border-top:1px solid var(--line); }
+  .status-row{ display:flex; justify-content:space-between; align-items:flex-start; gap:32px; padding:26px 0; border-bottom:1px solid var(--line); }
+  .status-row h3{ font-size:17px; font-weight:600; margin-bottom:6px; }
+  .status-row p{ font-size:14px; line-height:1.6; opacity:0.72; max-width:60ch; }
+
+  /* COMPARE GRID */
+  .compare-grid{ display:grid; grid-template-columns:1fr 1fr; gap:2px; background:var(--line); border:1px solid var(--line); }
+  .compare-card{ background:var(--sand); padding:36px 32px; }
+  .compare-card--proposed{ box-shadow:inset 3px 0 0 var(--gold); }
+  .compare-card h3{ font-size:20px; margin:12px 0 20px; }
+  .compare-list{ list-style:none; display:flex; flex-direction:column; }
+  .compare-list li{ display:flex; justify-content:space-between; gap:16px; padding:10px 0; border-bottom:1px solid var(--line); font-size:14px; }
+  .compare-list li:last-child{ border-bottom:none; }
+  .compare-list li span:first-child{ opacity:0.62; }
+  .compare-list li span:last-child{ font-family:'IBM Plex Mono', monospace; color:var(--olive); text-align:right; }
+  .plot-note{ margin-top:24px; font-size:13px; color:var(--ink); opacity:0.65; line-height:1.6; max-width:70ch; }
+
+  /* ROADMAP */
+  .roadmap-list{ border-top:1px solid var(--line); }
+  .roadmap-item{ display:flex; gap:28px; padding:28px 0; border-bottom:1px solid var(--line); }
+  .roadmap-item .num{ font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--gold); opacity:0.9; min-width:32px; padding-top:2px; }
+  .roadmap-item h3{ font-size:19px; margin-bottom:8px; font-weight:600; }
+  .roadmap-item p{ font-size:14px; line-height:1.65; opacity:0.72; max-width:60ch; }
+
   /* HERO */
   .hero{
     position:relative;
@@ -187,7 +218,10 @@
   @media (max-width:820px){
     .plot-wrap{ grid-template-columns:1fr; gap:40px; }
     .concept-grid{ grid-template-columns:1fr; }
+    .compare-grid{ grid-template-columns:1fr; }
     .hero-sub{ gap:28px; }
+    .status-row{ flex-direction:column; gap:12px; }
+    .roadmap-item{ flex-direction:column; gap:8px; }
   }
 </style>
 </head>
@@ -195,7 +229,7 @@
 
 <nav>
   <span class="brand">O Terreno</span>
-  <span class="area-tag">1.700 m² · zona a definir</span>
+  <span class="area-tag">17.500 m² · reclassificação em curso</span>
 </nav>
 
 <section class="hero">
@@ -206,44 +240,143 @@
   </svg>
   <h1>Um terreno.<br><em>Um hotel</em> por construir.</h1>
   <div class="hero-sub">
-    <p>Um projeto para transformar 1.700 m² num pequeno hotel com moradias de apoio — pensado, medido e agora visitável em 360º antes da primeira pedra.</p>
-    <div class="hero-stat"><div class="n">ÁREA TOTAL</div><div class="v">1.700 m²</div></div>
-    <div class="hero-stat"><div class="n">CONSTRUÇÃO HOTEL</div><div class="v">até 40%</div></div>
-    <div class="hero-stat"><div class="n">MORADIAS</div><div class="v">até 20%</div></div>
+    <p>Um projeto para transformar 17.500 m² num hotel — com uma possível tipologia mista de casas de apoio — pensado, medido e agora visitável em 360º antes da primeira pedra. O processo de reclassificação e ajuste de índice está em curso junto da Câmara Municipal.</p>
+    <div class="hero-stat"><div class="n">ÁREA TOTAL</div><div class="v">17.500 m²</div></div>
+    <div class="hero-stat"><div class="n">ÍNDICE ATUAL</div><div class="v">40%</div></div>
+    <div class="hero-stat"><div class="n">PISOS ACIMA DO SOLO</div><div class="v">3</div></div>
+    <div class="hero-stat"><div class="n">FACHADA MÁXIMA</div><div class="v">12 m</div></div>
   </div>
   <div class="scroll-cue"><div class="bar"></div>PERCORRER</div>
+</section>
+
+<section id="estado">
+  <div class="section-head">
+    <div class="eyebrow">Enquadramento urbanístico</div>
+    <h2>Onde o processo está, hoje</h2>
+    <p>Reunião com a Arq. Ana Bela, chefe de divisão do Departamento de Urbanismo, esclareceu o estado da classificação do terreno e do Plano Diretor Municipal (PDM).</p>
+  </div>
+  <div class="status-list">
+    <div class="status-row">
+      <div class="status-text">
+        <h3>Classificação atual: Equipamento</h3>
+        <p>Não permite construção de hotel — Equipamento destina-se a usos como piscinas públicas, campos desportivos ou parques.</p>
+      </div>
+      <span class="tag tag-pending">A alterar</span>
+    </div>
+    <div class="status-row">
+      <div class="status-text">
+        <h3>Classificação prevista: Serviços e Turismo</h3>
+        <p>A Câmara Municipal já incluiu esta reclassificação no novo PDM, precisamente para permitir a construção do hotel.</p>
+      </div>
+      <span class="tag tag-ok">Já incluída no PDM</span>
+    </div>
+    <div class="status-row">
+      <div class="status-text">
+        <h3>Plano Diretor Municipal em revisão</h3>
+        <p>A conclusão estava prevista para o ano anterior; a mudança de executivo atrasou a publicação da versão final. Nenhum projeto pode ser aprovado enquanto isso não acontecer — mas alterações a cotas, índices e classificações podem ser pedidas nesta fase.</p>
+      </div>
+      <span class="tag tag-progress">Em curso</span>
+    </div>
+    <div class="status-row">
+      <div class="status-text">
+        <h3>Postes de eletricidade e telecomunicações</h3>
+        <p>A remoção dos postes de betão de média tensão e dos postes de madeira de telecomunicações fica a nosso cargo, e pode ser solicitada assim que houver um projeto aprovado.</p>
+      </div>
+      <span class="tag tag-pending">Planeado</span>
+    </div>
+  </div>
 </section>
 
 <section id="plot">
   <div class="section-head">
     <div class="eyebrow">Índice de ocupação</div>
-    <h2>Como o terreno se reparte</h2>
-    <p>1.700 m² divididos por regulamento: até 40% para o edifício do hotel, até 20% para moradias de apoio, e o restante mantido como área livre — logradouro, acessos e enquadramento verde.</p>
+    <h2>Como o terreno se reparte (índice atual)</h2>
+    <p>17.500 m² sob o índice de construção atualmente em vigor para hotel: até 40% de implantação, em três pisos acima do solo, sem limite de pisos em subsolo. Piscinas não entram na contagem da área de construção.</p>
   </div>
   <div class="plot-wrap">
     <svg class="plot-map" viewBox="0 0 400 400">
       <rect x="4" y="4" width="392" height="392" fill="none" stroke="#3F4A32" stroke-width="1.5" stroke-dasharray="2 4" opacity="0.5"/>
       <rect x="4" y="4" width="392" height="392" fill="#E4DBC6"/>
-      <rect x="24" y="24" width="230" height="180" fill="#3F4A32"/>
-      <text x="34" y="200" font-family="IBM Plex Mono, monospace" font-size="11" fill="#EFE8D8">HOTEL · 40%</text>
-      <rect x="24" y="220" width="140" height="120" fill="#B08D3E"/>
-      <text x="34" y="330" font-family="IBM Plex Mono, monospace" font-size="11" fill="#1B2116">MORADIAS · 20%</text>
-      <text x="270" y="60" font-family="IBM Plex Mono, monospace" font-size="11" fill="#1B2116" opacity="0.55">ÁREA</text>
-      <text x="270" y="76" font-family="IBM Plex Mono, monospace" font-size="11" fill="#1B2116" opacity="0.55">LIVRE</text>
-      <text x="270" y="92" font-family="IBM Plex Mono, monospace" font-size="11" fill="#1B2116" opacity="0.55">40%</text>
+      <rect x="24" y="24" width="352" height="150" fill="#3F4A32"/>
+      <text x="34" y="160" font-family="IBM Plex Mono, monospace" font-size="12" fill="#EFE8D8">IMPLANTAÇÃO HOTEL · 40%</text>
+      <text x="34" y="220" font-family="IBM Plex Mono, monospace" font-size="11" fill="#1B2116" opacity="0.6">ÁREA LIVRE · 60%</text>
+      <text x="34" y="238" font-family="IBM Plex Mono, monospace" font-size="11" fill="#1B2116" opacity="0.6">logradouro · acessos</text>
     </svg>
     <div class="plot-legend">
       <div class="plot-row">
-        <div class="name"><span class="swatch" style="background:#3F4A32;"></span>Hotel</div>
-        <div><span class="pct">40%</span><span class="m2">680 m²</span></div>
+        <div class="name"><span class="swatch" style="background:#3F4A32;"></span>Implantação · Hotel</div>
+        <div><span class="pct">40%</span><span class="m2">7.000 m²</span></div>
       </div>
       <div class="plot-row">
-        <div class="name"><span class="swatch" style="background:#B08D3E;"></span>Moradias</div>
-        <div><span class="pct">20%</span><span class="m2">340 m²</span></div>
+        <div class="name"><span class="swatch" style="background:#E4DBC6; border:1px solid #1B2116;"></span>Área livre / logradouro</div>
+        <div><span class="pct">60%</span><span class="m2">10.500 m²</span></div>
       </div>
-      <div class="plot-row">
-        <div class="name"><span class="swatch" style="background:#E4DBC6; border:1px solid #1B2116;"></span>Área livre</div>
-        <div><span class="pct">40%</span><span class="m2">680 m²</span></div>
+    </div>
+  </div>
+  <p class="plot-note">Área bruta de construção com 3 pisos: 21.000 m². Fachada até 12 m · explanada permitida no topo do edifício · subsolo sem limite de pisos.</p>
+</section>
+
+<section id="expansao">
+  <div class="section-head">
+    <div class="eyebrow">Cenário em avaliação</div>
+    <h2>Índice alargado + tipologia mista</h2>
+    <p>Em paralelo ao processo do PDM, está a ser pedido ao Gabinete de Ordenamento do Território um aumento do índice de construção e uma tipologia mista — hotel com casas de apoio, à semelhança do Hotel Ibis em Évora. A Vereadora do Turismo, Paula Martins, já mostrou abertura para o pedido.</p>
+  </div>
+  <div class="compare-grid">
+    <div class="compare-card">
+      <div class="eyebrow">Atual</div>
+      <h3>Hotel · índice 40%</h3>
+      <ul class="compare-list">
+        <li><span>Índice de construção</span><span>40%</span></li>
+        <li><span>Implantação</span><span>7.000 m²</span></li>
+        <li><span>Tipologia</span><span>Hotel</span></li>
+      </ul>
+    </div>
+    <div class="compare-card compare-card--proposed">
+      <div class="eyebrow">Proposto · em avaliação</div>
+      <h3>Hotel + casas · índice até 60%</h3>
+      <ul class="compare-list">
+        <li><span>Índice de construção</span><span>até 60%</span></li>
+        <li><span>Implantação</span><span>até 10.500 m²</span></li>
+        <li><span>Tipologia</span><span>Mista — ex. 30% hotel + 30% casas</span></li>
+      </ul>
+    </div>
+  </div>
+  <p class="plot-note">Motivo: a Câmara identifica procura adicional de alojamento — também associada ao novo hospital de Évora — que a tipologia mista ajudaria a responder.</p>
+</section>
+
+<section id="proximos-passos">
+  <div class="section-head">
+    <div class="eyebrow">Roteiro</div>
+    <h2>Próximos passos</h2>
+  </div>
+  <div class="roadmap-list">
+    <div class="roadmap-item">
+      <div class="num">01</div>
+      <div class="body">
+        <h3>Pedido de aumento de índice de construção</h3>
+        <p>Junto ao Gabinete de Ordenamento do Território, com a Vereadora do Turismo Paula Martins — já reunidos, com abertura demonstrada.</p>
+      </div>
+    </div>
+    <div class="roadmap-item">
+      <div class="num">02</div>
+      <div class="body">
+        <h3>Pedido de tipologia de construção mista</h3>
+        <p>Autorização para hotel com casas de apoio, respondendo também à procura de alojamento gerada pelo novo hospital de Évora.</p>
+      </div>
+    </div>
+    <div class="roadmap-item">
+      <div class="num">03</div>
+      <div class="body">
+        <h3>Topografia e desenhos conceituais</h3>
+        <p>Em paralelo, com um arquiteto — para que, assim que a Câmara aprove índice e tipologia, o projeto esteja também pronto do nosso lado.</p>
+      </div>
+    </div>
+    <div class="roadmap-item">
+      <div class="num">04</div>
+      <div class="body">
+        <h3>Aprovação prioritária</h3>
+        <p>Urbanismo e Turismo já manifestaram apoio para dar prioridade ao projeto assim que estiver tudo pronto, por ser de interesse municipal.</p>
       </div>
     </div>
   </div>
@@ -274,24 +407,24 @@
 
 <section id="concept">
   <div class="section-head">
-    <div class="eyebrow">Conceito</div>
-    <h2>O que o projeto propõe</h2>
+    <div class="eyebrow">Parâmetros confirmados</div>
+    <h2>O que o regulamento atual permite</h2>
   </div>
   <div class="concept-grid">
     <div class="concept-card">
       <div class="num">01</div>
-      <h3>Hotel de escala pequena</h3>
-      <p>Volume principal ocupando até 40% do terreno, orientado para aproveitar a melhor exposição solar e vistas do lote.</p>
+      <h3>Subsolo sem limite de pisos</h3>
+      <p>Abaixo do solo, o número de pisos não está limitado — espaço para estacionamento, spa ou áreas técnicas, sem consumir índice de construção.</p>
     </div>
     <div class="concept-card">
       <div class="num">02</div>
-      <h3>Moradias de apoio</h3>
-      <p>Até 20% do terreno reservado a moradias — alojamento adicional, gestão ou unidades autónomas complementares ao hotel.</p>
+      <h3>Explanada e piscinas</h3>
+      <p>É permitida uma explanada no topo do edifício. Piscinas não contam para a área de construção nem para o índice.</p>
     </div>
     <div class="concept-card">
       <div class="num">03</div>
-      <h3>Área livre preservada</h3>
-      <p>Os restantes 40% mantidos como logradouro, acessos e zona verde — respiração entre a construção e o limite do terreno.</p>
+      <h3>Infraestruturas a remover</h3>
+      <p>Postes de betão de média tensão e postes de madeira de telecomunicações ficam a nosso cargo — a remoção pode ser pedida assim que o projeto for aprovado.</p>
     </div>
   </div>
 </section>
@@ -300,7 +433,7 @@
   <h2>Do terreno vazio<br>ao <em>primeiro hóspede</em>.</h2>
   <div class="footer-bottom">
     <span>O TERRENO — PROJETO HOTELEIRO</span>
-    <span>1.700 M² · ÁREA A DEFINIR</span>
+    <span>17.500 M² · SERVIÇOS E TURISMO (PDM EM ALTERAÇÃO)</span>
   </div>
 </footer>
 
