@@ -37,18 +37,48 @@
     color:var(--olive);
     opacity:0.75;
   }
-  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:600; line-height:1.05; }
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:600; line-height:1.05; text-wrap:balance; }
 
-  /* NAV */
-  nav{
-    position:fixed; top:0; left:0; right:0; z-index:50;
-    display:flex; justify-content:space-between; align-items:center;
-    padding:22px 6vw;
-    mix-blend-mode:normal;
-    pointer-events:none;
+  /* LOADER */
+  .loader{ position:fixed; inset:0; z-index:200; background:#16324F; display:flex; align-items:center; justify-content:center; transition:opacity 0.6s ease; }
+  .loader.hide{ opacity:0; pointer-events:none; }
+  .loader-text{ font-family:'Fraunces', serif; font-style:italic; font-size:22px; color:var(--sand); opacity:0.7; animation:loaderPulse 1.4s ease-in-out infinite; }
+  @keyframes loaderPulse{ 0%,100%{opacity:0.3} 50%{opacity:0.9} }
+
+  /* HAMBURGER MENU */
+  .menu-btn{
+    position:fixed; top:20px; left:24px; z-index:100;
+    width:44px; height:44px; border-radius:50%;
+    border:1px solid rgba(239,232,216,0.35);
+    background:rgba(14,23,32,0.3); backdrop-filter:blur(8px);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+    cursor:pointer; transition:background 0.2s;
   }
-  nav .brand{ font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:18px; color:var(--sand); pointer-events:auto; letter-spacing:0.01em;}
-  nav .area-tag{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--sand); opacity:0.85; pointer-events:auto; border:1px solid rgba(239,232,216,0.35); padding:6px 12px; border-radius:100px;}
+  .menu-btn:hover{ background:rgba(14,23,32,0.55); }
+  .menu-btn span{ width:16px; height:1.5px; background:var(--sand); transition:transform 0.3s, opacity 0.2s; }
+  .menu-btn.open span:nth-child(1){ transform:translateY(6.5px) rotate(45deg); }
+  .menu-btn.open span:nth-child(2){ opacity:0; }
+  .menu-btn.open span:nth-child(3){ transform:translateY(-6.5px) rotate(-45deg); }
+
+  .menu-overlay{ position:fixed; inset:0; z-index:85; background:rgba(14,23,32,0.6); opacity:0; pointer-events:none; transition:opacity 0.35s; }
+  .menu-overlay.open{ opacity:1; pointer-events:auto; }
+
+  .menu-panel{
+    position:fixed; top:0; left:0; bottom:0; z-index:90;
+    width:min(340px,84vw); background:var(--olive-deep); color:var(--sand);
+    padding:100px 32px 40px;
+    transform:translateX(-100%); transition:transform 0.4s cubic-bezier(.6,0,.2,1);
+    overflow-y:auto;
+  }
+  .menu-panel.open{ transform:translateX(0); }
+  .menu-panel .eyebrow{ color:var(--gold-soft); opacity:1; }
+  .menu-panel h3{ font-size:24px; margin:12px 0 36px; }
+  .model-row{ display:flex; justify-content:space-between; align-items:center; padding:18px 0; border-bottom:1px solid rgba(239,232,216,0.12); font-size:14px; text-decoration:none; color:var(--sand); transition:padding-left 0.25s ease; }
+  .model-row:hover, .model-row:focus-visible{ padding-left:8px; outline:none; }
+  .model-row:hover .tag, .model-row:focus-visible .tag{ opacity:1; border-color:var(--gold-soft); color:var(--gold-soft); }
+  .model-row .name{ font-family:'Inter', sans-serif; display:flex; align-items:baseline; gap:12px; }
+  .model-row .model-i{ font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--gold-soft); opacity:0.8; }
+  .model-row .tag{ transition:opacity 0.25s, border-color 0.25s, color 0.25s; font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.06em; opacity:0.5; border:1px solid rgba(239,232,216,0.25); padding:4px 10px; border-radius:100px; }
 
   /* TAGS / STATUS */
   .tag{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:6px 12px; border-radius:100px; white-space:nowrap; }
@@ -81,43 +111,59 @@
   .roadmap-item h3{ font-size:19px; margin-bottom:8px; font-weight:600; }
   .roadmap-item p{ font-size:14px; line-height:1.65; opacity:0.72; max-width:60ch; }
 
-  /* HERO */
-  .hero{
-    position:relative;
-    min-height:100vh;
-    display:flex; flex-direction:column; justify-content:flex-end;
-    padding:0 6vw 8vh 6vw;
-    background:
-      radial-gradient(120% 90% at 15% 0%, rgba(176,141,62,0.35), transparent 55%),
-      linear-gradient(180deg, #2A3222 0%, #212A1B 45%, #171F13 100%);
-    overflow:hidden;
+  /* SCROLL-LOCKED HERO */
+  /* O trilho dá a altura de scroll; o hero fica colado (sticky) dentro dele. */
+  .scroll-track{ position:relative; height:550vh; }
+  .scroll-hero{ position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; }
+
+  .sky{ position:absolute; inset:0; z-index:0; background:linear-gradient(180deg,#0d1f38 0%,#16324F 20%,#3C6E97 50%,#7fb3d0 75%,#AFCFDE 100%); }
+
+  .cloud-layer{ position:absolute; inset:0; z-index:1; overflow:hidden; pointer-events:none; }
+  .cloud{ position:absolute; background:white; border-radius:50%; opacity:0.18; filter:blur(40px); }
+  .cloud-1{ width:500px; height:160px; top:8%; left:-10%; animation:drift1 45s linear infinite; }
+  .cloud-2{ width:400px; height:120px; top:18%; left:60%; animation:drift2 55s linear infinite; opacity:0.12; }
+  .cloud-3{ width:600px; height:180px; top:4%; left:20%; animation:drift3 65s linear infinite; opacity:0.15; }
+  .cloud-4{ width:350px; height:110px; top:28%; left:-20%; animation:drift1 50s linear infinite; opacity:0.1; animation-delay:-20s; }
+  .cloud-5{ width:450px; height:140px; top:12%; left:40%; animation:drift2 40s linear infinite; opacity:0.14; animation-delay:-10s; }
+  .cloud-6{ width:300px; height:100px; top:2%; left:70%; animation:drift3 70s linear infinite; opacity:0.1; animation-delay:-30s; }
+  @keyframes drift1{ 0%{transform:translateX(0)} 100%{transform:translateX(120vw)} }
+  @keyframes drift2{ 0%{transform:translateX(0)} 100%{transform:translateX(-120vw)} }
+  @keyframes drift3{ 0%{transform:translateX(-20vw)} 100%{transform:translateX(100vw)} }
+
+  .hero-panels{ position:absolute; inset:0; z-index:5; display:flex; align-items:center; justify-content:center; }
+  .hero-panel{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:0 8vw; text-align:center;
+    opacity:0; transition:opacity 0.7s ease, transform 0.7s ease;
+    transform:translateY(40px);
   }
-  .hero-topo{
-    position:absolute; inset:0; opacity:0.35; pointer-events:none;
-  }
-  .hero h1{
-    color:var(--sand);
-    font-size:clamp(48px, 8vw, 108px);
-    max-width:14ch;
-    letter-spacing:-0.01em;
-  }
-  .hero h1 em{ font-style:italic; color:var(--gold-soft); font-weight:500; }
-  .hero-sub{
-    display:flex; gap:48px; align-items:flex-end; flex-wrap:wrap;
-    margin-top:36px;
-    color:var(--sand);
-  }
-  .hero-sub p{ max-width:38ch; font-size:15px; line-height:1.6; opacity:0.82; }
-  .hero-stat{ font-family:'IBM Plex Mono', monospace; }
-  .hero-stat .n{ font-size:15px; opacity:0.6; letter-spacing:0.08em; }
-  .hero-stat .v{ font-size:15px; color:var(--gold-soft); margin-top:2px;}
+  .hero-panel.active{ opacity:1; transform:translateY(0); }
+  .hero-panel.done{ opacity:0; transform:translateY(-40px); }
+  .hero-panel .step-num{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.12em; color:var(--gold-soft); opacity:0.8; margin-bottom:20px; }
+  .hero-panel h1{ color:white; font-size:clamp(38px,7vw,88px); letter-spacing:-0.01em; max-width:14ch; line-height:1.08; }
+  .hero-panel h1 em{ font-style:italic; color:var(--gold-soft); font-weight:500; }
+  .hero-panel .hero-sub-text{ margin-top:20px; color:rgba(239,232,216,0.7); font-size:clamp(14px,1.6vw,17px); max-width:44ch; line-height:1.6; }
+
+  .scroll-progress{ position:absolute; bottom:0; left:0; z-index:10; height:3px; background:var(--gold-soft); width:0%; transition:width 0.15s ease; }
+
   .scroll-cue{
-    position:absolute; bottom:32px; right:6vw;
+    position:absolute; bottom:36px; left:50%; transform:translateX(-50%); z-index:10;
     color:var(--sand); opacity:0.5; font-family:'IBM Plex Mono',monospace; font-size:11px;
-    display:flex; align-items:center; gap:8px; letter-spacing:0.1em;
+    display:flex; flex-direction:column; align-items:center; gap:8px; letter-spacing:0.1em;
+    transition:opacity 0.4s;
   }
-  .scroll-cue .bar{ width:1px; height:26px; background:var(--sand); animation:pulse 1.8s ease-in-out infinite; }
-  @keyframes pulse{ 0%,100%{opacity:0.15} 50%{opacity:0.8} }
+  .scroll-cue .arrow{ width:1px; height:28px; background:var(--sand); animation:pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{opacity:0.15} 50%{opacity:0.85} }
+
+  /* NAV (after hero) */
+  .site-nav{
+    position:relative; z-index:20;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:22px 6vw; background:var(--olive-deep);
+  }
+  .site-nav .brand{ font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:18px; color:var(--sand); letter-spacing:0.01em; }
+  .site-nav .area-tag{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--sand); opacity:0.85; border:1px solid rgba(239,232,216,0.35); padding:6px 12px; border-radius:100px; }
 
   /* SECTION shell */
   section{ padding:120px 6vw; position:relative; }
@@ -138,8 +184,38 @@
   }
   .plot-row .name{ display:flex; align-items:center; gap:12px; font-size:15px; }
   .plot-row .swatch{ width:11px; height:11px; border-radius:3px; display:inline-block; }
-  .plot-row .pct{ font-family:'IBM Plex Mono', monospace; font-size:26px; color:var(--olive); }
+  .plot-row .pct{ font-family:'IBM Plex Mono', monospace; font-size:26px; color:var(--olive); font-variant-numeric:tabular-nums; }
   .plot-row .m2{ font-family:'IBM Plex Mono', monospace; font-size:12px; opacity:0.55; margin-left:10px;}
+
+  /* MODELOS */
+  .modelos-section{ background:var(--olive-deep); color:var(--sand); }
+  .modelos-section .section-head h2{ color:var(--sand); }
+  .modelos-section .section-head p{ color:var(--sand); opacity:0.62; }
+  .modelos-section .eyebrow{ color:var(--gold-soft); opacity:1; }
+  .modelos-grid{ display:grid; grid-template-columns:repeat(6,1fr); gap:1px; background:rgba(239,232,216,0.14); border:1px solid rgba(239,232,216,0.14); }
+  .modelo-card{ grid-column:span 2; }
+  .modelo-card:nth-child(4), .modelo-card:nth-child(5){ grid-column:span 3; }
+  @media(max-width:1000px){
+    .modelos-grid{ grid-template-columns:repeat(2,1fr); }
+    .modelo-card, .modelo-card:nth-child(4){ grid-column:span 1; }
+    .modelo-card:nth-child(5){ grid-column:span 2; }
+  }
+  @media(max-width:620px){
+    .modelos-grid{ grid-template-columns:1fr; }
+    .modelo-card, .modelo-card:nth-child(4), .modelo-card:nth-child(5){ grid-column:span 1; }
+  }
+  .modelo-card{ background:var(--olive-deep); padding:34px 30px; display:flex; flex-direction:column; gap:16px; }
+  .modelo-n{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.12em; color:var(--gold-soft); }
+  .modelo-card h3{ font-size:24px; color:var(--sand); display:flex; flex-direction:column; gap:4px; }
+  .modelo-sub{ font-family:'Inter', sans-serif; font-size:12px; font-weight:400; letter-spacing:0.04em; text-transform:uppercase; color:var(--gold-soft); opacity:0.75; }
+  .modelo-zonas{ list-style:none; display:flex; flex-direction:column; gap:12px; margin-top:2px; }
+  .modelo-zonas li{ font-size:13.5px; line-height:1.6; opacity:0.72; padding-left:16px; position:relative; }
+  .modelo-zonas li::before{ content:''; position:absolute; left:0; top:0.62em; width:6px; height:1px; background:var(--gold-soft); opacity:0.8; }
+  .ficha-tecnica{ margin-top:56px; display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:0 48px; border-top:1px solid rgba(239,232,216,0.18); }
+  .ficha-linha{ display:flex; justify-content:space-between; align-items:baseline; gap:16px; padding:16px 0; border-bottom:1px solid rgba(239,232,216,0.12); }
+  .ficha-k{ font-size:13px; opacity:0.6; }
+  .ficha-v{ font-family:'IBM Plex Mono', monospace; font-size:14px; color:var(--gold-soft); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .nota-areas{ margin-top:22px; font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; opacity:0.4; }
 
   /* 360 SECTION */
   .tour-section{ background:var(--night); padding-bottom:100px; }
@@ -215,41 +291,104 @@
     font-family:'IBM Plex Mono', monospace; font-size:11px; opacity:0.5; flex-wrap:wrap; gap:8px;
   }
 
+  /* fade-in for below-hero sections */
+  .reveal{ opacity:0; transform:translateY(32px); transition:opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible{ opacity:1; transform:translateY(0); }
+
   @media (max-width:820px){
     .plot-wrap{ grid-template-columns:1fr; gap:40px; }
     .concept-grid{ grid-template-columns:1fr; }
     .compare-grid{ grid-template-columns:1fr; }
-    .hero-sub{ gap:28px; }
     .status-row{ flex-direction:column; gap:12px; }
     .roadmap-item{ flex-direction:column; gap:8px; }
+    .scroll-track{ height:460vh; }
+  }
+
+  /* sem animação: a abertura passa a secção normal, com tudo visível */
+  @media (prefers-reduced-motion:reduce){
+    html{ scroll-behavior:auto; }
+    .scroll-track{ height:auto; }
+    .scroll-hero{ position:relative; height:auto; padding:12vh 0; }
+    .hero-panels{ position:relative; inset:auto; flex-direction:column; gap:10vh; }
+    .hero-panel{ position:relative; inset:auto; opacity:1!important; transform:none!important; padding:0 8vw; }
+    .cloud{ animation:none; }
+    .scroll-progress, .scroll-cue{ display:none; }
+    .reveal{ opacity:1; transform:none; }
   }
 </style>
 </head>
 <body>
 
-<nav>
+<!-- LOADER -->
+<div class="loader" id="loader"><span class="loader-text">A preparar o terreno…</span></div>
+
+<!-- HAMBURGER -->
+<button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="menu-panel" id="menuPanel">
+  <div class="eyebrow">Navegar</div>
+  <h3>O Terreno</h3>
+  <a class="model-row" href="#estado"><span class="name"><span class="model-i">01</span>Estado do processo</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#plot"><span class="name"><span class="model-i">02</span>Índice de ocupação</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#expansao"><span class="name"><span class="model-i">03</span>Índice alargado + mista</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#modelos"><span class="name"><span class="model-i">04</span>5 estudos volumétricos</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#proximos-passos"><span class="name"><span class="model-i">05</span>Próximos passos</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#tour"><span class="name"><span class="model-i">06</span>Visita 360º</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#concept"><span class="name"><span class="model-i">07</span>Regulamento atual</span><span class="tag">VER</span></a>
+</div>
+
+<!-- SCROLL-LOCKED HERO -->
+<div class="scroll-track" id="scrollTrack">
+<div class="scroll-hero">
+  <div class="sky"></div>
+  <div class="cloud-layer">
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+    <div class="cloud cloud-5"></div>
+    <div class="cloud cloud-6"></div>
+  </div>
+
+  <div class="hero-panels" id="heroPanels">
+    <div class="hero-panel active" data-panel="0">
+      <div class="step-num">01 — O TERRENO</div>
+      <h1>Um terreno.<br><em>Um hotel</em> por construir.</h1>
+    </div>
+    <div class="hero-panel" data-panel="1">
+      <div class="step-num">02 — DIMENSÃO</div>
+      <h1>17.500&nbsp;m²<br>de <em>possibilidade</em>.</h1>
+    </div>
+    <div class="hero-panel" data-panel="2">
+      <div class="step-num">03 — ÍNDICE ATUAL</div>
+      <h1>40% para<br>o <em>hotel</em>.</h1>
+      <p class="hero-sub-text">Até 7.000&nbsp;m² de implantação, em três pisos acima do solo — fachada até 12&nbsp;m, subsolo sem limite de pisos.</p>
+    </div>
+    <div class="hero-panel" data-panel="3">
+      <div class="step-num">04 — PROCESSO</div>
+      <h1>PDM em<br><em>revisão</em>.</h1>
+      <p class="hero-sub-text">A classificação está a mudar de Equipamento para Serviços e Turismo. Índice alargado e tipologia mista em avaliação junto da Câmara.</p>
+    </div>
+    <div class="hero-panel" data-panel="4">
+      <div class="step-num">05 — VISÃO</div>
+      <h1>Do terreno vazio<br>ao primeiro <em>hóspede</em>.</h1>
+      <p class="hero-sub-text">Percorre o projeto antes de ele existir.</p>
+    </div>
+  </div>
+
+  <div class="scroll-progress" id="scrollProgress"></div>
+  <div class="scroll-cue" id="scrollCue">SCROLL<div class="arrow"></div></div>
+</div>
+</div>
+
+<!-- ─── REST OF SITE ─── -->
+
+<div class="site-nav">
   <span class="brand">O Terreno</span>
   <span class="area-tag">17.500 m² · reclassificação em curso</span>
-</nav>
+</div>
 
-<section class="hero">
-  <svg class="hero-topo" viewBox="0 0 1200 400" preserveAspectRatio="none">
-    <path d="M0,300 C150,260 300,340 450,300 C600,260 750,320 900,280 C1050,250 1150,290 1200,270" stroke="#B08D3E" stroke-width="1" fill="none"/>
-    <path d="M0,340 C150,300 300,370 450,340 C600,300 750,350 900,320 C1050,300 1150,330 1200,310" stroke="#B08D3E" stroke-width="1" fill="none"/>
-    <path d="M0,240 C150,210 300,260 450,230 C600,200 750,240 900,210 C1050,190 1150,220 1200,200" stroke="#B08D3E" stroke-width="1" fill="none"/>
-  </svg>
-  <h1>Um terreno.<br><em>Um hotel</em> por construir.</h1>
-  <div class="hero-sub">
-    <p>Um projeto para transformar 17.500 m² num hotel — com uma possível tipologia mista de casas de apoio — pensado, medido e agora visitável em 360º antes da primeira pedra. O processo de reclassificação e ajuste de índice está em curso junto da Câmara Municipal.</p>
-    <div class="hero-stat"><div class="n">ÁREA TOTAL</div><div class="v">17.500 m²</div></div>
-    <div class="hero-stat"><div class="n">ÍNDICE ATUAL</div><div class="v">40%</div></div>
-    <div class="hero-stat"><div class="n">PISOS ACIMA DO SOLO</div><div class="v">3</div></div>
-    <div class="hero-stat"><div class="n">FACHADA MÁXIMA</div><div class="v">12 m</div></div>
-  </div>
-  <div class="scroll-cue"><div class="bar"></div>PERCORRER</div>
-</section>
-
-<section id="estado">
+<section id="estado" class="reveal">
   <div class="section-head">
     <div class="eyebrow">Enquadramento urbanístico</div>
     <h2>Onde o processo está, hoje</h2>
@@ -287,7 +426,7 @@
   </div>
 </section>
 
-<section id="plot">
+<section id="plot" class="reveal">
   <div class="section-head">
     <div class="eyebrow">Índice de ocupação</div>
     <h2>Como o terreno se reparte (índice atual)</h2>
@@ -316,7 +455,7 @@
   <p class="plot-note">Área bruta de construção com 3 pisos: 21.000 m². Fachada até 12 m · explanada permitida no topo do edifício · subsolo sem limite de pisos.</p>
 </section>
 
-<section id="expansao">
+<section id="expansao" class="reveal">
   <div class="section-head">
     <div class="eyebrow">Cenário em avaliação</div>
     <h2>Índice alargado + tipologia mista</h2>
@@ -345,7 +484,73 @@
   <p class="plot-note">Motivo: a Câmara identifica procura adicional de alojamento — também associada ao novo hospital de Évora — que a tipologia mista ajudaria a responder.</p>
 </section>
 
-<section id="proximos-passos">
+<section id="modelos" class="modelos-section reveal">
+  <div class="section-head">
+    <div class="eyebrow">Cinco estudos volumétricos</div>
+    <h2>Se a tipologia mista for aprovada</h2>
+    <p>Uma exploração ilustrativa de como os 17.500 m² poderiam acomodar hotel e casas de apoio, caso o pedido de índice alargado e tipologia mista seja aceite pela Câmara. Muda a posição do hotel, a forma da piscina e o modo como as casas se organizam no lote — o programa é hipotético, a experiência não.</p>
+  </div>
+
+  <div class="modelos-grid">
+      <article class="modelo-card">
+        <div class="modelo-n">01</div>
+        <h3>U-Resort<span class="modelo-sub">Centralizado</span></h3>
+        <ul class="modelo-zonas">
+          <li>Hotel a sul com estacionamento em cave, receção, três salas de reunião modulares e restaurante de eventos no R/C.</li>
+          <li>Duas linhas de cinco casas a nascente e poente, voltadas para o interior.</li>
+          <li>Piscina retangular ao centro, com deck, bar de apoio e pomar em redor.</li>
+        </ul>
+      </article>
+      <article class="modelo-card">
+        <div class="modelo-n">02</div>
+        <h3>Terraço Linear<span class="modelo-sub">com cascata</span></h3>
+        <ul class="modelo-zonas">
+          <li>Hotel em linha ao longo da fronteira norte — receção e spa no R/C, quartos nos pisos de cima.</li>
+          <li>Piscina de borda infinita numa plataforma sobreelevada, com cascata a desaguar na zona verde.</li>
+          <li>Dez casas em banda curva a sul, com o pomar a servir de barreira verde.</li>
+        </ul>
+      </article>
+      <article class="modelo-card">
+        <div class="modelo-n">03</div>
+        <h3>Vila Alentejana<span class="modelo-sub">desconstruída</span></h3>
+        <ul class="modelo-zonas">
+          <li>Quatro edifícios baixos espalhados pelo pomar: receção e lounge, spa, e o bloco das três salas de reunião.</li>
+          <li>Piscina de formato orgânico, estilo lagoa, com ilha central e bar de madeira.</li>
+          <li>Dez casas em três núcleos, com pátios de pedra entre elas.</li>
+        </ul>
+      </article>
+      <article class="modelo-card">
+        <div class="modelo-n">04</div>
+        <h3>Edifício Integrado<span class="modelo-sub">de uso misto</span></h3>
+        <ul class="modelo-zonas">
+          <li>Hotel único a poente, com cave de garagem e serviços, R/C de receção, spa, restaurante e salas de reunião.</li>
+          <li>Linha contínua de dez casas geminadas a nascente, paralela ao hotel.</li>
+          <li>Corredor verde aberto ao centro a separar a zona residencial da zona do hotel.</li>
+        </ul>
+      </article>
+      <article class="modelo-card">
+        <div class="modelo-n">05</div>
+        <h3>Oásis de Eventos<span class="modelo-sub">com relvado de cerimónias</span></h3>
+        <ul class="modelo-zonas">
+          <li>Pavilhão de eventos e restaurante a sul, com caixilharia de vidro dobrável sobre o relvado de cerimónias.</li>
+          <li>Piscina ao lado do relvado, com cocktail bar e iluminação noturna.</li>
+          <li>Hotel e casas concentrados a norte — zona silenciosa, resguardada dos eventos.</li>
+        </ul>
+      </article>
+  </div>
+
+  <div class="ficha-tecnica">
+    <div class="ficha-linha"><span class="ficha-k">Área do lote</span><span class="ficha-v">17.500 m²</span></div>
+    <div class="ficha-linha"><span class="ficha-k">Implantação hotel (índice atual)</span><span class="ficha-v">40% · 7.000 m²</span></div>
+    <div class="ficha-linha"><span class="ficha-k">Índice em avaliação (mista)</span><span class="ficha-v">até 60% · até 10.500 m²</span></div>
+    <div class="ficha-linha"><span class="ficha-k">Casa duplex (exemplo)</span><span class="ficha-v">100 m² · 2 pisos</span></div>
+    <div class="ficha-linha"><span class="ficha-k">Rooftop por casa</span><span class="ficha-v">30 m² · jacuzzi</span></div>
+    <div class="ficha-linha"><span class="ficha-k">Piscina</span><span class="ficha-v">fora do índice</span></div>
+  </div>
+  <p class="nota-areas">Estudo ilustrativo, sujeito à aprovação do índice alargado e da tipologia mista, e a projeto de licenciamento.</p>
+</section>
+
+<section id="proximos-passos" class="reveal">
   <div class="section-head">
     <div class="eyebrow">Roteiro</div>
     <h2>Próximos passos</h2>
@@ -382,7 +587,7 @@
   </div>
 </section>
 
-<section class="tour-section" id="tour">
+<section class="tour-section reveal" id="tour">
   <div class="section-head">
     <div class="eyebrow">Visita virtual · 360º</div>
     <h2>Percorrer o projeto antes de o construir</h2>
@@ -405,7 +610,7 @@
   <p class="tour-note">Nota: como o hotel ainda não foi construído, esta demonstração usa uma cena gerada para mostrar a interação (percurso 360º + zoom). Assim que existirem fotografias 360º reais ou renders 3D do projeto, substituem-se diretamente por estas.</p>
 </section>
 
-<section id="concept">
+<section id="concept" class="reveal">
   <div class="section-head">
     <div class="eyebrow">Parâmetros confirmados</div>
     <h2>O que o regulamento atual permite</h2>
@@ -438,16 +643,91 @@
 </footer>
 
 <script>
+/* ---------------- LOADER ---------------- */
+(function(){
+  const hide = () => document.getElementById('loader').classList.add('hide');
+  window.addEventListener('load', () => setTimeout(hide, 600));
+  setTimeout(hide, 3500); // rede lenta não pode deixar o loader preso
+})();
+
+/* ---------------- MENU ---------------- */
+(function(){
+  const menuBtn = document.getElementById('menuBtn');
+  const menuPanel = document.getElementById('menuPanel');
+  const menuOverlay = document.getElementById('menuOverlay');
+  function toggleMenu(){
+    const open = menuPanel.classList.toggle('open');
+    menuOverlay.classList.toggle('open', open);
+    menuBtn.classList.toggle('open', open);
+  }
+  menuBtn.addEventListener('click', toggleMenu);
+  menuOverlay.addEventListener('click', toggleMenu);
+  menuPanel.addEventListener('click', (e)=>{
+    if(e.target.closest('.model-row')) toggleMenu();
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Escape' && menuPanel.classList.contains('open')) toggleMenu();
+  });
+})();
+
+/* ---------------- SCROLL-LOCKED HERO ---------------- */
+(function(){
+  const track = document.getElementById('scrollTrack');
+  const panels = Array.from(document.querySelectorAll('.hero-panel'));
+  const progressBar = document.getElementById('scrollProgress');
+  const scrollCue = document.getElementById('scrollCue');
+  const N = panels.length;
+
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  let ticking = false;
+  function update(){
+    ticking = false;
+    const total = track.offsetHeight - window.innerHeight;
+    const raw = total>0 ? -track.getBoundingClientRect().top/total : 0;
+    const p = Math.min(Math.max(raw,0),1);
+
+    progressBar.style.width = (p*100)+'%';
+    scrollCue.style.opacity = p>0.04 ? '0' : '0.5';
+
+    const idx = Math.min(Math.floor(p*N), N-1);
+    panels.forEach((el,i)=>{
+      el.classList.toggle('active', i===idx);
+      el.classList.toggle('done', i<idx);
+    });
+  }
+  window.addEventListener('scroll', ()=>{ if(!ticking){ ticking=true; requestAnimationFrame(update); } }, { passive:true });
+  window.addEventListener('resize', update);
+  update();
+})();
+
+/* ---------------- REVEAL ON SCROLL ---------------- */
+(function(){
+  const els = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold:0.15 });
+  els.forEach(el=> obs.observe(el));
+})();
+
 /* ---------------- 360 PANORAMA VIEWER ---------------- */
 (function(){
   const frame = document.getElementById('tourFrame');
   const label = document.getElementById('tourLabel');
   const hotspotBar = document.getElementById('hotspotBar');
+  if(!frame) return;
+  if(typeof THREE === 'undefined'){
+    const aviso = document.createElement('p');
+    aviso.className = 'tour-hint';
+    aviso.textContent = 'A VISITA 360º NÃO CARREGOU — VERIFIQUE A LIGAÇÃO À INTERNET.';
+    frame.after(aviso);
+    return;
+  }
 
   const scenes = [
     { name:'VISTA · AÉREA DO TERRENO', lon: 0,   mode:'day' },
     { name:'HOTEL · FACHADA PRINCIPAL', lon: 95,  mode:'day' },
-    { name:'MORADIAS · ZONA POENTE',    lon: 210, mode:'day' },
+    { name:'CASAS · ZONA POENTE',    lon: 210, mode:'day' },
     { name:'ÁREA VERDE · LOGRADOURO',   lon: 300, mode:'night' },
   ];
   let currentSceneIdx = 0;
