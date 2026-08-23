@@ -170,6 +170,47 @@
   .roadmap-item h3{ font-size:19px; margin-bottom:8px; font-weight:600; }
   .roadmap-item p{ font-size:14px; line-height:1.65; opacity:0.72; max-width:60ch; }
 
+  /* NÚMEROS QUE CONTAM */
+  .stat-strip{
+    margin-top:56px; display:grid; gap:0 44px;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    border-top:1px solid var(--line);
+  }
+  .stat{ padding:22px 0 18px; border-bottom:1px solid var(--line); }
+  .stat-n{
+    font-family:'IBM Plex Mono', monospace; font-size:clamp(26px,3vw,34px);
+    color:var(--olive); font-variant-numeric:tabular-nums; line-height:1.1;
+  }
+  .stat-k{ margin-top:6px; font-size:13px; opacity:0.6; line-height:1.4; }
+
+  /* CORTE ESQUEMÁTICO */
+  .corte-wrap{ display:grid; grid-template-columns:1.35fr 0.65fr; gap:60px; align-items:center; }
+  .corte-svg{ width:100%; height:auto; }
+  .c-lbl{ font-family:'IBM Plex Mono', monospace; font-size:12px; fill:var(--ink); opacity:0.75; }
+  .c-sand{ fill:var(--sand); opacity:0.9; }
+  .c-gold{ fill:var(--gold); opacity:1; }
+  .corte-list{ list-style:none; border-top:1px solid var(--line); }
+  .corte-list li{
+    display:flex; justify-content:space-between; align-items:baseline; gap:16px;
+    padding:16px 0; border-bottom:1px solid var(--line); font-size:14px;
+  }
+  .corte-list li span:first-child{ opacity:0.62; }
+  .corte-list li span:last-child{ font-family:'IBM Plex Mono', monospace; color:var(--olive); }
+
+  /* PORQUÊ AGORA */
+  .porque-section{ background:var(--olive-deep); color:var(--sand); }
+  .porque-section .section-head h2{ color:var(--sand); }
+  .porque-section .eyebrow{ color:var(--gold-soft); opacity:1; }
+  .porque-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(239,232,216,0.14); border:1px solid rgba(239,232,216,0.14); }
+  .porque-card{ background:var(--olive-deep); padding:38px 32px; }
+  .porque-card .num{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.12em; color:var(--gold-soft); }
+  .porque-card h3{ font-size:22px; color:var(--sand); margin:16px 0 14px; }
+  .porque-card p{ font-size:14px; line-height:1.7; opacity:0.7; }
+  @media (max-width:900px){
+    .corte-wrap{ grid-template-columns:1fr; gap:36px; }
+    .porque-grid{ grid-template-columns:1fr; }
+  }
+
   /* PISOS DO HOTEL — montagem explodida ligada ao scroll */
   .pisos-track{ position:relative; }
   .pisos-sticky{
@@ -419,13 +460,15 @@
   <h3>O Terreno</h3>
   <a class="model-row" href="#estado"><span class="name"><span class="model-i">01</span>Estado do processo</span><span class="tag">VER</span></a>
   <a class="model-row" href="#plot"><span class="name"><span class="model-i">02</span>Índice de ocupação</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#expansao"><span class="name"><span class="model-i">03</span>Índice alargado + mista</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#modelos"><span class="name"><span class="model-i">04</span>5 estudos volumétricos</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#proximos-passos"><span class="name"><span class="model-i">05</span>Próximos passos</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#concept"><span class="name"><span class="model-i">06</span>Regulamento atual</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#pisos"><span class="name"><span class="model-i">07</span>O hotel piso a piso</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#corte"><span class="name"><span class="model-i">03</span>O edifício em corte</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#expansao"><span class="name"><span class="model-i">04</span>Índice alargado + mista</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#modelos"><span class="name"><span class="model-i">05</span>5 estudos volumétricos</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#porque-agora"><span class="name"><span class="model-i">06</span>Porquê agora</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#proximos-passos"><span class="name"><span class="model-i">07</span>Próximos passos</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#concept"><span class="name"><span class="model-i">08</span>Regulamento atual</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#pisos"><span class="name"><span class="model-i">09</span>O hotel piso a piso</span><span class="tag">VER</span></a>
   <button class="model-row model-row--toggle" id="modelosToggle" aria-expanded="false" aria-controls="modelosSubmenu">
-    <span class="name"><span class="model-i">08</span>Modelos</span><span class="chev">›</span>
+    <span class="name"><span class="model-i">10</span>Modelos</span><span class="chev">›</span>
   </button>
   <div class="submenu" id="modelosSubmenu">
     <a href="#" data-modelo="1"><span><span class="sub-i">01</span>Modelo 1</span><span class="tag">ABRIR</span></a>
@@ -567,6 +610,69 @@
     </div>
   </div>
   <p class="plot-note">Área bruta de construção com 3 pisos: 21.000 m². Fachada até 12 m · explanada permitida no topo do edifício · subsolo sem limite de pisos.</p>
+
+  <div class="stat-strip">
+    <div class="stat"><div class="stat-n" data-to="17500" data-sep="1">0</div><div class="stat-k">m² de terreno</div></div>
+    <div class="stat"><div class="stat-n" data-to="7000" data-sep="1">0</div><div class="stat-k">m² de implantação</div></div>
+    <div class="stat"><div class="stat-n" data-to="21000" data-sep="1">0</div><div class="stat-k">m² de área bruta</div></div>
+    <div class="stat"><div class="stat-n" data-to="3">0</div><div class="stat-k">pisos acima do solo</div></div>
+    <div class="stat"><div class="stat-n" data-to="12" data-suf=" m">0</div><div class="stat-k">de fachada, no máximo</div></div>
+  </div>
+</section>
+
+<section id="corte" class="reveal">
+  <div class="section-head">
+    <div class="eyebrow">O edifício em corte</div>
+    <h2>O que cabe em altura</h2>
+    <p>O regulamento não limita só a área — limita a forma. Três pisos acima do solo dentro de 12 m de fachada, subsolo sem limite, e duas coisas que ficam de fora da contagem: a explanada no topo e as piscinas.</p>
+  </div>
+  <div class="corte-wrap">
+    <svg class="corte-svg" viewBox="0 0 820 540" role="img" aria-label="Corte esquemático do edifício">
+      <!-- terreno -->
+      <line x1="20" y1="330" x2="800" y2="330" stroke="#3F4A32" stroke-width="2"/>
+      <text x="24" y="350" class="c-lbl">COTA DO TERRENO</text>
+
+      <!-- subsolo -->
+      <rect x="150" y="330" width="380" height="60" fill="#E4DBC6" stroke="#3F4A32" stroke-width="1" stroke-dasharray="5 4"/>
+      <rect x="150" y="392" width="380" height="60" fill="#E4DBC6" stroke="#3F4A32" stroke-width="1" stroke-dasharray="5 4"/>
+      <text x="340" y="366" text-anchor="middle" class="c-lbl">CAVE −1</text>
+      <text x="340" y="428" text-anchor="middle" class="c-lbl">CAVE −2</text>
+      <text x="340" y="480" text-anchor="middle" class="c-lbl c-gold">SEM LIMITE DE PISOS ↓</text>
+      <path d="M340,486 L340,510" stroke="#B08D3E" stroke-width="1" stroke-dasharray="3 4"/>
+
+      <!-- pisos acima do solo -->
+      <rect x="150" y="270" width="380" height="60" fill="#3F4A32"/>
+      <rect x="150" y="210" width="380" height="60" fill="#46523A"/>
+      <rect x="150" y="150" width="380" height="60" fill="#3F4A32"/>
+      <text x="340" y="306" text-anchor="middle" class="c-lbl c-sand">RÉS-DO-CHÃO · receção e restaurante</text>
+      <text x="340" y="246" text-anchor="middle" class="c-lbl c-sand">1.º PISO · quartos</text>
+      <text x="340" y="186" text-anchor="middle" class="c-lbl c-sand">2.º PISO · quartos</text>
+
+      <!-- explanada + paineis -->
+      <rect x="150" y="136" width="380" height="14" fill="#B08D3E"/>
+      <text x="545" y="146" class="c-lbl c-gold">EXPLANADA — permitida</text>
+      <line x1="536" y1="143" x2="150" y2="143" stroke="none"/>
+
+      <!-- cota 12 m -->
+      <line x1="110" y1="150" x2="110" y2="330" stroke="#1B2116" stroke-width="1"/>
+      <path d="M106,154 L110,146 L114,154" fill="#1B2116"/>
+      <path d="M106,326 L110,334 L114,326" fill="#1B2116"/>
+      <text x="98" y="245" text-anchor="end" class="c-lbl">FACHADA</text>
+      <text x="98" y="262" text-anchor="end" class="c-lbl c-gold">ATÉ 12 m</text>
+
+      <!-- piscina -->
+      <rect x="586" y="306" width="150" height="24" rx="3" fill="#7FB3D0"/>
+      <text x="661" y="356" text-anchor="middle" class="c-lbl">PISCINA</text>
+      <text x="661" y="373" text-anchor="middle" class="c-lbl c-gold">FORA DO ÍNDICE</text>
+    </svg>
+    <ul class="corte-list">
+      <li><span>Pisos acima do solo</span><span>3</span></li>
+      <li><span>Altura de fachada</span><span>até 12 m</span></li>
+      <li><span>Pisos em subsolo</span><span>sem limite</span></li>
+      <li><span>Explanada no topo</span><span>permitida</span></li>
+      <li><span>Piscinas</span><span>não contam</span></li>
+    </ul>
+  </div>
 </section>
 
 <section id="expansao" class="reveal">
@@ -662,6 +768,30 @@
     <div class="ficha-linha"><span class="ficha-k">Piscina</span><span class="ficha-v">fora do índice</span></div>
   </div>
   <p class="nota-areas">Estudo ilustrativo, sujeito à aprovação do índice alargado e da tipologia mista, e a projeto de licenciamento.</p>
+</section>
+
+<section id="porque-agora" class="reveal porque-section">
+  <div class="section-head">
+    <div class="eyebrow">Porquê agora</div>
+    <h2>O momento em que vale a pena mexer</h2>
+  </div>
+  <div class="porque-grid">
+    <div class="porque-card">
+      <div class="num">01</div>
+      <h3>O PDM está aberto</h3>
+      <p>Um Plano Diretor Municipal fixa-se por anos. Enquanto está em revisão, é possível pedir alterações a índices, cotas e classificação — depois de publicado, deixa de ser. É esta janela que estamos a usar.</p>
+    </div>
+    <div class="porque-card">
+      <div class="num">02</div>
+      <h3>Évora vai precisar de camas</h3>
+      <p>O novo hospital em construção traz consigo procura de alojamento que a cidade ainda não tem — para profissionais, famílias e estadias prolongadas. É o argumento que sustenta o pedido de tipologia mista.</p>
+    </div>
+    <div class="porque-card">
+      <div class="num">03</div>
+      <h3>A Câmara está do lado do projeto</h3>
+      <p>Urbanismo e Turismo já manifestaram apoio para dar prioridade ao processo, e a reclassificação para Serviços e Turismo foi incluída no novo PDM precisamente para permitir o hotel.</p>
+    </div>
+  </div>
 </section>
 
 <section id="proximos-passos" class="reveal">
@@ -1162,6 +1292,36 @@
     const i = pisoAt(e.clientX-r.left, e.clientY-r.top);
     if(i>=0) openPiso(i);
   });
+})();
+
+/* ---------------- NÚMEROS QUE CONTAM ---------------- */
+(function(){
+  const nums = document.querySelectorAll('.stat-n');
+  if(!nums.length) return;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function fmt(v, sep, suf){
+    let s = String(Math.round(v));
+    if(sep) s = s.replace(/\B(?=(\d{3})+(?!\d))/g, '.');   // 17.500, como no resto do site
+    return s + (suf || '');
+  }
+  function run(el){
+    const to  = parseFloat(el.dataset.to);
+    const sep = el.dataset.sep === '1';
+    const suf = el.dataset.suf || '';
+    if(reduce){ el.textContent = fmt(to, sep, suf); return; }
+    const dur = 1100, t0 = performance.now();
+    (function tick(now){
+      const p = Math.min((now - t0)/dur, 1);
+      const eased = 1 - Math.pow(1-p, 3);
+      el.textContent = fmt(to*eased, sep, suf);
+      if(p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ run(e.target); obs.unobserve(e.target); } });
+  }, { threshold:0.5 });
+  nums.forEach(el=> obs.observe(el));
 })();
 
 /* ---------------- REVEAL ON SCROLL ---------------- */
