@@ -129,6 +129,10 @@
     padding:8px 18px; border-radius:100px;
   }
   .modelo-view-body p{ max-width:52ch; font-size:15px; line-height:1.7; opacity:0.68; }
+  .nota-render{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.05em;
+    opacity:0.45; max-width:56ch; line-height:1.6;
+  }
   .modelo-render{
     width:min(880px,90vw); height:auto; border-radius:6px;
     border:1px solid rgba(239,232,216,0.16);
@@ -390,6 +394,7 @@
     <h2 id="modeloViewTitle">Modelo <em>1</em></h2>
     <span class="em-breve" id="modeloEmBreve">Em breve</span>
     <img class="modelo-render" id="modeloRender" alt="" hidden>
+    <p class="nota-render" id="modeloNota" hidden>Render ilustrativo, para estudo volumétrico — não constitui projeto de arquitetura aprovado.</p>
     <p id="modeloViewText">Este modelo vai mostrar o terreno construído — hotel, casas, jardim e piscina — com a construção a montar-se à medida que percorres a página, e cada edifício clicável para ver o conceito por dentro.</p>
   </div>
 </div>
@@ -686,6 +691,7 @@
       <div class="pisos-legend">
         <div class="pisos-label" id="pisosLabel">Cave · <b>estacionamento</b></div>
         <div class="pisos-dots" id="pisosDots"></div>
+        <p class="nota-render">Render ilustrativo, para estudo volumétrico — não constitui projeto de arquitetura aprovado.</p>
       </div>
     </div>
   </div>
@@ -766,11 +772,13 @@
       img.alt = 'Render do Modelo ' + n;
       img.hidden = false;
       emBreve.hidden = true;
+      document.getElementById('modeloNota').hidden = false;
       texto.textContent = render.texto;
     } else {
       img.hidden = true;
       img.removeAttribute('src');
       emBreve.hidden = false;
+      document.getElementById('modeloNota').hidden = true;
       texto.textContent = 'Este modelo vai mostrar o terreno construído — hotel, casas, jardim e piscina — com a construção a montar-se à medida que percorres a página, e cada edifício clicável para ver o conceito por dentro.';
     }
 
