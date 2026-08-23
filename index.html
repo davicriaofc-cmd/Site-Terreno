@@ -186,6 +186,58 @@
     transition:transform 0.75s cubic-bezier(.5,0,.2,1), opacity 0.5s ease;
     will-change:transform;
   }
+  .pisos-stage.clickable{ cursor:pointer; }
+  .piso-layer.hot{ filter:drop-shadow(0 0 14px rgba(176,141,62,0.65)) brightness(1.05); }
+  .pisos-hint{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.08em;
+    color:var(--olive); opacity:0.6;
+  }
+
+  /* PAINEL DE DETALHE DE UM PISO */
+  .piso-panel{
+    position:fixed; top:0; right:0; bottom:0; z-index:160;
+    width:min(460px,92vw); background:var(--olive-deep); color:var(--sand);
+    transform:translateX(100%); transition:transform 0.45s cubic-bezier(.6,0,.2,1);
+    display:flex; flex-direction:column; overflow-y:auto;
+    box-shadow:-20px 0 60px rgba(0,0,0,0.3);
+  }
+  .piso-panel.open{ transform:translateX(0); }
+  .piso-panel-top{
+    display:flex; justify-content:space-between; align-items:center; gap:16px;
+    padding:26px 30px; border-bottom:1px solid rgba(239,232,216,0.14);
+  }
+  .piso-panel-top .eyebrow{ color:var(--gold-soft); opacity:1; }
+  .piso-close{
+    background:none; border:1px solid rgba(239,232,216,0.3); border-radius:50%;
+    width:34px; height:34px; color:var(--sand); font-size:16px; cursor:pointer; flex:none;
+    transition:background 0.2s, border-color 0.2s;
+  }
+  .piso-close:hover{ background:rgba(239,232,216,0.1); border-color:var(--gold-soft); }
+  .piso-panel-body{ padding:32px 30px 60px; display:flex; flex-direction:column; gap:22px; }
+  .piso-panel-body h3{ font-size:28px; }
+  .piso-panel-body h3 em{ font-style:italic; color:var(--gold-soft); font-weight:500; }
+  .piso-panel-body > p{ font-size:14.5px; line-height:1.75; opacity:0.72; }
+  .piso-zonas{ list-style:none; display:flex; flex-direction:column; border-top:1px solid rgba(239,232,216,0.14); }
+  .piso-zonas li{
+    padding:14px 0; border-bottom:1px solid rgba(239,232,216,0.1);
+    font-size:14px; line-height:1.6; opacity:0.8; padding-left:16px; position:relative;
+  }
+  .piso-zonas li::before{
+    content:''; position:absolute; left:0; top:1.5em;
+    width:7px; height:1px; background:var(--gold-soft); opacity:0.85;
+  }
+  .piso-fotos{
+    border:1px dashed rgba(239,232,216,0.28); border-radius:6px;
+    padding:26px 20px; text-align:center;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.08em;
+    opacity:0.5; line-height:1.7;
+  }
+  .piso-overlay{
+    position:fixed; inset:0; z-index:155; background:rgba(14,23,32,0.55);
+    opacity:0; pointer-events:none; transition:opacity 0.35s;
+  }
+  .piso-overlay.open{ opacity:1; pointer-events:auto; }
+
   .pisos-legend{
     display:flex; flex-direction:column; align-items:center; gap:12px;
     text-align:center;
@@ -691,11 +743,26 @@
       <div class="pisos-legend">
         <div class="pisos-label" id="pisosLabel">Cave · <b>estacionamento</b></div>
         <div class="pisos-dots" id="pisosDots"></div>
+        <p class="pisos-hint" id="pisosHint">CLICA NUM PISO PARA VER O QUE TEM LÁ DENTRO</p>
         <p class="nota-render">Render ilustrativo, para estudo volumétrico — não constitui projeto de arquitetura aprovado.</p>
       </div>
     </div>
   </div>
 </section>
+
+<div class="piso-overlay" id="pisoOverlay"></div>
+<aside class="piso-panel" id="pisoPanel" aria-hidden="true">
+  <div class="piso-panel-top">
+    <span class="eyebrow" id="pisoPanelTag">Cave</span>
+    <button class="piso-close" id="pisoClose" aria-label="Fechar">×</button>
+  </div>
+  <div class="piso-panel-body">
+    <h3 id="pisoPanelTitle">Cave</h3>
+    <p id="pisoPanelIntro"></p>
+    <ul class="piso-zonas" id="pisoPanelZonas"></ul>
+    <div class="piso-fotos">FOTOS DE REFERÊNCIA<br>A ACRESCENTAR</div>
+  </div>
+</aside>
 
 <footer>
   <h2>Do terreno vazio<br>ao <em>primeiro hóspede</em>.</h2>
@@ -1005,6 +1072,96 @@
   });
 
   window.addEventListener('resize', ()=>{ track.style.height = trackHeight()+'px'; render(); });
+
+  /* ---- pisos clicáveis: deteção pelo canal alpha ---- */
+  const PISOS = [
+    { tag:'Cave', titulo:'Cave · <em>estacionamento</em>',
+      intro:'O subsolo não conta para o índice de construção, por isso pode ter os pisos que forem precisos. É onde vive tudo o que o hotel precisa mas não quer à vista.',
+      zonas:['Estacionamento coberto para hóspedes e pessoal','Áreas técnicas, cozinhas de apoio e arrumos','Acesso direto ao rés-do-chão por elevador e escadas','Sem limite de pisos em profundidade'] },
+    { tag:'Rés-do-chão', titulo:'Rés-do-chão · <em>receção e restaurante</em>',
+      intro:'O piso de entrada, onde o hotel se abre ao terreno. É aqui que ficam as funções públicas — as que também servem quem não está hospedado.',
+      zonas:['Receção, lounge e áreas de bem-estar','Restaurante de eventos com terraço e salão de festas','Três salas de reunião flexíveis','Ligação direta à piscina e ao relvado de eventos'] },
+    { tag:'Primeiro piso', titulo:'Primeiro piso · <em>quartos</em>',
+      intro:'O primeiro dos dois pisos de alojamento, com os quartos alinhados ao longo do edifício e varanda contínua virada para o interior do lote.',
+      zonas:['Quartos com varanda sobre a piscina e o pomar','Corredor central de distribuição','Zonas de apoio e roupeiros por piso'] },
+    { tag:'Segundo piso', titulo:'Segundo piso · <em>quartos e cobertura</em>',
+      intro:'O piso mais alto, dentro dos 12 m de fachada permitidos. Por cima, a cobertura acumula duas funções: explanada e produção de energia.',
+      zonas:['Segundo nível de quartos com varanda','Explanada no topo do edifício — permitida pelo regulamento','Cobertura com painéis fotovoltaicos','Fachada até 12 m, o limite atual'] }
+  ];
+
+  const panel   = document.getElementById('pisoPanel');
+  const overlay = document.getElementById('pisoOverlay');
+  const pTag    = document.getElementById('pisoPanelTag');
+  const pTitle  = document.getElementById('pisoPanelTitle');
+  const pIntro  = document.getElementById('pisoPanelIntro');
+  const pZonas  = document.getElementById('pisoPanelZonas');
+
+  function openPiso(i){
+    const d = PISOS[i];
+    pTag.textContent = d.tag;
+    pTitle.innerHTML = d.titulo;
+    pIntro.textContent = d.intro;
+    pZonas.innerHTML = d.zonas.map(z=>`<li>${z}</li>`).join('');
+    panel.classList.add('open'); overlay.classList.add('open');
+    panel.setAttribute('aria-hidden','false');
+  }
+  function closePiso(){
+    panel.classList.remove('open'); overlay.classList.remove('open');
+    panel.setAttribute('aria-hidden','true');
+  }
+  document.getElementById('pisoClose').addEventListener('click', closePiso);
+  overlay.addEventListener('click', closePiso);
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape' && panel.classList.contains('open')) closePiso();
+  });
+
+  // mapas de alpha em baixa resolução, um por camada
+  const AW = 212, AH = 316;
+  const alphaMaps = new Array(layers.length).fill(null);
+  layers.forEach((img,i)=>{
+    const build = ()=>{
+      try{
+        const c = document.createElement('canvas');
+        c.width = AW; c.height = AH;
+        const ctx = c.getContext('2d', { willReadFrequently:true });
+        ctx.drawImage(img, 0, 0, AW, AH);
+        alphaMaps[i] = ctx.getImageData(0,0,AW,AH).data;
+        stage.classList.add('clickable');
+      }catch(err){ /* imagem de outra origem: fica sem deteção */ }
+    };
+    if(img.complete && img.naturalWidth) build();
+    else img.addEventListener('load', build, { once:true });
+  });
+
+  // qual o piso sob o ponto (x,y) relativo ao palco — de cima para baixo
+  function pisoAt(x, y){
+    const r = stage.getBoundingClientRect();
+    for(let i=layers.length-1; i>=0; i--){
+      const map = alphaMaps[i];
+      if(!map) continue;
+      const dy = (i < step ? DY[i] : 0) * r.height;
+      const u = x / r.width;
+      const v = (y - dy) / r.height;
+      if(u<0||u>=1||v<0||v>=1) continue;
+      const px = Math.min(AW-1, Math.floor(u*AW));
+      const py = Math.min(AH-1, Math.floor(v*AH));
+      if(map[(py*AW+px)*4 + 3] > 40) return i;
+    }
+    return -1;
+  }
+
+  stage.addEventListener('mousemove', (e)=>{
+    const r = stage.getBoundingClientRect();
+    const i = pisoAt(e.clientX-r.left, e.clientY-r.top);
+    layers.forEach((el,k)=> el.classList.toggle('hot', k===i));
+    stage.style.cursor = i>=0 ? 'pointer' : 'default';
+  });
+  stage.addEventListener('mouseleave', ()=> layers.forEach(el=>el.classList.remove('hot')));
+  stage.addEventListener('click', (e)=>{
+    const r = stage.getBoundingClientRect();
+    const i = pisoAt(e.clientX-r.left, e.clientY-r.top);
+    if(i>=0) openPiso(i);
+  });
 })();
 
 /* ---------------- REVEAL ON SCROLL ---------------- */
