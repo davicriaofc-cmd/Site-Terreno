@@ -129,6 +129,11 @@
     padding:8px 18px; border-radius:100px;
   }
   .modelo-view-body p{ max-width:52ch; font-size:15px; line-height:1.7; opacity:0.68; }
+  .modelo-render{
+    width:min(880px,90vw); height:auto; border-radius:6px;
+    border:1px solid rgba(239,232,216,0.16);
+    box-shadow:0 24px 60px rgba(0,0,0,0.35);
+  }
 
   /* TAGS / STATUS */
   .tag{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:6px 12px; border-radius:100px; white-space:nowrap; }
@@ -349,8 +354,9 @@
   </div>
   <div class="modelo-view-body">
     <h2 id="modeloViewTitle">Modelo <em>1</em></h2>
-    <span class="em-breve">Em breve</span>
-    <p>Este modelo vai mostrar o terreno construído — hotel, casas, jardim e piscina — com a construção a montar-se à medida que percorres a página, e cada edifício clicável para ver o conceito por dentro.</p>
+    <span class="em-breve" id="modeloEmBreve">Em breve</span>
+    <img class="modelo-render" id="modeloRender" alt="" hidden>
+    <p id="modeloViewText">Este modelo vai mostrar o terreno construído — hotel, casas, jardim e piscina — com a construção a montar-se à medida que percorres a página, e cada edifício clicável para ver o conceito por dentro.</p>
   </div>
 </div>
 
@@ -680,9 +686,37 @@
   const modeloTag = document.getElementById('modeloViewTag');
   const modeloTitle = document.getElementById('modeloViewTitle');
 
+  // Renders disponíveis por modelo. Quando houver imagem para um modelo,
+  // acrescenta aqui a linha correspondente e o "Em breve" desaparece sozinho.
+  const MODELO_RENDERS = {
+    '1': {
+      img: 'images/modelos/modelo1.png',
+      texto: 'Implantação com o hotel a poente e o edifício de apartamentos a norte, ambos com cobertura fotovoltaica. Ao centro, a piscina de 200 m² com bar de apoio; a nascente, as 10 moradias em banda com jacuzzi no rooftop; a sul, o relvado de eventos e o pomar.'
+    }
+  };
+
   function openModelo(n){
     modeloTag.textContent = 'MODELO ' + n;
     modeloTitle.innerHTML = 'Modelo <em>' + n + '</em>';
+
+    const render = MODELO_RENDERS[n];
+    const img = document.getElementById('modeloRender');
+    const emBreve = document.getElementById('modeloEmBreve');
+    const texto = document.getElementById('modeloViewText');
+
+    if(render){
+      img.src = render.img;
+      img.alt = 'Render do Modelo ' + n;
+      img.hidden = false;
+      emBreve.hidden = true;
+      texto.textContent = render.texto;
+    } else {
+      img.hidden = true;
+      img.removeAttribute('src');
+      emBreve.hidden = false;
+      texto.textContent = 'Este modelo vai mostrar o terreno construído — hotel, casas, jardim e piscina — com a construção a montar-se à medida que percorres a página, e cada edifício clicável para ver o conceito por dentro.';
+    }
+
     modeloView.classList.add('open');
     modeloView.setAttribute('aria-hidden','false');
     document.body.style.overflow = 'hidden';
