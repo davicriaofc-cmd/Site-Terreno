@@ -220,12 +220,28 @@
   }
   .pisos-stage{
     position:relative; height:74vh; aspect-ratio:1696/2528;
+    perspective:1600px;
+  }
+  /* camada interior que se inclina com o rato — o palco fica fixo,
+     para a deteção de cliques continuar a bater certo */
+  .pisos-stage-3d{
+    position:absolute; inset:0; transform-style:preserve-3d;
+    transition:transform 0.5s cubic-bezier(.3,0,.2,1);
   }
   .piso-layer{
     position:absolute; inset:0; width:100%; height:100%;
     object-fit:contain;
+    transform:translateY(var(--dy,0)) translateZ(var(--tz,0px));
     transition:transform 0.75s cubic-bezier(.5,0,.2,1), opacity 0.5s ease;
     will-change:transform;
+  }
+  /* profundidade: os pisos de cima ficam mais perto do observador */
+  .piso-layer:nth-child(1){ --tz:0px; }
+  .piso-layer:nth-child(2){ --tz:26px; }
+  .piso-layer:nth-child(3){ --tz:52px; }
+  .piso-layer:nth-child(4){ --tz:78px; }
+  @media (prefers-reduced-motion:reduce){
+    .pisos-stage-3d{ transform:none !important; transition:none; }
   }
   .pisos-stage.clickable{ cursor:pointer; }
   .piso-layer.hot{ filter:drop-shadow(0 0 14px rgba(176,141,62,0.65)) brightness(1.05); }
@@ -586,11 +602,13 @@
   <div class="pisos-track" id="pisosTrack">
     <div class="pisos-sticky">
       <div class="pisos-stage" id="pisosStage">
+       <div class="pisos-stage-3d" id="pisosStage3d">
         <!-- ordem de pintura: a cave fica atrás, o piso de cima à frente -->
         <img class="piso-layer" data-piso="cave" src="images/pisos/cave.webp" alt="Cave — estacionamento">
         <img class="piso-layer" data-piso="rc" src="images/pisos/rc.webp" alt="Rés-do-chão — receção e restaurante">
         <img class="piso-layer" data-piso="piso1" src="images/pisos/piso1.webp" alt="Primeiro piso — quartos">
         <img class="piso-layer" data-piso="piso2" src="images/pisos/piso2.webp" alt="Segundo piso e cobertura com painéis solares">
+       </div>
       </div>
       <div class="pisos-legend">
         <div class="pisos-label" id="pisosLabel">O hotel · <b>montado</b></div>
@@ -1136,7 +1154,7 @@
     // arranca montado; cada passo solta mais um piso, de cima para baixo
     layers.forEach((el,i)=>{
       const solto = i >= layers.length - step;
-      el.style.transform = solto ? 'translateY(0)' : `translateY(${DY[i]*100}%)`;
+      el.style.setProperty('--dy', solto ? '0%' : (DY[i]*100)+'%');
     });
     label.innerHTML = LABELS[step];
   }
@@ -1186,6 +1204,29 @@
   }, { passive:true });
 
   window.addEventListener('resize', ()=>{ track.style.height = trackHeight()+'px'; render(); });
+
+  /* ---- inclinação com o rato: dá volume ao conjunto ---- */
+  (function(){
+    const inner = document.getElementById('pisosStage3d');
+    if(!inner) return;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const MAX_X = 7, MAX_Y = 9;    // graus
+    let raf = null, tx = 0, ty = 0;
+
+    function apply(){
+      raf = null;
+      inner.style.transform = `rotateX(${tx.toFixed(2)}deg) rotateY(${ty.toFixed(2)}deg)`;
+    }
+    stage.addEventListener('mousemove', (e)=>{
+      const r = stage.getBoundingClientRect();
+      const nx = (e.clientX - r.left) / r.width  * 2 - 1;   // -1 … 1
+      const ny = (e.clientY - r.top)  / r.height * 2 - 1;
+      tx = -ny * MAX_X;
+      ty =  nx * MAX_Y;
+      if(!raf) raf = requestAnimationFrame(apply);
+    });
+    stage.addEventListener('mouseleave', ()=>{ tx = 0; ty = 0; if(!raf) raf = requestAnimationFrame(apply); });
+  })();
 
   /* ---- pisos clicáveis: deteção pelo canal alpha ---- */
   const PISOS = [
