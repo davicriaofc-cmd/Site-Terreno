@@ -1,0 +1,4 @@
+
+# Chaves de API — nunca commitar
+.env
+.env.local
