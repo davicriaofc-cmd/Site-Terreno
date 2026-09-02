@@ -14,8 +14,19 @@ projeto e o processo urbanístico à medida que avança.
 
 ## Dados reais do projeto (não inventar/alterar sem confirmação do utilizador)
 
+- **Localização:** Montemor-o-Novo (distrito de Évora), junto ao Centro
+  Hípico D. Duarte e ao complexo desportivo. Coordenadas ~38°38'36"N
+  8°12'05"W. **Não é na cidade de Évora** — Évora aparece no site só como
+  argumento de mercado (o novo hospital) e como referência de tipologia
+  (Hotel Ibis). Não voltar a escrever que o terreno é em Évora.
 - **Área do terreno:** 17.500 m² (não é 1.700 — esse número apareceu numa
-  versão inicial e estava errado).
+  versão inicial e estava errado). Uma medição do utilizador no Google
+  Earth deu 16.152 m² / 615 m de perímetro, mas o polígono era traçado à
+  mão; o utilizador confirmou que o valor a usar é 17.500 m².
+- **Forma do lote:** polígono irregular, tipo cunha, com o eixo maior a
+  correr NNO–SSE; lado mais largo a norte, a estreitar para sul. Estrada
+  ao longo do limite nascente/sudeste. Terreno praticamente plano
+  (225–233 m de cota). Ver o print do Google Earth no histórico da sessão.
 - **Classificação atual:** Equipamento (não permite hotel).
 - **Classificação prevista:** Serviços e Turismo — já incluída pelo Município
   no novo PDM, precisamente para permitir o hotel.
