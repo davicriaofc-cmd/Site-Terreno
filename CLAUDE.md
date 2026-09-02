@@ -96,6 +96,35 @@ textura via `THREE.TextureLoader` em vez de gerar a cena processual em
 canvas. Basta acrescentar `img:'images/tour/nome.jpg'` a uma cena quando
 houver material real — não é preciso mexer no resto do código.
 
+## Maquete 3D do Modelo 1 (`#modelos` → vista de modelo)
+
+O Modelo 1 abre com uma maquete 3D navegável (arrastar para rodar, roda para
+aproximar) que **cresce ao abrir**: o lote espalha-se, a via desenha-se, os
+edifícios sobem do chão, a piscina enche e o pomar nasce — cerca de 3 s no
+total. O botão "Ver crescer outra vez" repete. Script:
+`/* MODELO 1 — MAQUETE 3D (cresce ao abrir) */` no fim do `index.html`.
+
+- **Biblioteca:** `vendor/three.min.js` (three r160, build UMD), servida do
+  próprio repositório — o site continua sem depender de CDNs. Não trocar por
+  um CDN sem pedir.
+- **Só arranca quando o Modelo 1 é aberto** (nada de WebGL no carregamento da
+  página) e o `requestAnimationFrame` pára ao fechar. Sem WebGL, a maquete
+  fica escondida e mostra-se só o render — ver `MODELO_RENDERS['1'].maquete3d`.
+- **Lote:** polígono `LOTE`, traçado sobre o print do Google Earth e escalado
+  para dar exatamente 17.500 m². Não mexer sem refazer a escala.
+- **Implantação** (constantes no script, todas validadas por deteção de
+  colisão e recuo de 7 m aos limites — se mudares uma, revalida as outras):
+  hotel em L a sul (ala de 56×16 m + braço de 16×22 m, 3 pisos, fotovoltaico);
+  apartamentos a norte (52×14 m, 3 pisos, fotovoltaico); 10 moradias em banda
+  a nascente (8×12 m, 2 pisos, jacuzzi no rooftop); piscina de 200 m² com deck
+  e bar ao centro; relvado de eventos a sul; pomar em grelha; via perimetral
+  de 8 m entre `VIA_EXT` e `VIA_INT`.
+- **Câmara:** `enquadrar()` afasta-se sozinha até o construído caber, seja qual
+  for a proporção do canvas; `anguloDePartida()` escolhe a vista larga
+  (canvas ao baixo) ou a vista compacta (canvas em retrato).
+- `images/modelos/modelo1.png` passou a ser a **implantação de referência**,
+  mostrada mais pequena por baixo da maquete.
+
 ## Modelos 3D reais (pendente)
 
 O utilizador vai mandar fotos reais em fases (terreno ilustrativo, terreno
