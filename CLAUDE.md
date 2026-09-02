@@ -6,9 +6,9 @@ projeto e o processo urbanístico à medida que avança.
 
 ## Estado atual
 
-- Branch de trabalho: `claude/mano-slfa79` → PR #2 em
-  `davicriaofc-cmd/site-terreno` (ver com `git log`/`gh pr view 2` se precisares
-  do estado mais recente).
+- Branch de trabalho: `claude/site-assistance-pk5n2b` → PR #6 em
+  `davicriaofc-cmd/Site-Terreno` (ver com `git log` se precisares do estado
+  mais recente). O `claude/mano-slfa79` / PR #2 é histórico antigo.
 - Todo o site vive num único `index.html`. Sem framework, sem npm — editar
   diretamente o ficheiro.
 
@@ -164,8 +164,8 @@ contido, sem emojis.
 
 ## Fluxo de trabalho
 
-- Commits diretamente para `claude/mano-slfa79`, depois `git push`. O PR #2
-  atualiza-se sozinho a cada push.
+- Commits diretamente para `claude/site-assistance-pk5n2b`, depois `git push`.
+  O PR #6 atualiza-se sozinho a cada push.
 - Antes de dar como concluída qualquer alteração visual, testar com
   Playwright headless (`/opt/pw-browsers/chromium`, `NODE_PATH=/opt/node22/lib/node_modules`)
   e tirar screenshot — CDNs externos (Google Fonts, cdnjs three.js) podem
