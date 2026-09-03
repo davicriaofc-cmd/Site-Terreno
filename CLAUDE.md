@@ -1,7 +1,7 @@
 # O Terreno — Projeto Hoteleiro
 
 Site one-page (`index.html`, autocontido — sem build, sem dependências locais)
-para um projeto de hotel num terreno em Évora. Serve para documentar o
+para um projeto de hotel num terreno em Montemor-o-Novo. Serve para documentar o
 projeto e o processo urbanístico à medida que avança.
 
 ## Estado atual
@@ -59,22 +59,29 @@ tipologia mista). Não apresentar o cenário pendente como decidido.
 
 ## Estrutura do site (ordem das secções)
 
+Confirmar sempre com `grep -n '<section id=' index.html` — esta lista já
+esteve desatualizada.
+
 1. Loader + menu hambúrguer (fixo, liga a todas as secções por âncora)
 2. Hero com scroll-lock — 5 painéis (`#scrollTrack` / `.hero-panel`)
 3. `#estado` — estado do processo urbanístico
-4. `#plot` — índice de ocupação atual (40% hotel / 60% livre)
-5. `#expansao` — cenário em avaliação (índice alargado + tipologia mista)
-6. `#modelos` — 5 estudos volumétricos ilustrativos (hipotéticos, dependem
-   da aprovação do cenário acima)
-7. `#proximos-passos` — roteiro
-8. `#evolucao` — evolução da construção (crossfade ligado ao scroll normal,
-   6 fases: terreno ilustrativo, terreno limpo, 25%, 50%, 75%, 100%)
-9. `#tour` — visita virtual 360º (Three.js, cena processual gerada em
-   canvas — ainda não são fotos/renders reais)
-10. `#concept` — parâmetros confirmados (subsolo, explanada/piscinas, postes)
-11. `footer`
+4. `#pisos` — o hotel a abrir-se camada a camada (imagens em `images/pisos/`)
+5. `#corte` — corte esquemático em SVG (3 pisos, 12 m, cave, explanada)
+6. `#plot` — índice de ocupação atual (40% hotel / 60% livre)
+7. `#expansao` — cenário em avaliação (índice alargado + tipologia mista)
+8. `#modelos` — 5 estudos volumétricos; o Modelo 1 abre a maquete 3D
+9. `#porque-agora` — os três argumentos (PDM aberto, hospital, Câmara)
+10. `#proximos-passos` — roteiro
+11. `#concept` — parâmetros confirmados (subsolo, explanada/piscinas, postes)
+12. `footer`
 
-## Evolução da construção (`#evolucao`)
+**Já não existem:** `#evolucao` (crossfade das 6 fases de construção) e
+`#tour` (visita 360º em Three.js). Foram removidas do `index.html` numa
+sessão anterior, e as pastas `images/evolucao/` e `images/tour/` também já
+não existem. Os dois blocos abaixo descrevem-nas para memória futura, caso
+se queiram recuperar — mas **não estão no site**.
+
+## Evolução da construção (`#evolucao`) — REMOVIDA do site
 
 Crossfade entre 6 imagens ligado ao **scroll normal** (sem prender o rato —
 ao contrário do hero, aqui não há `preventDefault`, é só opacidade a mudar
@@ -88,7 +95,7 @@ cada fase, basta substituir os ficheiros com o mesmo nome (ou atualizar os
 `src=` no HTML se os nomes/formatos forem diferentes). Não regenerar os
 SVGs a partir de código sem pedir — foram feitos à mão para este efeito.
 
-## Visita 360º — pronta para fotos reais
+## Visita 360º (`#tour`) — REMOVIDA do site
 
 O array `scenes` no script do tour aceita um campo opcional `img` (caminho
 para uma foto/render equirretangular 2:1). Se presente, carrega essa
