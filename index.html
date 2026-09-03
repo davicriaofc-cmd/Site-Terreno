@@ -133,6 +133,26 @@
     font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.05em;
     opacity:0.45; max-width:56ch; line-height:1.6;
   }
+  /* abas do corte por modelo */
+  .modelo-linha{ font-size:14px; line-height:1.65; opacity:0.62; margin-top:8px; }
+  .corte-abas{
+    display:flex; flex-wrap:wrap; gap:8px; justify-content:center;
+    margin:0 auto 10px; max-width:820px;
+  }
+  .corte-aba{
+    background:none; border:1px solid var(--line); border-radius:100px;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.08em;
+    color:var(--ink); opacity:0.55; padding:8px 15px; cursor:pointer;
+    transition:opacity 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .corte-aba:hover{ opacity:0.9; border-color:var(--gold); }
+  .corte-aba.on{ opacity:1; background:var(--olive); color:var(--sand); border-color:var(--olive); }
+  .corte-nome{
+    text-align:center; font-family:'IBM Plex Mono', monospace; font-size:11px;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--gold);
+    margin-bottom:22px;
+  }
+  .roteiro-head{ margin-top:70px; }
   .modelo-render{
     width:min(880px,90vw); height:auto; border-radius:6px;
     border:1px solid rgba(239,232,216,0.16);
@@ -148,6 +168,13 @@
     background:#222A1C; cursor:grab; touch-action:none;
   }
   .modelo-3d canvas:active{ cursor:grabbing; }
+  .modelo-3d.a-carregar canvas{ opacity:0.35; transition:opacity 0.3s; }
+  .modelo-3d.a-carregar::after{
+    content:'A CARREGAR A MAQUETE…';
+    display:block; margin-top:-300px; margin-bottom:288px; text-align:center;
+    font-family:'IBM Plex Mono', monospace; font-size:11px;
+    letter-spacing:0.12em; opacity:0.6; pointer-events:none;
+  }
   .modelo-3d-bar{
     display:flex; align-items:center; justify-content:space-between; gap:18px;
     margin-top:12px; font-family:'IBM Plex Mono', monospace;
@@ -487,12 +514,9 @@
   <a class="model-row" href="#estado"><span class="name"><span class="model-i">01</span>Estado do processo</span><span class="tag">VER</span></a>
   <a class="model-row" href="#pisos"><span class="name"><span class="model-i">02</span>O hotel piso a piso</span><span class="tag">VER</span></a>
   <a class="model-row" href="#corte"><span class="name"><span class="model-i">03</span>O edifício em corte</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#plot"><span class="name"><span class="model-i">04</span>Índice de ocupação</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#expansao"><span class="name"><span class="model-i">05</span>Índice alargado + mista</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#modelos"><span class="name"><span class="model-i">06</span>5 estudos volumétricos</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#porque-agora"><span class="name"><span class="model-i">07</span>Porquê agora</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#proximos-passos"><span class="name"><span class="model-i">08</span>Próximos passos</span><span class="tag">VER</span></a>
-  <a class="model-row" href="#concept"><span class="name"><span class="model-i">09</span>Regulamento atual</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#plot"><span class="name"><span class="model-i">04</span>O que se pode construir</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#modelos"><span class="name"><span class="model-i">05</span>5 estudos volumétricos</span><span class="tag">VER</span></a>
+  <a class="model-row" href="#porque-agora"><span class="name"><span class="model-i">06</span>Porquê agora e o roteiro</span><span class="tag">VER</span></a>
   <button class="model-row model-row--toggle" id="modelosToggle" aria-expanded="false" aria-controls="modelosSubmenu">
     <span class="name"><span class="model-i">10</span>Modelos</span><span class="chev">›</span>
   </button>
@@ -561,9 +585,9 @@
       <p class="hero-sub-text">A classificação está a mudar de Equipamento para Serviços e Turismo. Índice alargado e tipologia mista em avaliação junto da Câmara de Montemor-o-Novo.</p>
     </div>
     <div class="hero-panel" data-panel="4">
-      <div class="step-num">VISÃO</div>
-      <h1>Do terreno vazio<br>ao primeiro <em>hóspede</em>.</h1>
-      <p class="hero-sub-text">Percorre o projeto antes de ele existir.</p>
+      <div class="step-num">O TERRENO EM NÚMEROS</div>
+      <h1>17.500&nbsp;m²<br>à espera de <em>contas</em>.</h1>
+      <p class="hero-sub-text">O que custa levantar o hotel, e o que rende cada noite.</p>
     </div>
   </div>
 
@@ -645,67 +669,39 @@
   <div class="section-head">
     <div class="eyebrow">O edifício em corte</div>
     <h2>O que cabe em altura</h2>
-    <p>O regulamento não limita só a área — limita a forma. Três pisos acima do solo dentro de 12 m de fachada, subsolo sem limite, e duas coisas que ficam de fora da contagem: a explanada no topo e as piscinas.</p>
+    <p>O regulamento não limita só a área — limita a forma. Três pisos dentro de 12 m de fachada, subsolo sem limite, e duas coisas fora da contagem: a explanada no topo e as piscinas. Cada modelo usa esse envelope de maneira diferente.</p>
   </div>
+
+  <div class="corte-abas" id="corteAbas" role="tablist" aria-label="Corte por modelo">
+    <button class="corte-aba" data-corte="1" role="tab" aria-selected="true">Modelo 1</button>
+    <button class="corte-aba" data-corte="2" role="tab" aria-selected="false">Modelo 2</button>
+    <button class="corte-aba" data-corte="3" role="tab" aria-selected="false">Modelo 3</button>
+    <button class="corte-aba" data-corte="4" role="tab" aria-selected="false">Modelo 4</button>
+    <button class="corte-aba" data-corte="5" role="tab" aria-selected="false">Modelo 5</button>
+  </div>
+  <div class="corte-nome" id="corteNome">U-Resort centralizado</div>
+
   <div class="corte-wrap">
-    <svg class="corte-svg" viewBox="0 0 820 540" role="img" aria-label="Corte esquemático do edifício">
-      <!-- terreno -->
-      <line x1="20" y1="330" x2="800" y2="330" stroke="#3F4A32" stroke-width="2"/>
-      <text x="24" y="350" class="c-lbl">COTA DO TERRENO</text>
-
-      <!-- laje do piso terreo -->
-      <rect x="150" y="330" width="380" height="8" fill="#2A3222"/>
-
-      <!-- subsolo, claramente separado do edificio -->
-      <rect x="150" y="352" width="380" height="56" fill="#E4DBC6" stroke="#3F4A32" stroke-width="1" stroke-dasharray="5 4"/>
-      <rect x="150" y="422" width="380" height="56" fill="#E4DBC6" stroke="#3F4A32" stroke-width="1" stroke-dasharray="5 4"/>
-      <text x="340" y="386" text-anchor="middle" class="c-lbl">CAVE −1 · estacionamento</text>
-      <text x="340" y="456" text-anchor="middle" class="c-lbl">CAVE −2 · áreas técnicas</text>
-      <text x="340" y="508" text-anchor="middle" class="c-lbl c-gold">SEM LIMITE DE PISOS ↓</text>
-      <path d="M340,514 L340,532" stroke="#B08D3E" stroke-width="1" stroke-dasharray="3 4"/>
-
-      <!-- pisos acima do solo -->
-      <rect x="150" y="270" width="380" height="60" fill="#3F4A32"/>
-      <rect x="150" y="210" width="380" height="60" fill="#46523A"/>
-      <rect x="150" y="150" width="380" height="60" fill="#3F4A32"/>
-      <text x="340" y="306" text-anchor="middle" class="c-lbl c-sand">RÉS-DO-CHÃO · receção e restaurante</text>
-      <text x="340" y="246" text-anchor="middle" class="c-lbl c-sand">1.º PISO · quartos</text>
-      <text x="340" y="186" text-anchor="middle" class="c-lbl c-sand">2.º PISO · quartos</text>
-
-      <!-- explanada + paineis -->
-      <rect x="150" y="136" width="380" height="14" fill="#B08D3E"/>
-      <text x="545" y="146" class="c-lbl c-gold">EXPLANADA — permitida</text>
-      <line x1="536" y1="143" x2="150" y2="143" stroke="none"/>
-
-      <!-- cota 12 m -->
-      <line x1="110" y1="150" x2="110" y2="330" stroke="#1B2116" stroke-width="1"/>
-      <path d="M106,154 L110,146 L114,154" fill="#1B2116"/>
-      <path d="M106,326 L110,334 L114,326" fill="#1B2116"/>
-      <text x="98" y="245" text-anchor="end" class="c-lbl">FACHADA</text>
-      <text x="98" y="262" text-anchor="end" class="c-lbl c-gold">ATÉ 12 m</text>
-
-      <!-- piscina -->
-      <rect x="586" y="306" width="150" height="24" rx="3" fill="#7FB3D0"/>
-      <text x="661" y="356" text-anchor="middle" class="c-lbl">PISCINA</text>
-      <text x="661" y="373" text-anchor="middle" class="c-lbl c-gold">FORA DO ÍNDICE</text>
-    </svg>
+    <svg class="corte-svg" id="corteSvg" viewBox="0 0 820 560" role="img" aria-label="Corte esquemático do edifício"></svg>
     <ul class="corte-list">
-      <li><span>Pisos acima do solo</span><span>3</span></li>
+      <li><span>Pisos acima do solo</span><span id="corteKPisos">3</span></li>
       <li><span>Altura de fachada</span><span>até 12 m</span></li>
       <li><span>Pisos em subsolo</span><span>sem limite</span></li>
       <li><span>Explanada no topo</span><span>permitida</span></li>
       <li><span>Piscinas</span><span>não contam</span></li>
+      <li><span>Postes a remover</span><span>a nosso cargo</span></li>
     </ul>
   </div>
+  <p class="nota-render">O envelope — 3 pisos, 12 m de fachada, subsolo livre — é o do regulamento em vigor e está confirmado. A distribuição de programa por piso em cada modelo é leitura das descrições dos estudos volumétricos e está por confirmar com o arquiteto.</p>
 </section>
 
 <section id="plot" class="reveal">
   <div class="section-head">
-    <div class="eyebrow">Índice de ocupação</div>
-    <h2>Como o terreno se reparte (índice atual)</h2>
-    <p>17.500 m² sob o índice de construção atualmente em vigor para hotel: até 40% de implantação, em três pisos acima do solo, sem limite de pisos em subsolo. Piscinas não entram na contagem da área de construção.</p>
+    <div class="eyebrow">O que se pode construir</div>
+    <h2>Quanto do terreno é edifício</h2>
+    <p>O índice em vigor permite 40% de implantação. Está pedido o alargamento até 60% com tipologia mista — hotel mais casas de apoio. O primeiro está confirmado; o segundo, em avaliação.</p>
   </div>
-  <div class="plot-wrap">
+<div class="plot-wrap">
     <svg class="plot-map" viewBox="0 0 400 400">
       <rect x="4" y="4" width="392" height="392" fill="none" stroke="#3F4A32" stroke-width="1.5" stroke-dasharray="2 4" opacity="0.5"/>
       <rect x="4" y="4" width="392" height="392" fill="#E4DBC6"/>
@@ -725,24 +721,7 @@
       </div>
     </div>
   </div>
-  <p class="plot-note">Área bruta de construção com 3 pisos: 21.000 m². Fachada até 12 m · explanada permitida no topo do edifício · subsolo sem limite de pisos.</p>
-
-  <div class="stat-strip">
-    <div class="stat"><div class="stat-n" data-to="17500" data-sep="1">0</div><div class="stat-k">m² de terreno</div></div>
-    <div class="stat"><div class="stat-n" data-to="7000" data-sep="1">0</div><div class="stat-k">m² de implantação</div></div>
-    <div class="stat"><div class="stat-n" data-to="21000" data-sep="1">0</div><div class="stat-k">m² de área bruta</div></div>
-    <div class="stat"><div class="stat-n" data-to="3">0</div><div class="stat-k">pisos acima do solo</div></div>
-    <div class="stat"><div class="stat-n" data-to="12" data-suf=" m">0</div><div class="stat-k">de fachada, no máximo</div></div>
-  </div>
-</section>
-
-<section id="expansao" class="reveal">
-  <div class="section-head">
-    <div class="eyebrow">Cenário em avaliação</div>
-    <h2>Índice alargado + tipologia mista</h2>
-    <p>Em paralelo ao processo do PDM, está a ser pedido ao Gabinete de Ordenamento do Território um aumento do índice de construção e uma tipologia mista — hotel com casas de apoio, à semelhança do Hotel Ibis em Évora. A Vereadora do Turismo, Paula Martins, já mostrou abertura para o pedido.</p>
-  </div>
-  <div class="compare-grid">
+<div class="compare-grid">
     <div class="compare-card">
       <div class="eyebrow">Atual</div>
       <h3>Hotel · índice 40%</h3>
@@ -762,61 +741,48 @@
       </ul>
     </div>
   </div>
-  <p class="plot-note">Motivo: a Câmara identifica procura adicional de alojamento — também associada ao novo hospital de Évora — que a tipologia mista ajudaria a responder.</p>
+<div class="stat-strip">
+    <div class="stat"><div class="stat-n" data-to="17500" data-sep="1">0</div><div class="stat-k">m² de terreno</div></div>
+    <div class="stat"><div class="stat-n" data-to="7000" data-sep="1">0</div><div class="stat-k">m² de implantação</div></div>
+    <div class="stat"><div class="stat-n" data-to="21000" data-sep="1">0</div><div class="stat-k">m² de área bruta</div></div>
+    <div class="stat"><div class="stat-n" data-to="3">0</div><div class="stat-k">pisos acima do solo</div></div>
+    <div class="stat"><div class="stat-n" data-to="12" data-suf=" m">0</div><div class="stat-k">de fachada, no máximo</div></div>
+  </div>
+  <p class="plot-note">Com 3 pisos, os 40% dão 21.000 m² de área bruta. Fachada até 12 m · explanada no topo · subsolo sem limite de pisos · piscinas fora da contagem.</p>
 </section>
 
 <section id="modelos" class="modelos-section reveal">
   <div class="section-head">
     <div class="eyebrow">Cinco estudos volumétricos</div>
     <h2>Se a tipologia mista for aprovada</h2>
-    <p>Uma exploração ilustrativa de como os 17.500 m² poderiam acomodar hotel e casas de apoio, caso o pedido de índice alargado e tipologia mista seja aceite pela Câmara. Muda a posição do hotel, a forma da piscina e o modo como as casas se organizam no lote — o programa é hipotético, a experiência não.</p>
+    <p>Cinco maneiras de acomodar hotel e casas de apoio nos 17.500 m², caso o índice alargado e a tipologia mista sejam aceites. Abre um modelo para ver o detalhe.</p>
   </div>
 
   <div class="modelos-grid">
       <article class="modelo-card">
         <div class="modelo-n">01</div>
         <h3>U-Resort<span class="modelo-sub">Centralizado</span></h3>
-        <ul class="modelo-zonas">
-          <li>Hotel a sul com estacionamento em cave, receção, três salas de reunião modulares e restaurante de eventos no R/C.</li>
-          <li>Duas linhas de cinco casas a nascente e poente, voltadas para o interior.</li>
-          <li>Piscina retangular ao centro, com deck, bar de apoio e pomar em redor.</li>
-        </ul>
+        <p class="modelo-linha">Hotel a sul, duas linhas de cinco casas voltadas para dentro, piscina ao centro.</p>
       </article>
       <article class="modelo-card">
         <div class="modelo-n">02</div>
         <h3>Terraço Linear<span class="modelo-sub">com cascata</span></h3>
-        <ul class="modelo-zonas">
-          <li>Hotel em linha ao longo da fronteira norte — receção e spa no R/C, quartos nos pisos de cima.</li>
-          <li>Piscina de borda infinita numa plataforma sobreelevada, com cascata a desaguar na zona verde.</li>
-          <li>Dez casas em banda curva a sul, com o pomar a servir de barreira verde.</li>
-        </ul>
+        <p class="modelo-linha">Hotel em linha a norte, piscina de borda infinita com cascata, casas em banda curva a sul.</p>
       </article>
       <article class="modelo-card">
         <div class="modelo-n">03</div>
         <h3>Vila Alentejana<span class="modelo-sub">desconstruída</span></h3>
-        <ul class="modelo-zonas">
-          <li>Quatro edifícios baixos espalhados pelo pomar: receção e lounge, spa, e o bloco das três salas de reunião.</li>
-          <li>Piscina de formato orgânico, estilo lagoa, com ilha central e bar de madeira.</li>
-          <li>Dez casas em três núcleos, com pátios de pedra entre elas.</li>
-        </ul>
+        <p class="modelo-linha">Quatro edifícios baixos pelo pomar, piscina-lagoa com ilha, casas em três núcleos.</p>
       </article>
       <article class="modelo-card">
         <div class="modelo-n">04</div>
         <h3>Edifício Integrado<span class="modelo-sub">de uso misto</span></h3>
-        <ul class="modelo-zonas">
-          <li>Hotel único a poente, com cave de garagem e serviços, R/C de receção, spa, restaurante e salas de reunião.</li>
-          <li>Linha contínua de dez casas geminadas a nascente, paralela ao hotel.</li>
-          <li>Corredor verde aberto ao centro a separar a zona residencial da zona do hotel.</li>
-        </ul>
+        <p class="modelo-linha">Um só edifício a poente, dez casas geminadas a nascente, corredor verde a separar.</p>
       </article>
       <article class="modelo-card">
         <div class="modelo-n">05</div>
         <h3>Oásis de Eventos<span class="modelo-sub">com relvado de cerimónias</span></h3>
-        <ul class="modelo-zonas">
-          <li>Pavilhão de eventos e restaurante a sul, com caixilharia de vidro dobrável sobre o relvado de cerimónias.</li>
-          <li>Piscina ao lado do relvado, com cocktail bar e iluminação noturna.</li>
-          <li>Hotel e casas concentrados a norte — zona silenciosa, resguardada dos eventos.</li>
-        </ul>
+        <p class="modelo-linha">Pavilhão de eventos e restaurante a sul sobre o relvado; hotel e casas a norte, no silêncio.</p>
       </article>
   </div>
 
@@ -834,10 +800,10 @@
 
 <section id="porque-agora" class="reveal porque-section">
   <div class="section-head">
-    <div class="eyebrow">Porquê agora</div>
+    <div class="eyebrow">Porquê agora, e o que se segue</div>
     <h2>O momento em que vale a pena mexer</h2>
   </div>
-  <div class="porque-grid">
+<div class="porque-grid">
     <div class="porque-card">
       <div class="num">01</div>
       <h3>O PDM está aberto</h3>
@@ -854,14 +820,10 @@
       <p>Urbanismo e Turismo já manifestaram apoio para dar prioridade ao processo, e a reclassificação para Serviços e Turismo foi incluída no novo PDM precisamente para permitir o hotel.</p>
     </div>
   </div>
-</section>
-
-<section id="proximos-passos" class="reveal">
-  <div class="section-head">
+  <div class="section-head roteiro-head">
     <div class="eyebrow">Roteiro</div>
-    <h2>Próximos passos</h2>
   </div>
-  <div class="roadmap-list">
+<div class="roadmap-list">
     <div class="roadmap-item">
       <div class="num">01</div>
       <div class="body">
@@ -893,30 +855,6 @@
   </div>
 </section>
 
-<section id="concept" class="reveal">
-  <div class="section-head">
-    <div class="eyebrow">Parâmetros confirmados</div>
-    <h2>O que o regulamento atual permite</h2>
-  </div>
-  <div class="concept-grid">
-    <div class="concept-card">
-      <div class="num">01</div>
-      <h3>Subsolo sem limite de pisos</h3>
-      <p>Abaixo do solo, o número de pisos não está limitado — espaço para estacionamento, spa ou áreas técnicas, sem consumir índice de construção.</p>
-    </div>
-    <div class="concept-card">
-      <div class="num">02</div>
-      <h3>Explanada e piscinas</h3>
-      <p>É permitida uma explanada no topo do edifício. Piscinas não contam para a área de construção nem para o índice.</p>
-    </div>
-    <div class="concept-card">
-      <div class="num">03</div>
-      <h3>Infraestruturas a remover</h3>
-      <p>Postes de betão de média tensão e postes de madeira de telecomunicações ficam a nosso cargo — a remoção pode ser pedida assim que o projeto for aprovado.</p>
-    </div>
-  </div>
-</section>
-
 <div class="piso-overlay" id="pisoOverlay"></div>
 <aside class="piso-panel" id="pisoPanel" aria-hidden="true">
   <div class="piso-panel-top">
@@ -938,8 +876,6 @@
     <span>MONTEMOR-O-NOVO · 17.500 M² · SERVIÇOS E TURISMO (PDM EM ALTERAÇÃO)</span>
   </div>
 </footer>
-
-<script src="vendor/three.min.js"></script>
 
 <script>
 /* ---------------- LOADER ---------------- */
@@ -1384,7 +1320,7 @@
 (function(){
   const host   = document.getElementById('modelo3d');
   const canvas = document.getElementById('modelo3dCanvas');
-  if(!host || !canvas || !window.THREE) return;
+  if(!host || !canvas) return;
 
   /* --- lote real, traçado sobre o Google Earth e escalado para 17.500 m² --- */
   const LOTE = [[-30.6,-89.7],[13.1,-103.2],[28.7,-94.8],[104.2,2.7],[64.8,31.1],
@@ -1409,10 +1345,11 @@
 
   let renderer, scene, camera, sol, raf=null, pronto=false, animacoes=[], inicio=0;
   let FOCO = [];   // cantos do construído, para a câmara se enquadrar pelo projeto
-  let yaw=rad(-110), pitch=rad(34), dist=235, alvo=new THREE.Vector3(11,4,6);
+  let yaw=rad(-110), pitch=rad(34), dist=235, alvo=null;   // alvo criado só depois do THREE existir
   let arrastar=false, ultX=0, ultY=0, parado=0, aberto=false;
 
-  const mat = (c,o) => new THREE.MeshLambertMaterial(Object.assign({color:c},o||{}));
+  const mat = (c,o) => new THREE.MeshStandardMaterial(
+    Object.assign({color:c, roughness:0.88, metalness:0.0}, o||{}));
   const MAT = {};
 
   /* ---- helpers de geometria ---- */
@@ -1481,25 +1418,32 @@
 
   /* ---- construção da cena ---- */
   function construir(){
+    alvo = new THREE.Vector3(11,4,6);
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x222A1C);
     scene.fog = new THREE.Fog(0x222A1C, 420, 780);
 
     for(const k in COR) MAT[k] = mat(COR[k]);
-    MAT.agua = mat(COR.agua,{transparent:true,opacity:0.9});
-    MAT.painel = mat(COR.painel);
+    MAT.agua   = mat(COR.agua,{transparent:true, opacity:0.88, roughness:0.12, metalness:0.15});
+    MAT.painel = mat(COR.painel,{roughness:0.32, metalness:0.35});
+    MAT.vidro  = mat(COR.vidro,{roughness:0.28, metalness:0.12});
+    MAT.alcatrao = mat(COR.alcatrao,{roughness:0.95});
 
     camera = new THREE.PerspectiveCamera(38, 1, 1, 1400);
 
-    scene.add(new THREE.HemisphereLight(0xE3ECF5, 0x6B6A4E, 0.9));
-    sol = new THREE.DirectionalLight(0xFFF3DC, 1.15);
+    scene.add(new THREE.HemisphereLight(0xDCE9F7, 0x6E6A4A, 1.15));
+    sol = new THREE.DirectionalLight(0xFFF1D2, 2.1);
     sol.position.set(-130,200,95);
     sol.castShadow = true;
-    sol.shadow.mapSize.set(1024,1024);
-    const s=180, sc=sol.shadow.camera;
-    sc.left=-s; sc.right=s; sc.top=s; sc.bottom=-s; sc.near=1; sc.far=560;
-    sol.shadow.bias=-0.0013;
+    sol.shadow.mapSize.set(2048,2048);
+    sol.shadow.radius = 3;
+    const s=190, sc=sol.shadow.camera;
+    sc.left=-s; sc.right=s; sc.top=s; sc.bottom=-s; sc.near=1; sc.far=580;
+    sol.shadow.bias=-0.0009; sol.shadow.normalBias=0.5;
     scene.add(sol);
+    // luz de preenchimento do lado da sombra, para as fachadas não fecharem a preto
+    const enche = new THREE.DirectionalLight(0xBFD2E8, 0.35);
+    enche.position.set(150,90,-120); scene.add(enche);
 
     // terreno envolvente
     const env = new THREE.Mesh(new THREE.PlaneGeometry(1600,1600), MAT.terra);
@@ -1559,16 +1503,16 @@
 
     // deck + piscina de 200 m² + bar de apoio, ao centro
     const deck = caixa(34,0.5,24,MAT.deck);
-    deck.position.set(10,0.25,24); deck.rotation.y=rad(-20); scene.add(deck); nasce(deck,1.45,0.35);
+    deck.position.set(10,0.25,-38); scene.add(deck); nasce(deck,1.45,0.35);
 
     const agua = caixa(20,0.9,10,MAT.agua);
-    agua.position.set(10,0.35,24); agua.rotation.y=rad(-20); scene.add(agua);
+    agua.position.set(10,0.35,-38); scene.add(agua);
     agua.scale.y=0.001; T.push({o:agua,t:1.70,dur:0.45,tipo:'sobe'});
 
     const bar = new THREE.Group();
     const corpo = caixa(9,3.2,7,MAT.parede); corpo.position.y=1.6; bar.add(corpo);
     const cob = caixa(11,0.45,9,MAT.vidro);  cob.position.y=3.42; bar.add(cob);
-    bar.position.set(-12,0.5,20); bar.rotation.y=rad(-20);
+    bar.position.set(10,0.5,-55);
     scene.add(bar); sobe(bar,1.60,0.40);
 
     // relvado de eventos, a sul
@@ -1577,16 +1521,30 @@
     relva.receiveShadow=true; scene.add(relva); nasce(relva,1.50,0.40);
 
     // pomar — só dentro do lote, longe do construído
-    const ocupado = [[-40,96,36],[-37.9,68.5,22],[2.0,-69.5,32],[10,24,23],[-23,43,20]];
+    const ocupado = [[-40,96,36],[-37.9,68.5,22],[2.0,-69.5,32],[10,-38,24],[-23,43,20]];
     const dentroDe = (pol,x,z)=>{ let c=false;
       for(let i=0,n=pol.length;i<n;i++){ const [x1,z1]=pol[i], [x2,z2]=pol[(i+1)%n];
         if((z1>z)!==(z2>z) && x < (x2-x1)*(z-z1)/(z2-z1)+x1) c=!c; } return c; };
     const dentro = (x,z)=> dentroDe(VIA_INT,x,z);
+    // distância ao limite do lote — serve para plantar em faixa e deixar o meio livre
+    function aoBordo(x,z){
+      let m = Infinity;
+      for(let i=0,n=LOTE.length;i<n;i++){
+        const a=LOTE[i], b=LOTE[(i+1)%n];
+        const vx=b[0]-a[0], vz=b[1]-a[1];
+        let t=((x-a[0])*vx+(z-a[1])*vz)/(vx*vx+vz*vz);
+        t=Math.max(0,Math.min(1,t));
+        m=Math.min(m, Math.hypot(x-(a[0]+vx*t), z-(a[1]+vz*t)));
+      }
+      return m;
+    }
     // pomar plantado em grelha, como um pomar a serio, alinhado com o deck
     const gr=rad(-20), cg=Math.cos(gr), sg=Math.sin(gr), passo=9.5;
     const livre = (x,z)=>{
       if(!dentro(x,z)) return false;
       if(!dentro(x+5,z)||!dentro(x-5,z)||!dentro(x,z+5)||!dentro(x,z-5)) return false;
+      const d = aoBordo(x,z);
+      if(d < 14 || d > 36) return false;   // faixa junto ao limite; o meio fica aberto
       if(ocupado.some(([ox,oz,r])=> Math.hypot(x-ox,z-oz) < r)) return false;
       if(CASAS.some(([cx,cz])=> Math.hypot(x-cx,z-cz) < 13)) return false;
       return true;
@@ -1614,7 +1572,7 @@
     foco(-40,96,56,16,-42,13);      // hotel, ala principal
     foco(-37.9,68.5,16,22,-42,13);  // hotel, ala curta
     foco(2.0,-69.5,52,14,8,13);     // apartamentos
-    foco(10,24,34,24,-20,2);        // deck e piscina
+    foco(10,-38,34,24,0,2);         // deck e piscina
     foco(-23,43,28,20,-30,2);       // relvado de eventos
     CASAS.forEach(function(c){ foco(c[0],c[1],CASA_W,12,CASA_ROT,8); });
 
@@ -1683,6 +1641,26 @@
       if(Math.abs(m - 0.90) < 0.015) break;
       dist = Math.max(110, Math.min(620, dist * m/0.90));
     }
+    // centrar: a projeção do centroide não cai no meio do canvas em perspetiva,
+    // por isso mede-se a caixa projetada e desloca-se o alvo para a igualar
+    const dir = new THREE.Vector3(), dir2 = new THREE.Vector3();
+    for(let k=0;k<3;k++){
+      porCamara(); camera.updateMatrixWorld(); camera.updateProjectionMatrix();
+      let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+      for(const pt of pts){
+        const q = pt.clone().project(camera);
+        x0=Math.min(x0,q.x); x1=Math.max(x1,q.x);
+        y0=Math.min(y0,q.y); y1=Math.max(y1,q.y);
+      }
+      const cx=(x0+x1)/2, cy=(y0+y1)/2;
+      if(Math.abs(cx)<0.01 && Math.abs(cy)<0.01) break;
+      const hMeia = Math.tan(camera.fov*Math.PI/360) * dist;
+      camera.getWorldDirection(dir);
+      dir2.crossVectors(dir, camera.up).normalize();          // direita da câmara
+      const cima = new THREE.Vector3().crossVectors(dir2, dir).normalize();
+      alvo.addScaledVector(dir2,  cx * hMeia * camera.aspect);
+      alvo.addScaledVector(cima,  cy * hMeia);
+    }
   }
 
   function medir(){
@@ -1715,25 +1693,53 @@
   }
 
   /* ---- API ---- */
+  /* A biblioteca 3D (660 KB) só desce quando alguém abre a maquete —
+     quem nunca abre o Modelo 1 não paga esse peso. */
+  let aCarregar = null;
+  function carregarThree(){
+    if(window.THREE) return Promise.resolve(true);
+    if(aCarregar) return aCarregar;
+    aCarregar = new Promise(function(resolve){
+      const el = document.createElement('script');
+      el.src = 'vendor/three.min.js';
+      el.onload  = function(){ resolve(!!window.THREE); };
+      el.onerror = function(){ resolve(false); };
+      document.head.appendChild(el);
+    });
+    return aCarregar;
+  }
+
   function abrir(){
+    aberto = true;
+    host.classList.add('a-carregar');
+    carregarThree().then(function(ok){
+      if(!ok || !aberto){ host.classList.remove('a-carregar'); return; }
+      arrancar();
+    });
+    return true;
+  }
+
+  function arrancar(){
+    host.classList.remove('a-carregar');
     if(!pronto){
       try{
         renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:true});
         renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      }catch(err){ return false; }
+        if(THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.05;
+      }catch(err){ host.hidden = true; return; }
       construir();
       ligarControlos();
     }
-    aberto = true;
     yaw=anguloDePartida(); pitch=rad(34); parado=0;
     inicio = 0;                       // recomeça o crescimento
     aplicar(0);
     medir();
     enquadrar();
     if(!raf) raf = requestAnimationFrame(laco);
-    return true;
   }
   function fechar(){
     aberto = false;
@@ -1754,6 +1760,135 @@
       }catch(_){ return false; }
     }
   };
+})();
+
+
+/* ---------------- CORTE POR MODELO (aba 1 a 5) ----------------
+   O envelope (3 pisos, 12 m, subsolo livre) vem do regulamento e é igual
+   para todos. O que muda é como cada estudo o usa. Os desenhos são gerados
+   a partir de CORTES, para se corrigirem num sítio só. */
+(function(){
+  const svg  = document.getElementById('corteSvg');
+  const abas = document.getElementById('corteAbas');
+  if(!svg || !abas) return;
+
+  // alturas em unidades de piso (1 = 60 px = ~4 m). O limite legal são 3.
+  const CORTES = {
+    '1': { nome:'U-Resort centralizado',
+      pisos:[ {h:1, t:'RÉS-DO-CHÃO · receção, 3 salas de reunião, restaurante'},
+              {h:1, t:'1.º PISO · quartos'},
+              {h:1, t:'2.º PISO · quartos'} ],
+      caves:[ 'CAVE −1 · estacionamento', 'CAVE −2 · áreas técnicas' ],
+      topo:'EXPLANADA — permitida',
+      agua:{t:'PISCINA AO CENTRO', y:0} },
+    '2': { nome:'Terraço linear com cascata',
+      pisos:[ {h:1, t:'RÉS-DO-CHÃO · receção e spa'},
+              {h:1, t:'1.º PISO · quartos'},
+              {h:1, t:'2.º PISO · quartos'} ],
+      caves:[ 'CAVE −1 · estacionamento e técnicas' ],
+      topo:'EXPLANADA — permitida',
+      agua:{t:'PISCINA SOBREELEVADA · borda infinita', y:-58} },
+    '3': { nome:'Vila alentejana desconstruída',
+      pisos:[ {h:1, t:'RÉS-DO-CHÃO · lounge, spa, salas de reunião'},
+              {h:1, t:'1.º PISO · quartos'} ],
+      caves:[ 'CAVE −1 · áreas técnicas' ],
+      topo:null,
+      agua:{t:'PISCINA-LAGOA · formato orgânico', y:0} },
+    '4': { nome:'Edifício integrado de uso misto',
+      pisos:[ {h:1, t:'RÉS-DO-CHÃO · receção, spa, restaurante, salas'},
+              {h:1, t:'1.º PISO · quartos'},
+              {h:1, t:'2.º PISO · quartos'} ],
+      caves:[ 'CAVE −1 · garagem', 'CAVE −2 · serviços e técnicas' ],
+      topo:'EXPLANADA — permitida',
+      agua:{t:'PISCINA', y:0} },
+    '5': { nome:'Oásis de eventos',
+      pisos:[ {h:2, t:'PAVILHÃO · pé-direito duplo, vidro dobrável'},
+              {h:1, t:'1.º PISO · quartos'} ],
+      caves:[ 'CAVE −1 · apoio a eventos e técnicas' ],
+      topo:'EXPLANADA — permitida',
+      agua:{t:'PISCINA JUNTO AO RELVADO', y:0} }
+  };
+
+  const SOLO = 340, PISO = 60, CAVE = 56, LIMITE = SOLO - 3*PISO;
+  const el = (t,a) => { const n=document.createElementNS('http://www.w3.org/2000/svg',t);
+    for(const k in a) n.setAttribute(k, a[k]); return n; };
+  const txt = (x,y,s,cls,anchor) => { const n=el('text',{x:x,y:y,class:cls||'c-lbl'});
+    if(anchor) n.setAttribute('text-anchor',anchor); n.textContent=s; return n; };
+
+  function desenhar(id){
+    const m = CORTES[id]; if(!m) return;
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    const X = 150, W = 380;
+
+    // limite legal dos 12 m, sempre no mesmo sítio — vê-se quem não o esgota
+    svg.appendChild(el('line',{x1:120,y1:LIMITE,x2:800,y2:LIMITE,
+      stroke:'#B08D3E','stroke-width':1,'stroke-dasharray':'6 5',opacity:0.7}));
+    svg.appendChild(txt(124, LIMITE-9, 'LIMITE DE FACHADA · 12 m','c-lbl c-gold'));
+
+    // terreno
+    svg.appendChild(el('line',{x1:20,y1:SOLO,x2:800,y2:SOLO,stroke:'#3F4A32','stroke-width':2}));
+    svg.appendChild(txt(24, SOLO+20, 'COTA DO TERRENO'));
+    svg.appendChild(el('rect',{x:X,y:SOLO,width:W,height:8,fill:'#2A3222'}));
+
+    // subsolo
+    m.caves.forEach(function(t,i){
+      const y = SOLO + 22 + i*70;
+      svg.appendChild(el('rect',{x:X,y:y,width:W,height:CAVE,fill:'#E4DBC6',
+        stroke:'#3F4A32','stroke-width':1,'stroke-dasharray':'5 4'}));
+      svg.appendChild(txt(X+W/2, y+34, t, 'c-lbl', 'middle'));
+    });
+    const fim = SOLO + 22 + m.caves.length*70;
+    svg.appendChild(txt(X+W/2, fim+26, 'SEM LIMITE DE PISOS ↓','c-lbl c-gold','middle'));
+    svg.appendChild(el('path',{d:'M'+(X+W/2)+','+(fim+32)+' L'+(X+W/2)+','+(fim+52),
+      stroke:'#B08D3E','stroke-width':1,'stroke-dasharray':'3 4'}));
+
+    // pisos acima do solo
+    let y = SOLO, escuro = true, alturaTotal = 0;
+    m.pisos.forEach(function(p){
+      const h = p.h*PISO; y -= h; alturaTotal += p.h;
+      svg.appendChild(el('rect',{x:X,y:y,width:W,height:h,fill: escuro?'#3F4A32':'#46523A'}));
+      svg.appendChild(txt(X+W/2, y+h/2+5, p.t, 'c-lbl c-sand', 'middle'));
+      escuro = !escuro;
+    });
+
+    // explanada
+    if(m.topo){
+      svg.appendChild(el('rect',{x:X,y:y-14,width:W,height:14,fill:'#B08D3E'}));
+      svg.appendChild(txt(X+W+15, y-3, m.topo, 'c-lbl c-gold'));
+    }
+
+    // cota da fachada deste modelo
+    const alt = (alturaTotal*4);
+    svg.appendChild(el('line',{x1:110,y1:y,x2:110,y2:SOLO,stroke:'#1B2116','stroke-width':1}));
+    svg.appendChild(el('path',{d:'M106,'+(y+4)+' L110,'+(y-4)+' L114,'+(y+4),fill:'#1B2116'}));
+    svg.appendChild(el('path',{d:'M106,'+(SOLO-4)+' L110,'+(SOLO+4)+' L114,'+(SOLO-4),fill:'#1B2116'}));
+    svg.appendChild(txt(98, (y+SOLO)/2 - 6, 'FACHADA', 'c-lbl', 'end'));
+    svg.appendChild(txt(98, (y+SOLO)/2 + 11, '~'+alt+' m', 'c-lbl c-gold', 'end'));
+
+    // piscina, fora do índice
+    const py = SOLO - 24 + (m.agua.y || 0);
+    if(m.agua.y){  // plataforma sobreelevada
+      svg.appendChild(el('rect',{x:586,y:py+24,width:150,height:34,fill:'#E4DBC6',
+        stroke:'#3F4A32','stroke-width':1}));
+    }
+    svg.appendChild(el('rect',{x:586,y:py,width:150,height:24,rx:3,fill:'#7FB3D0'}));
+    svg.appendChild(txt(661, SOLO+38, m.agua.t, 'c-lbl', 'middle'));
+    svg.appendChild(txt(661, SOLO+55, 'FORA DO ÍNDICE', 'c-lbl c-gold', 'middle'));
+
+    document.getElementById('corteNome').textContent = m.nome;
+    document.getElementById('corteKPisos').textContent = m.pisos.length;
+    abas.querySelectorAll('.corte-aba').forEach(function(b){
+      const on = b.dataset.corte === id;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-selected', String(on));
+    });
+  }
+
+  abas.addEventListener('click', function(e){
+    const b = e.target.closest('.corte-aba');
+    if(b) desenhar(b.dataset.corte);
+  });
+  desenhar('1');
 })();
 
 </script>

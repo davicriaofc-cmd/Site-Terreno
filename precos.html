@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>As contas — O Terreno · Montemor-o-Novo</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sand:#EFE8D8; --sand-dim:#E4DBC6; --ink:#1B2116; --olive:#3F4A32;
+    --olive-deep:#2A3222; --gold:#B08D3E; --gold-soft:#D8BE84; --night:#0E1720;
+    --line:rgba(27,33,22,0.14);
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--sand); color:var(--ink);
+    font-family:'Inter', system-ui, sans-serif; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{ font-family:'Fraunces', Georgia, serif; font-weight:600; margin:0; line-height:1.1; }
+  em{ font-style:italic; color:var(--gold); font-weight:500; }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.14em;
+    text-transform:uppercase; color:var(--gold); margin-bottom:14px;
+  }
+  header{ padding:60px 6vw 0; max-width:1100px; margin:0 auto; }
+  .voltar{
+    display:inline-flex; align-items:center; gap:9px; text-decoration:none;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.08em;
+    color:var(--ink); border:1px solid var(--line); border-radius:100px;
+    padding:9px 16px; margin-bottom:44px; transition:border-color .25s;
+  }
+  .voltar:hover{ border-color:var(--gold); }
+  header h1{ font-size:clamp(38px,6vw,68px); }
+  header p.lead{ max-width:56ch; margin-top:20px; font-size:16px; line-height:1.75; opacity:0.7; }
+
+  .aviso{
+    max-width:1100px; margin:40px auto 0; padding:20px 24px; border-radius:6px;
+    background:rgba(176,141,62,0.13); border:1px solid rgba(176,141,62,0.4);
+    font-size:14px; line-height:1.7;
+  }
+  .aviso b{ color:var(--gold); }
+
+  main{ max-width:1100px; margin:0 auto; padding:0 6vw 110px; }
+  section{ margin-top:80px; }
+  section > h2{ font-size:clamp(26px,3.4vw,40px); margin-bottom:8px; }
+  section > p.sub{ max-width:56ch; font-size:15px; line-height:1.7; opacity:0.66; margin:0 0 34px; }
+
+  .campos{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; }
+  .campo{ border:1px solid var(--line); border-radius:6px; padding:16px 18px; background:rgba(255,255,255,0.35); }
+  .campo label{
+    display:block; font-family:'IBM Plex Mono', monospace; font-size:10px;
+    letter-spacing:0.1em; text-transform:uppercase; opacity:0.55; margin-bottom:9px;
+  }
+  .campo input{
+    width:100%; border:none; background:none; border-bottom:1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace; font-size:19px; color:var(--ink);
+    padding:3px 0; outline:none;
+  }
+  .campo input:focus{ border-bottom-color:var(--gold); }
+  .campo .un{ font-family:'IBM Plex Mono', monospace; font-size:10px; opacity:0.45; margin-top:7px; display:block; }
+  .campo.porconf{ border-color:rgba(176,141,62,0.5); background:rgba(176,141,62,0.07); }
+  .campo.porconf label::after{ content:' · por confirmar'; color:var(--gold); opacity:0.9; }
+
+  .saida{ margin-top:26px; border-top:1px solid var(--line); }
+  .linha{
+    display:flex; justify-content:space-between; align-items:baseline; gap:18px;
+    padding:15px 2px; border-bottom:1px solid var(--line);
+  }
+  .linha span:first-child{ font-size:14px; opacity:0.7; }
+  .linha span:last-child{ font-family:'IBM Plex Mono', monospace; font-size:17px; }
+  .linha.total span:first-child{ opacity:1; font-weight:600; }
+  .linha.total span:last-child{ font-size:22px; color:var(--gold); }
+
+  footer{
+    border-top:1px solid var(--line); padding:34px 6vw; max-width:1100px; margin:0 auto;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; opacity:0.5;
+    display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between;
+  }
+  @media (max-width:640px){ header{ padding-top:34px; } section{ margin-top:56px; } }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="voltar" href="index.html">‹ Voltar ao terreno</a>
+  <div class="eyebrow">As contas · documento interno</div>
+  <h1>Do terreno<br>ao <em>retorno</em>.</h1>
+  <p class="lead">Duas leituras separadas: o que custa levantar isto, e o que se cobra depois. Muda os valores nos campos — as contas refazem-se sozinhas.</p>
+</header>
+
+<div class="aviso">
+  <b>Nenhum número desta página é um valor do projeto.</b> São marcadores para a folha
+  funcionar. O custo do terreno, o custo de construção por m², o número de quartos e a
+  tarifa por noite têm de vir de orçamento e de estudo de mercado. Enquanto não vierem,
+  isto serve para ver a forma da conta — não para decidir, e muito menos para mostrar
+  a terceiros como se fosse estimativa do projeto.
+</div>
+
+<main>
+
+<section>
+  <h2>O que custa pôr de pé</h2>
+  <p class="sub">O índice em vigor permite 7.000 m² de implantação em três pisos, o que dá 21.000 m² de área bruta. O subsolo não conta para o índice, mas custa a construir — por isso entra à parte.</p>
+
+  <div class="campos">
+    <div class="campo porconf">
+      <label>Terreno</label>
+      <input id="iTerreno" type="number" value="0" step="10000">
+      <span class="un">€ · aquisição ou valor atribuído</span>
+    </div>
+    <div class="campo porconf">
+      <label>Construção acima do solo</label>
+      <input id="iCusto" type="number" value="1200" step="50">
+      <span class="un">€ / m²</span>
+    </div>
+    <div class="campo porconf">
+      <label>Subsolo</label>
+      <input id="iCave" type="number" value="0" step="500">
+      <span class="un">m² de cave a construir</span>
+    </div>
+    <div class="campo porconf">
+      <label>Custo do subsolo</label>
+      <input id="iCustoCave" type="number" value="900" step="50">
+      <span class="un">€ / m²</span>
+    </div>
+    <div class="campo">
+      <label>Área bruta acima do solo</label>
+      <input id="iBruta" type="number" value="21000" step="500">
+      <span class="un">m² · 7.000 × 3 pisos</span>
+    </div>
+    <div class="campo porconf">
+      <label>Projeto, licenças e imprevistos</label>
+      <input id="iMargem" type="number" value="15" step="1">
+      <span class="un">% sobre a construção</span>
+    </div>
+  </div>
+
+  <div class="saida">
+    <div class="linha"><span>Construção acima do solo</span><span id="oAcima">—</span></div>
+    <div class="linha"><span>Construção em subsolo</span><span id="oCave">—</span></div>
+    <div class="linha"><span>Projeto, licenças e imprevistos</span><span id="oMargem">—</span></div>
+    <div class="linha"><span>Terreno</span><span id="oTerreno">—</span></div>
+    <div class="linha total"><span>Investimento total</span><span id="oTotal">—</span></div>
+    <div class="linha"><span>Custo por m² de área bruta</span><span id="oPorM2">—</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>O que se cobra ao hóspede</h2>
+  <p class="sub">A outra metade da conta. O argumento de procura é o novo hospital de Évora, a cerca de 30 km — profissionais, famílias e estadias prolongadas. A área bruta por quarto serve de aferição: abaixo de 40 m² é apertado, acima de 90 m² sobra área que ninguém está a vender.</p>
+
+  <div class="campos">
+    <div class="campo porconf">
+      <label>Quartos</label>
+      <input id="iQuartos" type="number" value="300" step="10">
+      <span class="un">unidades</span>
+    </div>
+    <div class="campo porconf">
+      <label>Tarifa média</label>
+      <input id="iTarifa" type="number" value="90" step="5">
+      <span class="un">€ / noite</span>
+    </div>
+    <div class="campo porconf">
+      <label>Ocupação média anual</label>
+      <input id="iOcup" type="number" value="60" step="1">
+      <span class="un">%</span>
+    </div>
+    <div class="campo porconf">
+      <label>Custo de operação</label>
+      <input id="iOpex" type="number" value="55" step="1">
+      <span class="un">% da receita</span>
+    </div>
+  </div>
+
+  <div class="saida">
+    <div class="linha"><span>Área bruta por quarto</span><span id="oM2Quarto">—</span></div>
+    <div class="linha"><span>Noites vendidas por ano</span><span id="oNoites">—</span></div>
+    <div class="linha"><span>Receita bruta anual</span><span id="oReceita">—</span></div>
+    <div class="linha"><span>Custo de operação</span><span id="oOpex">—</span></div>
+    <div class="linha total"><span>Resultado operacional anual</span><span id="oEbitda">—</span></div>
+    <div class="linha"><span>Anos para recuperar o investimento</span><span id="oPayback">—</span></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span>O TERRENO — MONTEMOR-O-NOVO</span>
+  <span>DOCUMENTO INTERNO · NÃO PUBLICAR</span>
+</footer>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const eur = n => isFinite(n) ? new Intl.NumberFormat('pt-PT',
+    {style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n) : '—';
+  const num = n => isFinite(n) ? new Intl.NumberFormat('pt-PT',
+    {maximumFractionDigits:0}).format(n) : '—';
+  const v = id => parseFloat($(id).value) || 0;
+
+  function contas(){
+    const bruta = v('iBruta'), acima = bruta * v('iCusto');
+    const cave  = v('iCave') * v('iCustoCave');
+    const margem = (acima + cave) * v('iMargem')/100;
+    const terreno = v('iTerreno');
+    const total = acima + cave + margem + terreno;
+
+    $('oAcima').textContent   = eur(acima);
+    $('oCave').textContent    = eur(cave);
+    $('oMargem').textContent  = eur(margem);
+    $('oTerreno').textContent = eur(terreno);
+    $('oTotal').textContent   = eur(total);
+    $('oPorM2').textContent   = bruta ? eur(total/bruta) + ' / m²' : '—';
+
+    const noites  = v('iQuartos') * 365 * v('iOcup')/100;
+    const receita = noites * v('iTarifa');
+    const opex    = receita * v('iOpex')/100;
+    const ebitda  = receita - opex;
+
+    const q = v('iQuartos');
+    $('oM2Quarto').textContent = q ? num(bruta/q) + ' m² / quarto' : '—';
+    $('oNoites').textContent  = num(noites);
+    $('oReceita').textContent = eur(receita);
+    $('oOpex').textContent    = eur(opex);
+    $('oEbitda').textContent  = eur(ebitda);
+    $('oPayback').textContent = (ebitda > 0 && total > 0)
+      ? (total/ebitda).toFixed(1).replace('.', ',') + ' anos' : '—';
+  }
+
+  document.querySelectorAll('input').forEach(i => i.addEventListener('input', contas));
+  contas();
+})();
+</script>
+</body>
+</html>

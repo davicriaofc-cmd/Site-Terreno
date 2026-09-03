@@ -169,72 +169,50 @@ contido, sem emojis.
   (extrusões simples da pegada de cada modelo), que eu consigo construir
   em código. Perguntar qual dos dois antes de avançar.
 
-## Combinado com o utilizador, por fazer (nada disto está começado)
+## Estado do que estava combinado
 
-Ordem recomendada e discutida: primeiro cortar/reorganizar, depois preços,
-depois 3D e envolvente, e as fotos quando existirem. **Perguntar antes de
-avançar** — o utilizador tem parado o trabalho várias vezes para decidir.
+**Feito:**
+- Corte com **aba por modelo (1 a 5)** — `#corte`. Os desenhos são gerados de
+  `CORTES` no script `/* CORTE POR MODELO */`; o envelope (3 pisos, 12 m,
+  subsolo livre) é regulamento confirmado, mas **a distribuição de programa
+  por piso de cada modelo é leitura das descrições e está por confirmar**.
+  O limite dos 12 m é desenhado sempre à mesma altura, para se ver quem o
+  não esgota (Modelo 3 usa 2 pisos).
+- **Painel "VISÃO" do hero substituído** por `O TERRENO EM NÚMEROS` ·
+  "17.500 m² à espera de contas" (opção A das duas propostas). A frase antiga
+  continua no rodapé.
+- **Site encurtado: 9 secções → 6, 1.160 → 868 palavras.** Fundidas
+  `#plot`+`#expansao` e `#corte`+`#concept` e `#porque-agora`+`#proximos-passos`.
+  No `#modelos` cada estudo ficou com uma linha. Menu refeito com 6 entradas.
+- **`three.js` só a pedido** — `carregarThree()` injeta o script quando o
+  Modelo 1 abre. Não há pedido nenhum no arranque da página.
+- **Maquete mais realista** — MeshStandardMaterial com rugosidade, sol mais
+  forte com sombras 2048 e luz de preenchimento, tone mapping ACES.
+- **Maquete alinhada com `modelo1.png`** — piscina/deck/bar movidos para
+  norte (z=-38), entre apartamentos e moradias; pomar plantado só numa faixa
+  a 14–36 m do limite (`aoBordo()`), deixando o centro aberto como no render.
+- **`precos.html`** — página à parte, `noindex`, **sem link nenhum a partir do
+  `index.html`** (decisão: não mostrar contas à Câmara). Duas secções, o que
+  custa pôr de pé e o que se cobra, com os campos editáveis e as contas a
+  refazerem-se. Mostra "área bruta por quarto" para denunciar programas
+  incoerentes.
 
-**Público do site: investidores/parceiros E a Câmara.** Os dois puxam para
-lados opostos. Mostrar custos e retorno à Câmara, no momento em que se lhes
-pede aumento de índice, faz o projeto parecer especulativo. Daí a decisão
-sobre os preços, abaixo.
-
-1. **Aba de cortes por modelo.** No `#corte`, um seletor para escolher entre
-   os Modelos 1 a 5, cada um com o seu corte. Bloqueio real: o corte atual é
-   genérico (3 pisos, cave, 12 m) e os Modelos 2–5 só existem em texto — não
-   têm alturas nem número de pisos definidos. É preciso decidir isso primeiro.
-   Nota: isto faz o `#corte` crescer, o que puxa contra o ponto 4.
-
-2. **Tirar o painel "VISÃO" do hero** (o último, "Do terreno vazio ao primeiro
-   hóspede"). Essa frase fica no rodapé, onde já está repetida. No lugar entra
-   um painel que aterra nas contas — o utilizador quer que o hero acabe no
-   dinheiro, não numa visão abstrata. Cuidado: o painel 1 já é sobre o
-   terreno, não repetir. Duas propostas dadas, sem escolha ainda:
-   - A: `O TERRENO EM NÚMEROS` · "17.500 m² à espera de contas."
-   - B: `AS CONTAS` · "Do terreno ao retorno."
-
-3. **Preços — as duas leituras, em separado:** o que custa construir e o que
-   se cobra ao hóspede. **Recomendação dada: fora do scroll e do menu**, em
-   página própria com link à parte, partilhada só com investidores.
-   **Falta o essencial e não se inventa:** valor do terreno, custo de
-   construção por m², número de quartos previsto, tarifa média por noite. Sem
-   isso, ou se espera ou se usa referência pública marcada como estimativa,
-   com o pressuposto à vista (mesma disciplina de confirmado vs em avaliação).
-
-4. **Encurtar o site.** O problema não é o volume (1.160 palavras, ~5 min) —
-   é a monotonia: nove secções com a mesma forma (título, parágrafo, cartões).
-   Passar de 9 para 6, juntando o que já se repete: `#plot`+`#expansao` (ambas
-   sobre índice), `#corte`+`#concept` (ambas sobre parâmetros),
-   `#porque-agora`+`#proximos-passos`. E no `#modelos` (325 palavras, a maior)
-   deixar só título e uma linha por modelo — o detalhe aparece ao abrir.
-
-5. **Maquete mais realista.** Por ordem de retorno: (a) luz e materiais —
-   céu com gradiente, sombras suaves, rugosidade, oclusão de ambiente; (b)
-   pormenor — janelas individuais em vez de faixas, varandas, caminhos,
-   estacionamento, espreguiçadeiras. **Teto honesto:** sem um `.glb` de
-   arquiteto não chega ao nível do vídeo de referência que o utilizador
-   mostrou (um visualizador tipo Sketchfab). Dizer-lhe isso, não prometer.
-
-6. **Alinhar a maquete com `images/modelos/modelo1.png`.** Diferenças já
-   identificadas: no render as árvores estão pelas bordas e o centro fica
-   aberto (na maquete há uma grelha densa ao centro), e a piscina está mais
-   a norte, entre os apartamentos e as moradias.
-
-7. **Envolvente.** Centro Hípico D. Duarte, estádio, pista de atletismo,
-   armazéns, estradas. Serve os dois públicos: integração para a Câmara,
-   "não está no meio do nada" para o investidor. Pedir ao utilizador um print
-   do Google Earth mais afastado, ou o KML.
-
-8. **`three.js` a carregar só a pedido.** Hoje são 660 KB descarregados por
-   toda a gente, mesmo por quem nunca abre o Modelo 1 — mais de metade do
-   peso da página. Já assumido como descuido; corrigir sem precisar de
-   decisão do utilizador.
-
-9. **Fotos.** Não servem para o 3D (uma foto não se converte em geometria) —
-   isto já foi explicado e convém não voltar a pedir fotos para esse fim. Mas
-   o site não tem **uma única foto real do terreno**: uma foto ao nível do
-   solo no hero é a coisa de maior efeito que só o utilizador pode dar.
+**Por fazer, e porquê:**
+- **Números reais para o `precos.html`.** Os valores lá dentro são marcadores
+  assumidos como tal num aviso no topo — não são estimativas do projeto.
+  Faltam: valor do terreno, custo de construção €/m², m² de cave, nº de
+  quartos, tarifa média, ocupação. **Não inventar.**
+- **Alturas e pisos dos Modelos 2 a 5**, para os cortes deixarem de ser
+  leitura minha.
+- **Envolvente 3D** (Centro Hípico, estádio, pista, armazéns, estradas) —
+  falta um print do Google Earth mais afastado, ou o KML.
+- **Fotos reais do terreno** — o site não tem uma única. Servem para o hero,
+  não para o 3D.
+- **Pormenor fino da maquete** (janelas individuais, varandas, caminhos,
+  estacionamento, espreguiçadeiras). O teto sem `.glb` de arquiteto mantém-se.
+- **Ligar (ou não) o `precos.html` ao site.** O painel novo do hero promete
+  falar de custos e de receita, mas não há caminho para lá — é decisão do
+  utilizador, porque criar o link expõe as contas a quem abrir o site.
 
 ## Pull requests
 
