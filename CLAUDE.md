@@ -162,6 +162,81 @@ contido, sem emojis.
   (extrusões simples da pegada de cada modelo), que eu consigo construir
   em código. Perguntar qual dos dois antes de avançar.
 
+## Combinado com o utilizador, por fazer (nada disto está começado)
+
+Ordem recomendada e discutida: primeiro cortar/reorganizar, depois preços,
+depois 3D e envolvente, e as fotos quando existirem. **Perguntar antes de
+avançar** — o utilizador tem parado o trabalho várias vezes para decidir.
+
+**Público do site: investidores/parceiros E a Câmara.** Os dois puxam para
+lados opostos. Mostrar custos e retorno à Câmara, no momento em que se lhes
+pede aumento de índice, faz o projeto parecer especulativo. Daí a decisão
+sobre os preços, abaixo.
+
+1. **Aba de cortes por modelo.** No `#corte`, um seletor para escolher entre
+   os Modelos 1 a 5, cada um com o seu corte. Bloqueio real: o corte atual é
+   genérico (3 pisos, cave, 12 m) e os Modelos 2–5 só existem em texto — não
+   têm alturas nem número de pisos definidos. É preciso decidir isso primeiro.
+   Nota: isto faz o `#corte` crescer, o que puxa contra o ponto 4.
+
+2. **Tirar o painel "VISÃO" do hero** (o último, "Do terreno vazio ao primeiro
+   hóspede"). Essa frase fica no rodapé, onde já está repetida. No lugar entra
+   um painel que aterra nas contas — o utilizador quer que o hero acabe no
+   dinheiro, não numa visão abstrata. Cuidado: o painel 1 já é sobre o
+   terreno, não repetir. Duas propostas dadas, sem escolha ainda:
+   - A: `O TERRENO EM NÚMEROS` · "17.500 m² à espera de contas."
+   - B: `AS CONTAS` · "Do terreno ao retorno."
+
+3. **Preços — as duas leituras, em separado:** o que custa construir e o que
+   se cobra ao hóspede. **Recomendação dada: fora do scroll e do menu**, em
+   página própria com link à parte, partilhada só com investidores.
+   **Falta o essencial e não se inventa:** valor do terreno, custo de
+   construção por m², número de quartos previsto, tarifa média por noite. Sem
+   isso, ou se espera ou se usa referência pública marcada como estimativa,
+   com o pressuposto à vista (mesma disciplina de confirmado vs em avaliação).
+
+4. **Encurtar o site.** O problema não é o volume (1.160 palavras, ~5 min) —
+   é a monotonia: nove secções com a mesma forma (título, parágrafo, cartões).
+   Passar de 9 para 6, juntando o que já se repete: `#plot`+`#expansao` (ambas
+   sobre índice), `#corte`+`#concept` (ambas sobre parâmetros),
+   `#porque-agora`+`#proximos-passos`. E no `#modelos` (325 palavras, a maior)
+   deixar só título e uma linha por modelo — o detalhe aparece ao abrir.
+
+5. **Maquete mais realista.** Por ordem de retorno: (a) luz e materiais —
+   céu com gradiente, sombras suaves, rugosidade, oclusão de ambiente; (b)
+   pormenor — janelas individuais em vez de faixas, varandas, caminhos,
+   estacionamento, espreguiçadeiras. **Teto honesto:** sem um `.glb` de
+   arquiteto não chega ao nível do vídeo de referência que o utilizador
+   mostrou (um visualizador tipo Sketchfab). Dizer-lhe isso, não prometer.
+
+6. **Alinhar a maquete com `images/modelos/modelo1.png`.** Diferenças já
+   identificadas: no render as árvores estão pelas bordas e o centro fica
+   aberto (na maquete há uma grelha densa ao centro), e a piscina está mais
+   a norte, entre os apartamentos e as moradias.
+
+7. **Envolvente.** Centro Hípico D. Duarte, estádio, pista de atletismo,
+   armazéns, estradas. Serve os dois públicos: integração para a Câmara,
+   "não está no meio do nada" para o investidor. Pedir ao utilizador um print
+   do Google Earth mais afastado, ou o KML.
+
+8. **`three.js` a carregar só a pedido.** Hoje são 660 KB descarregados por
+   toda a gente, mesmo por quem nunca abre o Modelo 1 — mais de metade do
+   peso da página. Já assumido como descuido; corrigir sem precisar de
+   decisão do utilizador.
+
+9. **Fotos.** Não servem para o 3D (uma foto não se converte em geometria) —
+   isto já foi explicado e convém não voltar a pedir fotos para esse fim. Mas
+   o site não tem **uma única foto real do terreno**: uma foto ao nível do
+   solo no hero é a coisa de maior efeito que só o utilizador pode dar.
+
+## Pull requests
+
+Só deve existir **um PR aberto de cada vez** — o utilizador pediu isso
+explicitamente. Os PRs #1 e #5 foram fechados por essa razão (o #5 levou nota
+a dizer que o commit `4c85888`, "inclinar o hotel com o movimento do rato",
+continua no branch `claude/mano-slfa79` e nunca foi integrado). Não abrir PRs
+novos: o #6 atualiza-se sozinho a cada push.
+
 ## Fluxo de trabalho
 
 - Commits diretamente para `claude/site-assistance-pk5n2b`, depois `git push`.
