@@ -263,30 +263,14 @@ primeiros são de graça e não dependem de ninguém de fora.
 Ordem prática sugerida ao utilizador: 1 e 2 primeiro (dez minutos no Google
 Earth, salto grande), depois 3 e 4, e as fotos quando lá for.
 
-## Como tornar o terreno e o site realistas (respondido ao utilizador)
-
-**Terreno**, por ordem de efeito:
-1. **Levantamento topográfico** (topógrafo, DWG/DXF): limites exatos, curvas de
-   nível, cotas. É o passo 3 do roteiro e resolve a dúvida 17.500 vs 16.152 m².
-   Com ele, o polígono `LOTE` deixa de ser traçado à mão sobre um print.
-2. **Voo de drone com fotogrametria** (serviço externo, pedir `.obj`/`.glb` com
-   textura): é o que dá o salto grande — chão real texturado em vez de plano verde.
-3. **Caderneta predial (Finanças) + planta de localização (Câmara)**: área e
-   limites registados, praticamente de graça.
-
-**Plantas** — avisado o utilizador de que desenhos feitos por ele **não têm valor
-para licenciamento** (em Portugal o projeto de arquitetura tem de ser assinado por
-arquiteto inscrito na Ordem); servem para comunicar a ideia ao arquiteto.
-Recomendado por ordem de facilidade: Sweet Home 3D (grátis, desktop) → Floorplanner
-ou RoomSketcher (browser) → SketchUp → Blender.
-
-**O formato que este site precisa é `.glb`/`.gltf`.** Blender exporta direto;
-SketchUp e Sweet Home 3D dão `.obj`/`.dae` (converte-se). Foi dito ao utilizador
-para **pedir o `.glb` ao arquiteto** junto com os desenhos.
-
-**Site**, por ordem: foto real do terreno ao nível do solo (a mais barata e a de
-maior efeito — o hero abre com nuvens desenhadas) → números verdadeiros no
-`precos.html` → envolvente 3D (falta o print do Google Earth mais afastado).
+**Plantas — onde as fazer.** Avisado o utilizador de que desenhos feitos por
+ele **não têm valor para licenciamento**: em Portugal o projeto de arquitetura
+tem de ser assinado por arquiteto inscrito na Ordem. Servem para chegar ao
+arquiteto com a ideia já clara. Por ordem de facilidade: Sweet Home 3D (grátis,
+desktop, aprende-se numa tarde) → Floorplanner ou RoomSketcher (browser) →
+SketchUp (versão web gratuita) → Blender (sem limites, mas é um programa a
+sério). Para alimentar este site o formato é `.glb`/`.gltf`: o Blender exporta
+direto, o SketchUp e o Sweet Home 3D dão `.obj`/`.dae` e converte-se.
 
 ## Pull requests
 
