@@ -183,7 +183,7 @@ contido, sem emojis.
   continua no rodapé.
 - **Site encurtado: 9 secções → 6, 1.160 → 868 palavras.** Fundidas
   `#plot`+`#expansao` e `#corte`+`#concept` e `#porque-agora`+`#proximos-passos`.
-  No `#modelos` cada estudo ficou com uma linha. Menu refeito com 6 entradas.
+  No `#modelos` cada estudo ficou com uma linha. Menu refeito com 6 entradas, mais `07 · As contas` a apontar ao `precos.html`.
 - **`three.js` só a pedido** — `carregarThree()` injeta o script quando o
   Modelo 1 abre. Não há pedido nenhum no arranque da página.
 - **Maquete mais realista** — MeshStandardMaterial com rugosidade, sol mais
@@ -191,28 +191,52 @@ contido, sem emojis.
 - **Maquete alinhada com `modelo1.png`** — piscina/deck/bar movidos para
   norte (z=-38), entre apartamentos e moradias; pomar plantado só numa faixa
   a 14–36 m do limite (`aoBordo()`), deixando o centro aberto como no render.
-- **`precos.html`** — página à parte, `noindex`, **sem link nenhum a partir do
-  `index.html`** (decisão: não mostrar contas à Câmara). Duas secções, o que
-  custa pôr de pé e o que se cobra, com os campos editáveis e as contas a
-  refazerem-se. Mostra "área bruta por quarto" para denunciar programas
-  incoerentes.
+- **`precos.html`** — página à parte, `noindex`, **com entrada no menu
+  (`07 · As contas`)**. O utilizador decidiu expor as contas; por isso a página
+  foi reescrita para aguentar ser lida por terceiros. Quatro secções: o que
+  custa pôr de pé, o que se cobra, a sensibilidade, e de onde vem cada número.
+  Mostra "área bruta por quarto" com veredito (apertado / coerente / sobra área)
+  para denunciar programas incoerentes.
+- **Valores de partida do `precos.html` deixaram de ser marcadores** — são
+  referências publicadas, com a fonte escrita por baixo de cada campo e a lista
+  numerada no fim da página. Ver `COMO-OBTER-OS-NUMEROS.md`. **Continuam a não
+  ser o orçamento do projeto** — o aviso do topo diz isso, e o rodapé passou de
+  "documento interno · não publicar" para "ordem de grandeza · não é orçamento".
+- **Secção "O que mais mexe na conta"** — sensibilidade um-campo-de-cada-vez
+  sobre nove campos, ordenada por amplitude, com barras divergentes à volta do
+  caso atual, rótulo direto em cada extremo, dica no hover e vista em tabela.
+  A palete (`--pior:#A8762B` / `--melhor:#00789C` sobre o fundo areia) foi
+  escolhida por passar os testes de daltonismo e contraste — a dupla original
+  gold/olive falhava. **Não trocar por cores do site sem revalidar.**
+- **Alturas dos cortes em metros** — cada piso de `CORTES` tem `m` (pé-direito)
+  e cada modelo tem `platibanda`. A escala é `PXM = 15` px/m e o limite dos 12 m
+  é `SOLO - 12*PXM`. As alturas são **proposta minha, por confirmar com o
+  arquiteto** (tabela em `COMO-OBTER-OS-NUMEROS.md`, ponto 6): 11,4 / 11,6 /
+  7,8 / 11,9 / 11,6 m. O Modelo 4 fica a 10 cm do limite — é o primeiro a rever.
+- **`COMO-OBTER-OS-NUMEROS.md`** — guia dos nove pontos que faltam, com o texto
+  do pedido de orçamento já escrito, as perguntas para o Gabinete de Ordenamento
+  do Território e para o arquiteto, os passos do KML e a lista de fotos.
 
 **Por fazer, e porquê:**
-- **Números reais para o `precos.html`.** Os valores lá dentro são marcadores
-  assumidos como tal num aviso no topo — não são estimativas do projeto.
-  Faltam: valor do terreno, custo de construção €/m², m² de cave, nº de
-  quartos, tarifa média, ocupação. **Não inventar.**
-- **Alturas e pisos dos Modelos 2 a 5**, para os cortes deixarem de ser
-  leitura minha.
+- **Números reais para o `precos.html`.** Os de partida já têm fonte publicada,
+  mas continuam a não ser do projeto. Faltam, por ordem de impacto na conta:
+  a regra de estacionamento do PDM (decide os m² de cave), o orçamento do
+  construtor (€/m²), o valor do terreno (escritura ou caderneta), e tarifa e
+  ocupação recolhidas dos comparáveis. **Não inventar** — ver
+  `COMO-OBTER-OS-NUMEROS.md`, que diz de onde vem cada um e a quem se pede.
+- **Confirmação do arquiteto às alturas dos Modelos 2 a 5.** Já estão propostas
+  e desenhadas; falta validar. A pergunta que mais importa é **de que cota se
+  mede a altura de fachada** — o lote varia entre 225 e 233 m, e a resposta
+  pode valer um piso inteiro.
 - **Envolvente 3D** (Centro Hípico, estádio, pista, armazéns, estradas) —
   falta um print do Google Earth mais afastado, ou o KML.
 - **Fotos reais do terreno** — o site não tem uma única. Servem para o hero,
   não para o 3D.
 - **Pormenor fino da maquete** (janelas individuais, varandas, caminhos,
   estacionamento, espreguiçadeiras). O teto sem `.glb` de arquiteto mantém-se.
-- **Ligar (ou não) o `precos.html` ao site.** O painel novo do hero promete
-  falar de custos e de receita, mas não há caminho para lá — é decisão do
-  utilizador, porque criar o link expõe as contas a quem abrir o site.
+- **Envolvente do 3D continua à espera do KML.** Tentei ir buscá-la a
+  cartografia aberta (Overpass/Nominatim) — está bloqueado pelo proxy de rede
+  desta sessão. Tem mesmo de vir do utilizador.
 
 ## Pull requests
 

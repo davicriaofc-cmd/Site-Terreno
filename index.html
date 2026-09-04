@@ -517,6 +517,7 @@
   <a class="model-row" href="#plot"><span class="name"><span class="model-i">04</span>O que se pode construir</span><span class="tag">VER</span></a>
   <a class="model-row" href="#modelos"><span class="name"><span class="model-i">05</span>5 estudos volumétricos</span><span class="tag">VER</span></a>
   <a class="model-row" href="#porque-agora"><span class="name"><span class="model-i">06</span>Porquê agora e o roteiro</span><span class="tag">VER</span></a>
+  <a class="model-row" href="precos.html"><span class="name"><span class="model-i">07</span>As contas</span><span class="tag">ABRIR</span></a>
   <button class="model-row model-row--toggle" id="modelosToggle" aria-expanded="false" aria-controls="modelosSubmenu">
     <span class="name"><span class="model-i">10</span>Modelos</span><span class="chev">›</span>
   </button>
@@ -686,13 +687,14 @@
     <ul class="corte-list">
       <li><span>Pisos acima do solo</span><span id="corteKPisos">3</span></li>
       <li><span>Altura de fachada</span><span>até 12 m</span></li>
+      <li><span>Altura deste modelo</span><span id="corteKAltura">11,4 m</span></li>
       <li><span>Pisos em subsolo</span><span>sem limite</span></li>
       <li><span>Explanada no topo</span><span>permitida</span></li>
       <li><span>Piscinas</span><span>não contam</span></li>
       <li><span>Postes a remover</span><span>a nosso cargo</span></li>
     </ul>
   </div>
-  <p class="nota-render">O envelope — 3 pisos, 12 m de fachada, subsolo livre — é o do regulamento em vigor e está confirmado. A distribuição de programa por piso em cada modelo é leitura das descrições dos estudos volumétricos e está por confirmar com o arquiteto.</p>
+  <p class="nota-render">O envelope — 3 pisos, 12 m de fachada, subsolo livre — é o do regulamento em vigor e está confirmado. Os pé-direitos de cada piso e a distribuição de programa são uma proposta minha — pé-direito maior onde há programa público, 3,2 m nos pisos de quartos — e estão por confirmar com o arquiteto. Nenhum dos cinco esgota os 12 m; o Modelo 3 fica-se pelos dois pisos.</p>
 </section>
 
 <section id="plot" class="reveal">
@@ -1772,44 +1774,53 @@
   const abas = document.getElementById('corteAbas');
   if(!svg || !abas) return;
 
-  // alturas em unidades de piso (1 = 60 px = ~4 m). O limite legal são 3.
+  /* Alturas em METROS, piso a piso, mais a platibanda que remata a fachada.
+     O envelope — 3 pisos e 12 m de fachada — é regulamento confirmado. A
+     repartição por piso é PROPOSTA, para o arquiteto confirmar ou corrigir:
+     pé-direito maior onde há programa público (receção, restaurante, spa,
+     pavilhão) e 3,2 m nos pisos de quartos, que é o corrente em hotelaria. */
   const CORTES = {
     '1': { nome:'U-Resort centralizado',
-      pisos:[ {h:1, t:'RÉS-DO-CHÃO · receção, 3 salas de reunião, restaurante'},
-              {h:1, t:'1.º PISO · quartos'},
-              {h:1, t:'2.º PISO · quartos'} ],
+      pisos:[ {m:4.0, t:'RÉS-DO-CHÃO · receção, restaurante, 3 salas'},
+              {m:3.2, t:'1.º PISO · quartos'},
+              {m:3.2, t:'2.º PISO · quartos'} ],
+      platibanda:1.0,
       caves:[ 'CAVE −1 · estacionamento', 'CAVE −2 · áreas técnicas' ],
       topo:'EXPLANADA — permitida',
       agua:{t:'PISCINA AO CENTRO', y:0} },
     '2': { nome:'Terraço linear com cascata',
-      pisos:[ {h:1, t:'RÉS-DO-CHÃO · receção e spa'},
-              {h:1, t:'1.º PISO · quartos'},
-              {h:1, t:'2.º PISO · quartos'} ],
+      pisos:[ {m:4.2, t:'RÉS-DO-CHÃO · receção e spa'},
+              {m:3.2, t:'1.º PISO · quartos'},
+              {m:3.2, t:'2.º PISO · quartos'} ],
+      platibanda:1.0,
       caves:[ 'CAVE −1 · estacionamento e técnicas' ],
       topo:'EXPLANADA — permitida',
       agua:{t:'PISCINA SOBREELEVADA · borda infinita', y:-58} },
     '3': { nome:'Vila alentejana desconstruída',
-      pisos:[ {h:1, t:'RÉS-DO-CHÃO · lounge, spa, salas de reunião'},
-              {h:1, t:'1.º PISO · quartos'} ],
+      pisos:[ {m:3.8, t:'RÉS-DO-CHÃO · lounge, spa, salas de reunião'},
+              {m:3.2, t:'1.º PISO · quartos'} ],
+      platibanda:0.8,
       caves:[ 'CAVE −1 · áreas técnicas' ],
       topo:null,
       agua:{t:'PISCINA-LAGOA · formato orgânico', y:0} },
     '4': { nome:'Edifício integrado de uso misto',
-      pisos:[ {h:1, t:'RÉS-DO-CHÃO · receção, spa, restaurante, salas'},
-              {h:1, t:'1.º PISO · quartos'},
-              {h:1, t:'2.º PISO · quartos'} ],
+      pisos:[ {m:4.5, t:'RÉS-DO-CHÃO · receção, spa, restaurante'},
+              {m:3.2, t:'1.º PISO · quartos'},
+              {m:3.2, t:'2.º PISO · quartos'} ],
+      platibanda:1.0,
       caves:[ 'CAVE −1 · garagem', 'CAVE −2 · serviços e técnicas' ],
       topo:'EXPLANADA — permitida',
       agua:{t:'PISCINA', y:0} },
     '5': { nome:'Oásis de eventos',
-      pisos:[ {h:2, t:'PAVILHÃO · pé-direito duplo, vidro dobrável'},
-              {h:1, t:'1.º PISO · quartos'} ],
+      pisos:[ {m:7.5, t:'PAVILHÃO · pé-direito duplo'},
+              {m:3.2, t:'1.º PISO · quartos'} ],
+      platibanda:0.9,
       caves:[ 'CAVE −1 · apoio a eventos e técnicas' ],
       topo:'EXPLANADA — permitida',
       agua:{t:'PISCINA JUNTO AO RELVADO', y:0} }
   };
 
-  const SOLO = 340, PISO = 60, CAVE = 56, LIMITE = SOLO - 3*PISO;
+  const SOLO = 340, PXM = 15, CAVE = 56, LIMITE = SOLO - 12*PXM;
   const el = (t,a) => { const n=document.createElementNS('http://www.w3.org/2000/svg',t);
     for(const k in a) n.setAttribute(k, a[k]); return n; };
   const txt = (x,y,s,cls,anchor) => { const n=el('text',{x:x,y:y,class:cls||'c-lbl'});
@@ -1823,7 +1834,7 @@
     // limite legal dos 12 m, sempre no mesmo sítio — vê-se quem não o esgota
     svg.appendChild(el('line',{x1:120,y1:LIMITE,x2:800,y2:LIMITE,
       stroke:'#B08D3E','stroke-width':1,'stroke-dasharray':'6 5',opacity:0.7}));
-    svg.appendChild(txt(124, LIMITE-9, 'LIMITE DE FACHADA · 12 m','c-lbl c-gold'));
+    svg.appendChild(txt(124, LIMITE-18, 'LIMITE DE FACHADA · 12 m','c-lbl c-gold'));
 
     // terreno
     svg.appendChild(el('line',{x1:20,y1:SOLO,x2:800,y2:SOLO,stroke:'#3F4A32','stroke-width':2}));
@@ -1842,14 +1853,24 @@
     svg.appendChild(el('path',{d:'M'+(X+W/2)+','+(fim+32)+' L'+(X+W/2)+','+(fim+52),
       stroke:'#B08D3E','stroke-width':1,'stroke-dasharray':'3 4'}));
 
-    // pisos acima do solo
+    // pisos acima do solo — cada um com o seu pé-direito, à escala
     let y = SOLO, escuro = true, alturaTotal = 0;
     m.pisos.forEach(function(p){
-      const h = p.h*PISO; y -= h; alturaTotal += p.h;
+      const h = p.m*PXM; y -= h; alturaTotal += p.m;
       svg.appendChild(el('rect',{x:X,y:y,width:W,height:h,fill: escuro?'#3F4A32':'#46523A'}));
       svg.appendChild(txt(X+W/2, y+h/2+5, p.t, 'c-lbl c-sand', 'middle'));
+      svg.appendChild(txt(X+W+12, y+h/2+5,
+        p.m.toFixed(1).replace('.',',')+' m', 'c-lbl'));
       escuro = !escuro;
     });
+
+    // platibanda — remata a fachada e conta para os 12 m
+    if(m.platibanda){
+      const h = m.platibanda*PXM; y -= h; alturaTotal += m.platibanda;
+      svg.appendChild(el('rect',{x:X,y:y,width:W,height:h,fill:'#2A3222'}));
+      svg.appendChild(txt(X+W+15, y+h-1, 'PLATIBANDA · '
+        + m.platibanda.toFixed(1).replace('.',',')+' m', 'c-lbl'));
+    }
 
     // explanada
     if(m.topo){
@@ -1858,12 +1879,15 @@
     }
 
     // cota da fachada deste modelo
-    const alt = (alturaTotal*4);
+    const alt = alturaTotal.toFixed(1).replace('.',',');
     svg.appendChild(el('line',{x1:110,y1:y,x2:110,y2:SOLO,stroke:'#1B2116','stroke-width':1}));
     svg.appendChild(el('path',{d:'M106,'+(y+4)+' L110,'+(y-4)+' L114,'+(y+4),fill:'#1B2116'}));
     svg.appendChild(el('path',{d:'M106,'+(SOLO-4)+' L110,'+(SOLO+4)+' L114,'+(SOLO-4),fill:'#1B2116'}));
-    svg.appendChild(txt(98, (y+SOLO)/2 - 6, 'FACHADA', 'c-lbl', 'end'));
-    svg.appendChild(txt(98, (y+SOLO)/2 + 11, '~'+alt+' m', 'c-lbl c-gold', 'end'));
+    svg.appendChild(txt(98, (y+SOLO)/2 - 14, 'FACHADA', 'c-lbl', 'end'));
+    svg.appendChild(txt(98, (y+SOLO)/2 + 3, alt+' m', 'c-lbl c-gold', 'end'));
+    const folga = 12 - alturaTotal;
+    svg.appendChild(txt(98, (y+SOLO)/2 + 19,
+      'sobram '+folga.toFixed(1).replace('.',',')+' m', 'c-lbl', 'end'));
 
     // piscina, fora do índice
     const py = SOLO - 24 + (m.agua.y || 0);
@@ -1876,6 +1900,7 @@
     svg.appendChild(txt(661, SOLO+55, 'FORA DO ÍNDICE', 'c-lbl c-gold', 'middle'));
 
     document.getElementById('corteNome').textContent = m.nome;
+    document.getElementById('corteKAltura').textContent = alt + ' m';
     document.getElementById('corteKPisos').textContent = m.pisos.length;
     abas.querySelectorAll('.corte-aba').forEach(function(b){
       const on = b.dataset.corte === id;
