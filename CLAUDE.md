@@ -26,7 +26,10 @@ projeto e o processo urbanístico à medida que avança.
 - **Forma do lote:** polígono irregular, tipo cunha, com o eixo maior a
   correr NNO–SSE; lado mais largo a norte, a estreitar para sul. Estrada
   ao longo do limite nascente/sudeste. Terreno praticamente plano
-  (225–233 m de cota). Ver o print do Google Earth no histórico da sessão.
+  em declive (225,18–233,41 m de cota, ~1% ao longo do eixo maior), mas os
+  **8 m de desnível não são irrelevantes**: mandam na cota a partir da qual
+  se mede a altura de fachada, e no que é preciso escavar ou aterrar. A
+  maquete 3D modela o lote plano — é uma simplificação conhecida. Ver o print do Google Earth no histórico da sessão.
 - **Classificação atual:** Equipamento (não permite hotel).
 - **Classificação prevista:** Serviços e Turismo — já incluída pelo Município
   no novo PDM, precisamente para permitir o hotel.
@@ -239,6 +242,12 @@ contido, sem emojis.
   desta sessão. Tem mesmo de vir do utilizador.
 
 ## Como tornar o terreno realista (guia para o utilizador)
+
+> Sobrepõe-se em parte ao `COMO-OBTER-OS-NUMEROS.md`, que é a lista de ações
+> para o utilizador (nove pontos, com os pedidos já escritos). Este guia é o
+> lado do 3D; esse é o lado dos números e do processo. **Se mexeres num,
+> confere o outro** — os pontos do KML, do print da envolvente e das fotos
+> vivem nos dois.
 
 Por ordem de efeito, do que dá mais salto por menos esforço. Os quatro
 primeiros são de graça e não dependem de ninguém de fora.

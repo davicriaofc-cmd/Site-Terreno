@@ -210,9 +210,10 @@ não sobrevive a uma laje mais espessa, e é o primeiro a rever.
 1. Os pé-direitos aguentam? 3,2 m livres em piso de quartos, com laje e tectos
    falsos para AVAC, é o mínimo — se não chegar, o Modelo 4 estoura os 12 m.
 2. A altura de fachada mede-se de que cota, no regulamento? Terreno natural,
-   soleira, ou cota média? O lote varia entre 225 e 233 m — **8 metros de
-   diferença.** Num terreno inclinado, a resposta a esta pergunta pode valer
-   um piso inteiro.
+   soleira, ou cota média? O lote vai dos **225,18 m aos 233,41 m** — 8 metros
+   de diferença, e o site ainda descreve o terreno como praticamente plano.
+   Num terreno com este desnível, a resposta a esta pergunta pode valer um
+   piso inteiro.
 3. A platibanda conta para a altura de fachada? Assumi que sim, que é o mais
    conservador.
 4. No Modelo 5, o pavilhão de pé-direito duplo e o corpo de quartos são dois
@@ -235,13 +236,16 @@ trabalho — está bloqueado a partir do sítio onde corro. Tem mesmo de vir de 
 obriga-me a traçar tudo à mão por cima; o KML traz as coordenadas reais e a
 envolvente fica no sítio certo, à escala certa, sem eu adivinhar nada.
 
-**Como exportar o KML (Google Earth Pro, computador):**
+**Como exportar o KML**, conforme a versão que uses:
 
-1. Painel *Locais*, à esquerda → botão direito na pasta que tem o polígono do
-   lote → **Guardar local como…**
-2. Tipo de ficheiro: **KML** (não KMZ, que é o KML comprimido — os dois servem,
-   o KML é texto e vejo-o logo)
-3. Se traçares também a envolvente, mete tudo na mesma pasta antes de exportar
+- *Google Earth Pro (computador):* painel **Locais**, à esquerda → botão direito
+  na pasta que tem o polígono do lote → **Guardar local como…** → tipo de
+  ficheiro **KML**. Se traçares também a envolvente, mete tudo na mesma pasta
+  antes de exportar.
+- *Google Earth novo (web ou app):* **Guardar no projeto** e depois exportar o
+  projeto como **KML**.
+
+KMZ é só o KML comprimido — os dois servem; o KML é texto e leio-o logo.
 
 **O que gostava que estivesse traçado, além do lote:**
 
@@ -257,6 +261,17 @@ Não precisa de rigor: linhas à mão sobre a imagem chegam. Preciso de saber
 vista de cima a direito (não inclinada), com a régua de escala do Google
 Earth visível no canto. E, se puderes, um segundo print com o lote no centro
 e cerca de 300 m de lado, para eu conferir os limites.
+
+**Enquanto lá estás, dois extras que valem mais do que o print da envolvente**
+(estão desenvolvidos no `CLAUDE.md`, na secção *Como tornar o terreno realista*):
+
+- **A ortofoto do lote** — o mesmo enquadramento apertado, exatamente de cima
+  (a tecla `r` repõe o norte e tira a inclinação). Aplica-se como textura ao
+  chão da maquete e o terreno deixa de ser um verde chapado.
+- **Os contornos de elevação** — no painel de medição há o botão *"Gerar
+  contornos para este local"*. **O terreno não é plano: 225,18 m no ponto mais
+  baixo, 233,41 no mais alto.** Isso são 8 m que a maquete hoje ignora, que
+  mudam quanto se escava, e que mandam na pergunta 2 do ponto 6.
 
 ---
 
@@ -314,14 +329,16 @@ o endereço.
 
 ## Por onde começar
 
-Se só fizeres três coisas desta lista, faz estas, por esta ordem:
+Se só fizeres quatro coisas desta lista, faz estas, por esta ordem:
 
 1. **A pergunta do estacionamento** (ponto 3) — é grátis, já tens a conversa
    aberta com o Gabinete de Ordenamento do Território, e é o que mais mexe na
    conta toda.
-2. **A foto do terreno** (ponto 8) — é uma tarde, e é o que mais muda o site.
-3. **A pergunta 2 do ponto 6** — de que cota se mede a altura de fachada. É
+2. **A ortofoto e o KML** (ponto 7) — dez minutos no Google Earth, e é o maior
+   salto que a maquete pode dar sem arquiteto nenhum.
+3. **A foto do terreno** (ponto 8) — é uma tarde, e é o que mais muda o site.
+4. **A pergunta 2 do ponto 6** — de que cota se mede a altura de fachada. É
    grátis, e num terreno com 8 m de desnível pode valer um piso inteiro.
 
-As outras seis dependem de terceiros: do arquiteto, do construtor, ou de doze
+As outras dependem de terceiros: do arquiteto, do construtor, ou de doze
 meses a recolher preços.
