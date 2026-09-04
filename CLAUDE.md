@@ -238,6 +238,64 @@ contido, sem emojis.
   cartografia aberta (Overpass/Nominatim) — está bloqueado pelo proxy de rede
   desta sessão. Tem mesmo de vir do utilizador.
 
+## Como tornar o terreno realista (guia para o utilizador)
+
+Por ordem de efeito, do que dá mais salto por menos esforço. Os quatro
+primeiros são de graça e não dependem de ninguém de fora.
+
+1. **Ortofoto drapeada sobre o lote.** É de longe o maior salto: em vez de
+   um verde chapado, o chão passa a ser a imagem aérea real, com os
+   caminhos, as manchas de terra e a vegetação que lá estão. Como obter:
+   Google Earth, vista **exatamente de cima** (tecla `r` repõe o norte e
+   anula a inclinação), zoom até o lote encher o ecrã, esconder painéis, e
+   guardar a imagem. Fica um PNG que se aplica como textura ao polígono do
+   lote. **Importante:** sem inclinação nenhuma, senão a imagem fica
+   deformada e não assenta no polígono.
+
+2. **KML/KMZ do lote.** Substitui o polígono que eu tracei à mão por
+   coordenadas exatas. No Google Earth: **Guardar no projeto** e depois
+   exportar como KML. Resolve de vez a dúvida entre os 16.152 m² medidos e
+   os 17.500 m² assumidos.
+
+3. **Contornos de elevação.** O terreno **não é plano** — 225,18 m no ponto
+   mais baixo, 233,41 no mais alto, 8 m de diferença. A maquete modela-o
+   plano, o que é uma simplificação visível. O painel de medição do Google
+   Earth tem o botão **"Gerar contornos para este local"**: com esses
+   contornos dá para modelar o relevo real e ver onde é preciso escavar ou
+   aterrar. Isto também interessa ao custo de construção.
+
+4. **Print mais afastado para a envolvente.** Um enquadramento que apanhe o
+   Centro Hípico D. Duarte, o estádio, a pista de atletismo e os armazéns.
+   Serve para construir os volumes à volta — mostra à Câmara que o projeto
+   se integra e ao investidor que o terreno não está isolado.
+
+5. **Fotos do terreno ao nível do solo.** Não servem para geometria (uma
+   foto não tem profundidade), mas servem para duas coisas: o hero do site,
+   que não tem uma única imagem real, e para acertar cores e vegetação da
+   maquete. Úteis: uma da entrada pela estrada nascente, uma do interior a
+   olhar para o hípico, uma a apanhar os postes a remover.
+
+6. **Levantamento topográfico do topógrafo.** É o passo 3 do roteiro e
+   substitui os pontos 2 e 3 com rigor de projeto. Pedir em **DWG/DXF ou
+   pontos XYZ**, não só em PDF — de PDF não se extrai geometria.
+
+7. **`.glb`/`.gltf` do arquiteto.** O teto. Sem este ficheiro a maquete não
+   chega ao nível de um render de arquitetura (janelas, varandas, materiais
+   modelados). Ao pedir o trabalho ao arquiteto, **pedir também a exportação
+   em glTF** — é um pedido normal e não custa mais.
+
+Ordem prática sugerida ao utilizador: 1 e 2 primeiro (dez minutos no Google
+Earth, salto grande), depois 3 e 4, e as fotos quando lá for.
+
+**Plantas — onde as fazer.** Avisado o utilizador de que desenhos feitos por
+ele **não têm valor para licenciamento**: em Portugal o projeto de arquitetura
+tem de ser assinado por arquiteto inscrito na Ordem. Servem para chegar ao
+arquiteto com a ideia já clara. Por ordem de facilidade: Sweet Home 3D (grátis,
+desktop, aprende-se numa tarde) → Floorplanner ou RoomSketcher (browser) →
+SketchUp (versão web gratuita) → Blender (sem limites, mas é um programa a
+sério). Para alimentar este site o formato é `.glb`/`.gltf`: o Blender exporta
+direto, o SketchUp e o Sweet Home 3D dão `.obj`/`.dae` e converte-se.
+
 ## Pull requests
 
 Só deve existir **um PR aberto de cada vez** — o utilizador pediu isso
