@@ -6,9 +6,10 @@ projeto e o processo urbanístico à medida que avança.
 
 ## Estado atual
 
-- Branch de trabalho: `claude/site-assistance-pk5n2b` → PR #6 em
-  `davicriaofc-cmd/Site-Terreno` (ver com `git log` se precisares do estado
-  mais recente). O `claude/mano-slfa79` / PR #2 é histórico antigo.
+- Branch de trabalho: `claude/modelo-1-parte-3-jliudo` → PR #7 em
+  `davicriaofc-cmd/Site-Terreno`. Ver com `git log` se precisares do estado
+  mais recente. O `claude/site-assistance-pk5n2b` (PR #6) já foi para o `main`;
+  o `claude/mano-slfa79` / PR #2 é histórico antigo.
 - Todo o site vive num único `index.html`. Sem framework, sem npm — editar
   diretamente o ficheiro.
 
@@ -108,11 +109,110 @@ houver material real — não é preciso mexer no resto do código.
 
 ## Maquete 3D do Modelo 1 (`#modelos` → vista de modelo)
 
-O Modelo 1 abre com uma maquete 3D navegável (arrastar para rodar, roda para
-aproximar) que **cresce ao abrir**: o lote espalha-se, a via desenha-se, os
-edifícios sobem do chão, a piscina enche e o pomar nasce — cerca de 3 s no
-total. O botão "Ver crescer outra vez" repete. Script:
-`/* MODELO 1 — MAQUETE 3D (cresce ao abrir) */` no fim do `index.html`.
+O Modelo 1 abre com uma maquete 3D navegável que **cresce ao abrir**: o lote
+espalha-se, a via desenha-se, os edifícios sobem do chão, a piscina enche e o
+pomar nasce — cerca de 3 s no total. O botão "Ver crescer outra vez" repete;
+o botão "Vista geral" volta ao enquadramento sem repetir o crescimento.
+Script: `/* MODELO 1 — MAQUETE 3D (cresce ao abrir) */` no fim do `index.html`.
+
+### Navegação livre (pedido a partir do vídeo do Spacio.ai)
+
+O utilizador mandou uma gravação do Spacio.ai a percorrer um modelo, do lote
+inteiro até encostar à fachada, e pediu o mesmo aqui. O que ficou:
+
+- **Rodar** — arrastar com o botão esquerdo. `pitch` entre −20º e 88º.
+- **Deslocar** — botão direito, botão do meio, `shift`+arrastar, ou dois dedos.
+  O passo é o fator exato da perspetiva (`2·tan(fov/2)·dist / altura`), por isso
+  a maquete acompanha o cursor pixel a pixel em qualquer distância.
+- **Aproximar** — roda do rato ou pinça, exponencial, entre 5 m e 900 m. O alvo
+  é puxado para o **ponto debaixo do cursor** (raycast aos volumes e ao chão),
+  que é o que faz mergulhar no edifício em vez de aproximar sempre ao centro.
+  Pontos a mais de 3× a distância atual, ou a mais de 300 m do centro, são
+  ignorados — sem isso apontar ao horizonte atirava a câmara para fora do lote.
+- **Duplo clique** — voa até ao ponto tocado.
+- **Limite do chão** — `porCamara()` levanta o `pitch` o necessário para a
+  câmara nunca descer abaixo de 1,6 m; o valor corrigido é guardado.
+- **Rotação lenta de apresentação** — só corre até alguém tocar na maquete
+  (`interagiu`), senão era impossível ficar parado a olhar para uma fachada.
+- **Cota da câmara** — canto inferior direito do canvas (`#modelo3dCota`).
+
+### Identificar volumes
+
+Passar o cursor por cima (ou tocar, no telemóvel) acende o contorno a ouro da
+implantação e abre um rótulo com nome, dimensões, implantação e área bruta.
+As áreas são **medidas na maquete** (o rótulo di-lo) — são o volume de estudo,
+não programa confirmado. Clicar fixa o contorno; clicar outra vez larga.
+O contorno tem `depthTest:false` para se ver mesmo com o edifício à frente.
+
+### Pormenor de perto
+
+Como agora se chega à fachada, os edifícios deixaram de ser caixas com faixas
+de vidro. `edificio()` abre os vãos um a um (caixilho escuro + vidro à frente,
+vão de 4,0 m, mais alto no rés-do-chão), põe friso de laje entre pisos,
+varandas com guarda de vidro de três em três vãos nas fachadas compridas
+acima do rés-do-chão, e entrada com pala onde `op.entrada` o pedir. Há figuras
+humanas de 1,75 m (numa varanda de cada edifício com varandas, e duas no deck)
+só para dar escala.
+
+Tudo o que se repete — caixilhos, vidros, lajes e guardas de varanda, painéis
+fotovoltaicos — entra por `instanciar()` numa `InstancedMesh` por família: são
+centenas de peças com meia dúzia de chamadas de desenho. Os vãos **não lançam
+sombra** (a parede já lança a dela), o que poupa metade do trabalho do mapa de
+sombras sem se notar.
+
+Custo medido no sandbox, com SwiftShader (rasterizador por CPU, sem placa
+gráfica): 15 fps antes, 10–11 fps depois, na vista geral a 1440×900. A
+diferença é quase toda o passo das sombras. Num GPU real nenhum dos dois
+chega perto do limite — não tirar conclusões destes números.
+
+**Céu** — gradiente vertical gerado em canvas (`ceu()`), usado como
+`scene.background` equirretangular. A cor no horizonte é igual à do nevoeiro
+(`#5E634A`), para a aresta do plano envolvente não se ver. Sem isto, chegar à
+cota de uma pessoa dava meio ecrã de cor chapada.
+
+### Envolvente real — encaixe pronto, à espera do ficheiro
+
+O utilizador viu a maquete e disse que **não estava nada parecida com o vídeo**
+do Spacio.ai que tinha mandado. Tinha razão, e a razão principal é esta: no
+vídeo o lote está dentro de Montemor a sério — curvas de nível no terreno todo,
+as estradas verdadeiras, a rotunda, uns 40 edifícios vizinhos, tudo recortado
+num quadrado com o limite a tracejado. A maquete daqui tem o lote a flutuar
+num plano castanho vazio, porque a envolvente não se inventa. **Foi a decisão
+certa, mas devia ter sido dita à cabeça** — não depois de entregar o trabalho.
+
+As outras duas diferenças, para memória: o Spacio é uma maquete **branca sobre
+fundo branco** (a nossa segue a palete escura do site), e o volume do vídeo é
+**um bloco só**, de 15.356 m² de área bruta, não a implantação do Modelo 1
+(hotel em L + apartamentos + 10 moradias + piscina + pomar).
+
+O caminho combinado é o utilizador **exportar do Spacio** (botão no canto
+superior direito) em `.glb` ou `.gltf` e mandar o ficheiro. O encaixe já está
+feito:
+
+- `vendor/GLTFLoader.js` — o GLTFLoader do three r160.1 convertido de módulo ES
+  para UMD (o bloco de `import` passou a desestruturação de `window.THREE`, o
+  `export` passou a `THREE.GLTFLoader`, o corpo não foi tocado, e o
+  `toTrianglesDrawMode` do `BufferGeometryUtils` veio copiado). **Não editar à
+  mão** — se for preciso outra versão, refazer a conversão a partir do pacote
+  npm. Ficheiros comprimidos com **Draco ou Meshopt** ainda precisam do
+  descodificador respetivo, que não está vendorizado.
+- `const ENVOLVENTE` no topo do script da maquete: `ficheiro` (caminho, `null`
+  enquanto não houver), `escala`, `rodar` (graus) e `mover` ([x,y,z] em metros).
+- `carregarEnvolvente()` carrega, mede, esconde o plano liso, mete as malhas no
+  `CHAO` (para a roda e o duplo clique poderem mergulhar nelas) e alarga a
+  câmara de sombras e o nevoeiro ao tamanho do que chegou. Se o ficheiro faltar
+  ou vier corrompido, escreve um aviso e **fica tudo como estava** — a maquete
+  nunca deixa de abrir por causa disto.
+- Ao carregar, a consola imprime **as medidas do que veio** ("900,0 × 900,0 m
+  em planta, 18,5 m de altura; centro em 0,0, 1,3, 0,0"). É por aí que se
+  acertam `escala`, `rodar` e `mover` até o lote assentar no sítio certo.
+- O `GLTFLoader.js` (110 KB) **só desce se `ENVOLVENTE.ficheiro` estiver
+  preenchido**. Com ele a `null`, abrir o Modelo 1 continua a pedir só o
+  `three.min.js` — verificado.
+
+Testado de ponta a ponta com um `.glb` gerado para o efeito (terreno de
+900×900 m mais 25 volumes), que **não foi commitado de propósito**: seria
+exatamente a envolvente inventada que não queremos no repositório.
 
 - **Biblioteca:** `vendor/three.min.js` (three r160, build UMD), servida do
   próprio repositório — o site continua sem depender de CDNs. Não trocar por
@@ -231,12 +331,18 @@ contido, sem emojis.
   e desenhadas; falta validar. A pergunta que mais importa é **de que cota se
   mede a altura de fachada** — o lote varia entre 225 e 233 m, e a resposta
   pode valer um piso inteiro.
-- **Envolvente 3D** (Centro Hípico, estádio, pista, armazéns, estradas) —
-  falta um print do Google Earth mais afastado, ou o KML.
+- **Envolvente 3D** (Centro Hípico, estádio, pista, armazéns, estradas) — o
+  encaixe está feito (ver "Envolvente real"), falta o ficheiro `.glb`/`.gltf`
+  exportado do Spacio. Em alternativa, um KML ou um print do Google Earth mais
+  afastado. Nesta sessão não deu para ir buscar os dados a lado nenhum
+  (OpenStreetMap, Overpass e OpenTopography estão bloqueados pela política de
+  rede do sandbox); o npm, esse, chega lá — foi de lá que veio o GLTFLoader.
 - **Fotos reais do terreno** — o site não tem uma única. Servem para o hero,
   não para o 3D.
-- **Pormenor fino da maquete** (janelas individuais, varandas, caminhos,
-  estacionamento, espreguiçadeiras). O teto sem `.glb` de arquiteto mantém-se.
+- **Pormenor fino da maquete** — janelas individuais, varandas e figuras à
+  escala já estão feitas. Faltam caminhos, estacionamento e espreguiçadeiras.
+  O teto sem `.glb` de arquiteto mantém-se: andar **por dentro** dos edifícios
+  continua a precisar do ficheiro 3D do arquiteto.
 - **Envolvente do 3D continua à espera do KML.** Tentei ir buscá-la a
   cartografia aberta (Overpass/Nominatim) — está bloqueado pelo proxy de rede
   desta sessão. Tem mesmo de vir do utilizador.
