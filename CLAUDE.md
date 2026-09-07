@@ -6,10 +6,10 @@ projeto e o processo urbanístico à medida que avança.
 
 ## Estado atual
 
-- Branch de trabalho: `claude/modelo-1-parte-3-jliudo`, que continua o
-  `claude/site-assistance-pk5n2b` (PR #6) em `davicriaofc-cmd/Site-Terreno`.
-  Ver com `git log` se precisares do estado mais recente. O
-  `claude/mano-slfa79` / PR #2 é histórico antigo.
+- Branch de trabalho: `claude/modelo-1-parte-3-jliudo` → PR #7 em
+  `davicriaofc-cmd/Site-Terreno`. Ver com `git log` se precisares do estado
+  mais recente. O `claude/site-assistance-pk5n2b` (PR #6) já foi para o `main`;
+  o `claude/mano-slfa79` / PR #2 é histórico antigo.
 - Todo o site vive num único `index.html`. Sem framework, sem npm — editar
   diretamente o ficheiro.
 
