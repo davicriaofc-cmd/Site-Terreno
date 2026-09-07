@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>As contas — O Terreno · Montemor-o-Novo</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sand:#EFE8D8; --sand-dim:#E4DBC6; --ink:#1B2116; --olive:#3F4A32;
+    --olive-deep:#2A3222; --gold:#B08D3E; --gold-soft:#D8BE84; --night:#0E1720;
+    --line:rgba(27,33,22,0.14);
+    /* par divergente da sensibilidade — validado sobre o fundo areia:
+       banda de luminosidade, chroma, separação para daltonismo e contraste */
+    --pior:#A8762B; --melhor:#00789C; --centro:#6B6F5F;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--sand); color:var(--ink);
+    font-family:'Inter', system-ui, sans-serif; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{ font-family:'Fraunces', Georgia, serif; font-weight:600; margin:0; line-height:1.1; }
+  em{ font-style:italic; color:var(--gold); font-weight:500; }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.14em;
+    text-transform:uppercase; color:var(--gold); margin-bottom:14px;
+  }
+  header{ padding:60px 6vw 0; max-width:1100px; margin:0 auto; }
+  .voltar{
+    display:inline-flex; align-items:center; gap:9px; text-decoration:none;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.08em;
+    color:var(--ink); border:1px solid var(--line); border-radius:100px;
+    padding:9px 16px; margin-bottom:44px; transition:border-color .25s;
+  }
+  .voltar:hover{ border-color:var(--gold); }
+  header h1{ font-size:clamp(38px,6vw,68px); }
+  header p.lead{ max-width:56ch; margin-top:20px; font-size:16px; line-height:1.75; opacity:0.7; }
+
+  .aviso{
+    max-width:1100px; margin:40px auto 0; padding:20px 24px; border-radius:6px;
+    background:rgba(176,141,62,0.13); border:1px solid rgba(176,141,62,0.4);
+    font-size:14px; line-height:1.7;
+  }
+  .aviso b{ color:var(--gold); }
+  .aviso p{ margin:0 0 10px; }
+  .aviso p:last-child{ margin-bottom:0; }
+
+  main{ max-width:1100px; margin:0 auto; padding:0 6vw 110px; }
+  section{ margin-top:80px; }
+  section > h2{ font-size:clamp(26px,3.4vw,40px); margin-bottom:8px; }
+  section > p.sub{ max-width:60ch; font-size:15px; line-height:1.7; opacity:0.66; margin:0 0 34px; }
+
+  /* ---- placar do topo ---- */
+  .placar{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1px;
+    background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden; margin-top:44px; }
+  .placar .t{ background:var(--sand); padding:22px 24px; }
+  .placar .t span{ display:block; font-family:'IBM Plex Mono', monospace; font-size:10px;
+    letter-spacing:0.11em; text-transform:uppercase; opacity:0.55; margin-bottom:10px; }
+  .placar .t strong{ font-family:'Fraunces', Georgia, serif; font-weight:600;
+    font-size:clamp(26px,3.6vw,38px); line-height:1; display:block; }
+  .placar .t small{ display:block; margin-top:9px; font-size:12px; opacity:0.5; }
+
+  .campos{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; }
+  .campo{ border:1px solid var(--line); border-radius:6px; padding:16px 18px; background:rgba(255,255,255,0.35); }
+  .campo label{
+    display:block; font-family:'IBM Plex Mono', monospace; font-size:10px;
+    letter-spacing:0.1em; text-transform:uppercase; opacity:0.55; margin-bottom:9px;
+  }
+  .campo input{
+    width:100%; border:none; background:none; border-bottom:1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace; font-size:19px; color:var(--ink);
+    padding:3px 0; outline:none;
+  }
+  .campo input:focus{ border-bottom-color:var(--gold); }
+  .campo .un{ font-family:'IBM Plex Mono', monospace; font-size:10px; opacity:0.45; margin-top:7px; display:block; }
+  .campo .fonte{ display:block; margin-top:10px; padding-top:9px; border-top:1px dotted var(--line);
+    font-size:11px; line-height:1.55; opacity:0.62; }
+  .campo.vazio{ border-color:rgba(176,141,62,0.55); background:rgba(176,141,62,0.09); }
+  .campo.vazio label::after{ content:' · só tu tens'; color:var(--gold); opacity:0.95; }
+
+  .saida{ margin-top:26px; border-top:1px solid var(--line); }
+  .linha{
+    display:flex; justify-content:space-between; align-items:baseline; gap:18px;
+    padding:15px 2px; border-bottom:1px solid var(--line);
+  }
+  .linha span:first-child{ font-size:14px; opacity:0.7; }
+  .linha span:last-child{ font-family:'IBM Plex Mono', monospace; font-size:17px; }
+  .linha.total span:first-child{ opacity:1; font-weight:600; }
+  .linha.total span:last-child{ font-size:22px; color:var(--gold); }
+  .linha .veredito{ font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.08em;
+    text-transform:uppercase; padding:3px 9px; border-radius:100px; border:1px solid currentColor; margin-left:10px; }
+
+  /* ---- sensibilidade ---- */
+  .tornado{ margin-top:8px; }
+  .t-row{ display:grid; grid-template-columns:minmax(140px,210px) 1fr; gap:16px;
+    align-items:center; padding:11px 0; border-bottom:1px solid var(--line); }
+  .t-nome{ font-size:13px; line-height:1.4; }
+  .t-nome small{ display:block; font-family:'IBM Plex Mono', monospace; font-size:10px;
+    opacity:0.5; margin-top:3px; }
+  .t-pista{ position:relative; height:30px; }
+  .t-bar{ position:absolute; top:9px; height:12px; border-radius:4px; }
+  .t-bar.melhor{ background:var(--melhor); }
+  .t-bar.pior{ background:var(--pior); }
+  /* 2px de fundo entre os dois segmentos, e anel do mesmo fundo sobre a marca central */
+  .t-centro{ position:absolute; top:4px; height:22px; width:2px; background:var(--centro);
+    box-shadow:0 0 0 2px var(--sand); }
+  .t-num{ position:absolute; top:8px; font-family:'IBM Plex Mono', monospace;
+    font-size:11px; opacity:0.75; white-space:nowrap; }
+  .t-eixo{ display:flex; justify-content:space-between; font-family:'IBM Plex Mono', monospace;
+    font-size:10px; opacity:0.45; margin-top:12px; padding-left:calc(min(210px,26%) + 16px); }
+  .t-legenda{ display:flex; flex-wrap:wrap; gap:20px; margin:22px 0 4px;
+    font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.07em; text-transform:uppercase; opacity:0.7; }
+  .t-legenda i{ display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:7px; vertical-align:-1px; }
+  .dica{ position:fixed; pointer-events:none; opacity:0; transform:translate(-50%,-100%);
+    background:var(--olive-deep); color:var(--sand); padding:9px 12px; border-radius:5px;
+    font-size:12px; line-height:1.5; max-width:260px; z-index:60; transition:opacity .12s; }
+  .dica b{ font-family:'IBM Plex Mono', monospace; font-weight:500; color:var(--gold-soft); }
+
+  details.tabela{ margin-top:26px; border:1px solid var(--line); border-radius:6px; padding:0 18px; }
+  details.tabela summary{ cursor:pointer; padding:14px 0; font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:0.08em; text-transform:uppercase; opacity:0.65; }
+  table{ width:100%; border-collapse:collapse; margin-bottom:18px; font-size:13px; }
+  th,td{ text-align:left; padding:10px 12px 10px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+  th{ font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.09em;
+    text-transform:uppercase; opacity:0.55; font-weight:400; }
+  td.n{ font-family:'IBM Plex Mono', monospace; white-space:nowrap; }
+
+  /* ---- de onde vem cada número ---- */
+  .origem{ overflow-x:auto; }
+  .origem table{ min-width:720px; }
+  .origem td:first-child{ font-weight:600; width:23%; }
+  .origem td small{ display:block; font-family:'IBM Plex Mono', monospace;
+    font-size:10px; opacity:0.55; margin-top:4px; }
+  .fontes{ margin-top:44px; border-top:1px solid var(--line); padding-top:26px;
+    font-size:12.5px; line-height:1.85; opacity:0.62; }
+  .fontes h3{ font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.11em;
+    text-transform:uppercase; opacity:0.7; margin-bottom:14px; font-weight:400; }
+  .fontes a{ color:inherit; }
+  .fontes ol{ margin:0; padding-left:20px; }
+
+  footer{
+    border-top:1px solid var(--line); padding:34px 6vw; max-width:1100px; margin:0 auto;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; opacity:0.5;
+    display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between;
+  }
+  @media (max-width:640px){
+    header{ padding-top:34px; } section{ margin-top:56px; }
+    .t-row{ grid-template-columns:1fr; gap:6px; }
+    .t-eixo{ padding-left:0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="voltar" href="index.html">‹ Voltar ao terreno</a>
+  <div class="eyebrow">As contas</div>
+  <h1>Do terreno<br>ao <em>retorno</em>.</h1>
+  <p class="lead">Duas leituras separadas: o que custa levantar isto, e o que se cobra depois. Muda os valores nos campos — as contas, e a ordem do que mais pesa, refazem-se sozinhas.</p>
+</header>
+
+<div class="aviso">
+  <p><b>Os valores de partida são referências publicadas, não são o orçamento do projeto.</b>
+  Cada campo diz por baixo de onde veio o número que lá está — estatística do INE,
+  portaria do Governo, média de mercado. Servem para a conta ter uma forma discutível
+  em vez de estar em branco.</p>
+  <p>Três continuam por preencher porque <b>só o dono do terreno os tem</b>: o valor do
+  terreno, e depois o orçamento real do construtor e o estudo de mercado que substituem
+  o custo por m² e a tarifa. Enquanto não vierem, isto lê-se como ordem de grandeza —
+  não como estimativa do projeto.</p>
+</div>
+
+<main>
+
+<div class="placar">
+  <div class="t"><span>Investimento total</span><strong id="pInvest">—</strong><small id="pInvestSub">terreno por somar</small></div>
+  <div class="t"><span>Resultado operacional anual</span><strong id="pEbitda">—</strong><small>receita menos operação</small></div>
+  <div class="t"><span>Anos para recuperar</span><strong id="pPayback">—</strong><small id="pPaybackSub">sem juros nem inflação</small></div>
+</div>
+
+<section>
+  <h2>O que custa pôr de pé</h2>
+  <p class="sub">O índice em vigor permite 7.000 m² de implantação em três pisos — 21.000 m² de área bruta é o <em>tecto legal</em>, não um programa. O primeiro campo é a área que se conta mesmo construir. O subsolo não conta para o índice, mas é a linha mais cara por m² que aqui existe.</p>
+
+  <div class="campos">
+    <div class="campo vazio">
+      <label>Terreno</label>
+      <input id="iTerreno" type="number" value="0" step="10000" min="0">
+      <span class="un">€ · aquisição ou valor atribuído</span>
+      <span class="fonte">Em branco de propósito. Sai da escritura, da caderneta predial ou de uma avaliação — não de uma média de portal.</span>
+    </div>
+    <div class="campo">
+      <label>Área bruta a construir</label>
+      <input id="iBruta" type="number" value="8400" step="200" min="0">
+      <span class="un">m² acima do solo · <span id="oEnvelope">—</span></span>
+      <span class="fonte">8.400 m² é um programa de ~120 quartos, não o tecto. Põe 21.000 para ver o envelope todo esgotado.</span>
+    </div>
+    <div class="campo">
+      <label>Construção acima do solo</label>
+      <input id="iCusto" type="number" value="1600" step="50" min="0">
+      <span class="un">€ / m²</span>
+      <span class="fonte">Habitação corrente em 2025 anda nos 950–1.500 €/m² <sup>[2]</sup>; hotel de 4★ passa dos 2.000 €/m² quando se divide o investimento pela área total <sup>[3]</sup>. 1.600 é o meio, para interior e acabamento contido.</span>
+    </div>
+    <div class="campo">
+      <label>Lugares de estacionamento</label>
+      <input id="iLugares" type="number" value="120" step="10" min="0">
+      <span class="un">lugares em cave</span>
+      <span class="fonte">Um por quarto é a regra prudente enquanto o PDM novo não sai. Põe 0 para ver a conta com estacionamento à superfície.</span>
+    </div>
+    <div class="campo">
+      <label>Área por lugar</label>
+      <input id="iM2Lugar" type="number" value="30" step="1" min="0">
+      <span class="un">m² · lugar + circulação</span>
+      <span class="fonte">2,5 × 5 m de lugar mais rampas e vias dá 28–32 m² por lugar em cave.</span>
+    </div>
+    <div class="campo">
+      <label>Cave além do estacionamento</label>
+      <input id="iCaveExtra" type="number" value="700" step="50" min="0">
+      <span class="un">m² · técnicas, lavandaria, economato</span>
+      <span class="fonte">Central térmica, AVAC, lavandaria e arrumos de um hotel desta escala.</span>
+    </div>
+    <div class="campo">
+      <label>Custo do subsolo</label>
+      <input id="iCustoCave" type="number" value="1000" step="50" min="0">
+      <span class="un">€ / m² · <span id="oCaveM2">—</span></span>
+      <span class="fonte">Escavação, contenção e estrutura. Fica tipicamente 60–75% do custo acima do solo, mas sem revestimentos nem caixilharia.</span>
+    </div>
+    <div class="campo">
+      <label>Projeto, licenças e imprevistos</label>
+      <input id="iMargem" type="number" value="22" step="1" min="0">
+      <span class="un">% sobre a construção</span>
+      <span class="fonte">As fontes de construção falam em 20–30% acima do custo de obra para projeto, taxas camarárias e imprevistos <sup>[2]</sup>.</span>
+    </div>
+  </div>
+
+  <div class="saida">
+    <div class="linha"><span>Construção acima do solo</span><span id="oAcima">—</span></div>
+    <div class="linha"><span>Construção em subsolo</span><span id="oCave">—</span></div>
+    <div class="linha"><span>Projeto, licenças e imprevistos</span><span id="oMargem">—</span></div>
+    <div class="linha"><span>Terreno</span><span id="oTerreno">—</span></div>
+    <div class="linha total"><span>Investimento total</span><span id="oTotal">—</span></div>
+    <div class="linha"><span>Custo por m² de área bruta</span><span id="oPorM2">—</span></div>
+    <div class="linha"><span>Custo por quarto</span><span id="oPorQuarto">—</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>O que se cobra ao hóspede</h2>
+  <p class="sub">A outra metade da conta. O argumento de procura é o novo hospital de Évora, a cerca de 30 km — profissionais, famílias e estadias prolongadas, que é procura de semana e fora de época, exatamente onde o Alentejo é fraco. A área bruta por quarto serve de aferição: abaixo de 40 m² é apertado, acima de 90 m² sobra área que ninguém está a vender.</p>
+
+  <div class="campos">
+    <div class="campo">
+      <label>Quartos</label>
+      <input id="iQuartos" type="number" value="120" step="5" min="0">
+      <span class="un">unidades</span>
+      <span class="fonte">120 é um programa plausível para os 8.400 m². O envelope legal cheio daria perto de 300 quartos — muito acima do que um concelho de ~15 mil habitantes absorve sem uma procura nova.</span>
+    </div>
+    <div class="campo">
+      <label>Tarifa média</label>
+      <input id="iTarifa" type="number" value="95" step="5" min="0">
+      <span class="un">€ / noite, ano inteiro</span>
+      <span class="fonte">O Alentejo marcou 174,8 € de ADR em agosto de 2025 <sup>[4]</sup>, mas isso é pico e inclui o litoral; a média nacional de novembro foi 97,8 € <sup>[5]</sup>. 95 € é uma média anual contida para interior.</span>
+    </div>
+    <div class="campo">
+      <label>Ocupação média anual</label>
+      <input id="iOcup" type="number" value="48" step="1" min="0" max="100">
+      <span class="un">% dos quartos-noite</span>
+      <span class="fonte">A ocupação-cama do Alentejo em 2025 foi de 18,2% em janeiro e 35,3% em maio <sup>[4][6]</sup> — a sazonalidade é o problema central do negócio. Por quarto, o ano inteiro, 48% é otimista mas defensável.</span>
+    </div>
+    <div class="campo">
+      <label>Custo de operação</label>
+      <input id="iOpex" type="number" value="62" step="1" min="0" max="100">
+      <span class="un">% da receita</span>
+      <span class="fonte">Pessoal, energia, comissões de canal e manutenção. Deixa uma margem operacional de 38%, no topo do que a hotelaria portuguesa faz.</span>
+    </div>
+  </div>
+
+  <div class="saida">
+    <div class="linha"><span>Área bruta por quarto</span><span><span id="oM2Quarto">—</span><span class="veredito" id="oVeredito" hidden></span></span></div>
+    <div class="linha"><span>Noites vendidas por ano</span><span id="oNoites">—</span></div>
+    <div class="linha"><span>Receita bruta anual</span><span id="oReceita">—</span></div>
+    <div class="linha"><span>Custo de operação</span><span id="oOpex">—</span></div>
+    <div class="linha total"><span>Resultado operacional anual</span><span id="oEbitda">—</span></div>
+    <div class="linha"><span>Anos para recuperar o investimento</span><span id="oPayback">—</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>O que mais mexe na conta</h2>
+  <p class="sub">Cada linha põe um só campo no seu mínimo e no seu máximo plausível, com todos os outros como os deixaste, e mostra em quantos anos isso põe a recuperação. Quem está no topo é quem decide o negócio — e é aí que vale a pena gastar dinheiro a saber o número certo.</p>
+
+  <div class="t-legenda">
+    <span><i style="background:#00789C"></i>Recupera mais depressa</span>
+    <span><i style="background:#A8762B"></i>Recupera mais devagar</span>
+    <span><i style="background:#6B6F5F"></i>Com os valores atuais</span>
+  </div>
+
+  <div class="tornado" id="tornado"></div>
+  <div class="t-eixo"><span id="eixoMin">—</span><span>anos para recuperar</span><span id="eixoMax">—</span></div>
+
+  <p class="sub" style="margin-top:26px">Cada linha mexe num campo só, e deixa os outros quietos — por isso <em>número de quartos</em> lê-se como densidade dentro da mesma área construída (mais quartos, mais pequenos, na mesma casca), e não como construir mais. Quem controla isso é a aferição de m² por quarto, na secção acima. A conta não desconta juros nem inflação: é dinheiro posto a dividir por dinheiro recebido.</p>
+
+  <details class="tabela">
+    <summary>Ver como tabela</summary>
+    <table>
+      <thead><tr><th>Campo</th><th>Mínimo</th><th>Anos</th><th>Máximo</th><th>Anos</th><th>Amplitude</th></tr></thead>
+      <tbody id="tornadoTab"></tbody>
+    </table>
+  </details>
+</section>
+
+<section class="origem">
+  <h2>De onde vem cada número</h2>
+  <p class="sub">Esta é a lista de compras. À esquerda o que a folha usa hoje; à direita o documento que o substitui e quem o passa. Enquanto a coluna da direita não estiver feita, a conta acima é uma ordem de grandeza.</p>
+
+  <table>
+    <thead><tr><th>Número</th><th>O que lá está agora</th><th>O que o substitui, e quem o dá</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Valor do terreno</td>
+        <td class="n">em branco<small>só tu tens</small></td>
+        <td>Escritura de compra, se foi comprado. Se veio por herança ou permuta, o valor patrimonial da <b>caderneta predial urbana</b> (Portal das Finanças → Consultar Património) ou uma avaliação de perito. Serve o valor de entrada, não o que se espera vir a valer.</td>
+      </tr>
+      <tr>
+        <td>Custo de construção</td>
+        <td class="n">1.600 €/m²<small>média de mercado [2][3]</small></td>
+        <td><b>Orçamento de construtor</b> sobre o estudo prévio do arquiteto — sem desenho não há orçamento a sério. Pede a dois ou três construtores da região e usa o do meio. O passo 3 do roteiro tem de acontecer primeiro.</td>
+      </tr>
+      <tr>
+        <td>Área de cave e o seu custo</td>
+        <td class="n">4.300 m² · 1.000 €/m²<small>derivado de 120 lugares</small></td>
+        <td>Sai da <b>regra de estacionamento do PDM novo</b> — quantos lugares por quarto o regulamento exige. Pergunta-se ao Gabinete de Ordenamento do Território, na mesma conversa dos índices. É a resposta que mais dinheiro move nesta página.</td>
+      </tr>
+      <tr>
+        <td>Número de quartos</td>
+        <td class="n">120<small>programa assumido</small></td>
+        <td>Decisão de programa, tomada com o arquiteto ao mesmo tempo que as áreas. A aferição está acima: se a área bruta por quarto sair fora de 40–90 m², o programa está incoerente com a área.</td>
+      </tr>
+      <tr>
+        <td>Tarifa e ocupação</td>
+        <td class="n">95 € · 48%<small>estatística regional [4][5][6]</small></td>
+        <td><b>Estudo de mercado</b> ou, mais barato e quase tão bom: os preços praticados o ano inteiro pelos hotéis comparáveis de Évora e Montemor, recolhidos mês a mês. O argumento do hospital tem de aparecer aqui em quartos-noite, não em conversa.</td>
+      </tr>
+      <tr>
+        <td>Alturas e pisos<br>dos Modelos 2 a 5</td>
+        <td class="n">3 pisos · 12 m<small>proposta minha</small></td>
+        <td>Confirmação do <b>arquiteto</b>. O envelope (3 pisos, 12 m de fachada) é regulamento; a distribuição de programa por piso de cada modelo é leitura das descrições e está por validar.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="fontes">
+    <h3>Fontes</h3>
+    <ol>
+      <li>Portaria n.º 471/2025/1, de 26 de dezembro — valor médio de construção por m² para efeitos de IMI em 2026: <b>570 €/m²</b>. É um valor fiscal, para avaliar o imóvel e calcular imposto; não é custo de obra. <a href="https://www.idealista.pt/news/imobiliario/habitacao/2025/12/26/73232-imi-2026-valor-da-construcao-a-ter-em-conta-sobe-para-570-euros">idealista</a> · <a href="https://www.garrigues.com/pt/pt-PT/news/valor-medio-construcao-metro-quadrado-efeitos-imi-vigorar-no-ano-2026">Garrigues</a></li>
+      <li>Custo de construção corrente em Portugal, 2025: 950–1.500 €/m², mais 20–30% para projeto, licenças e taxas. <a href="https://www.idealista.pt/news/imobiliario/construcao/2025/10/13/70864-quanto-custa-construir-uma-casa-terrea-de-100m2-em-2025">idealista</a> · <a href="https://blog.kinvest.pt/quanto-custa-construir-uma-casa-em-portugal-em-2025-guia-realista-detalhado">K-invest</a></li>
+      <li>Hotelaria de 4★: acima de 2.000 €/m² quando se divide o investimento global pela área construída total. <a href="https://www.smartorder.ai/resources/pt/blog/how-much-does-it-cost-to-build-a-hotel-pt/">Smart Order</a></li>
+      <li>INE, Atividade Turística — Estatísticas Rápidas, 2025. ADR do Alentejo em agosto: 174,8 €, o segundo mais alto do país. Ocupação-cama do Alentejo: 18,2% em janeiro, 34,9% em abril, 35,3% em maio. <a href="https://travelbi.turismodeportugal.pt/turismo-portugal/atividade-turistica-3-trimestre-2025-ine/">TravelBI / INE</a></li>
+      <li>INE, novembro de 2025 — ADR nacional 97,8 €, RevPAR 47,1 €. No 3.º trimestre de 2025, ADR nacional 151,3 € e RevPAR 106,5 €.</li>
+      <li>INE / Turismo de Portugal — o Alentejo cresceu acima da média nacional em 2025 (+20,2% de proveitos totais em janeiro, +9,3% em novembro), partindo de uma base baixa e muito sazonal.</li>
+    </ol>
+  </div>
+</section>
+
+</main>
+
+<div class="dica" id="dica"></div>
+
+<footer>
+  <span>O TERRENO — MONTEMOR-O-NOVO</span>
+  <span>ORDEM DE GRANDEZA · NÃO É ORÇAMENTO</span>
+</footer>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const eur = n => isFinite(n) ? new Intl.NumberFormat('pt-PT',
+    {style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n) : '—';
+  const num = (n,d) => isFinite(n) ? new Intl.NumberFormat('pt-PT',
+    {maximumFractionDigits:d||0}).format(n) : '—';
+  const v = id => parseFloat($(id).value) || 0;
+  const ENVELOPE = 21000;   // 7.000 m² de implantação × 3 pisos
+  const TETO = 60;          // anos acima disto lêem-se como "não recupera"
+
+  /* Uma só função de conta, usada pelo painel e por cada simulação da
+     sensibilidade. `sub` troca um campo sem lhe mexer no input. */
+  function calcular(sub){
+    const g = id => (sub && id in sub) ? sub[id] : v(id);
+    const bruta   = g('iBruta');
+    const caveM2  = g('iLugares') * g('iM2Lugar') + g('iCaveExtra');
+    const acima   = bruta * g('iCusto');
+    const cave    = caveM2 * g('iCustoCave');
+    const margem  = (acima + cave) * g('iMargem')/100;
+    const terreno = g('iTerreno');
+    const total   = acima + cave + margem + terreno;
+
+    const quartos = g('iQuartos');
+    const noites  = quartos * 365 * g('iOcup')/100;
+    const receita = noites * g('iTarifa');
+    const opex    = receita * g('iOpex')/100;
+    const ebitda  = receita - opex;
+    const payback = (ebitda > 0 && total > 0) ? total/ebitda : Infinity;
+
+    return {bruta, caveM2, acima, cave, margem, terreno, total,
+            quartos, noites, receita, opex, ebitda, payback};
+  }
+
+  const anos = p => isFinite(p) ? num(p,1).replace(',0','') + ' anos'
+                                : 'não recupera';
+
+  function pintarPainel(){
+    const c = calcular();
+
+    $('oAcima').textContent   = eur(c.acima);
+    $('oCave').textContent    = eur(c.cave);
+    $('oMargem').textContent  = eur(c.margem);
+    $('oTerreno').textContent = c.terreno ? eur(c.terreno) : 'por preencher';
+    $('oTotal').textContent   = eur(c.total);
+    $('oPorM2').textContent   = c.bruta ? eur(c.total/c.bruta) + ' / m²' : '—';
+    $('oPorQuarto').textContent = c.quartos ? eur(c.total/c.quartos) + ' / quarto' : '—';
+    $('oCaveM2').textContent  = num(c.caveM2) + ' m² de cave';
+    $('oEnvelope').textContent = ENVELOPE
+      ? num(100*c.bruta/ENVELOPE) + '% do tecto de 21.000 m²' : '';
+
+    $('oNoites').textContent  = num(c.noites);
+    $('oReceita').textContent = eur(c.receita);
+    $('oOpex').textContent    = eur(c.opex);
+    $('oEbitda').textContent  = eur(c.ebitda);
+    $('oPayback').textContent = anos(c.payback);
+
+    const m2q = c.quartos ? c.bruta/c.quartos : NaN;
+    $('oM2Quarto').textContent = isFinite(m2q) ? num(m2q) + ' m² / quarto' : '—';
+    const vd = $('oVeredito');
+    if(!isFinite(m2q)){ vd.hidden = true; }
+    else {
+      vd.hidden = false;
+      if(m2q < 40){ vd.textContent = 'apertado';    vd.style.color = 'var(--pior)'; }
+      else if(m2q > 90){ vd.textContent = 'sobra área'; vd.style.color = 'var(--pior)'; }
+      else { vd.textContent = 'coerente';           vd.style.color = 'var(--melhor)'; }
+    }
+
+    $('pInvest').textContent  = eur(c.total);
+    $('pInvestSub').textContent = c.terreno ? 'terreno incluído' : 'terreno por somar';
+    $('pEbitda').textContent  = eur(c.ebitda);
+    $('pPayback').textContent = isFinite(c.payback) ? num(c.payback,1) : '—';
+    $('pPaybackSub').textContent = isFinite(c.payback)
+      ? 'anos · sem juros nem inflação' : 'a operação não cobre o investimento';
+
+    return c;
+  }
+
+  /* ---- sensibilidade: um campo de cada vez, extremos plausíveis ---- */
+  const BANDAS = [
+    {id:'iCusto',     nome:'Custo de construção',           min:1300, max:2100, un:' €/m²'},
+    {id:'iBruta',     nome:'Área bruta a construir',        min:6000, max:12000, un:' m²'},
+    {id:'iTarifa',    nome:'Tarifa média',                  min:80,   max:130,  un:' €'},
+    {id:'iOcup',      nome:'Ocupação anual',                min:40,   max:62,   un:'%'},
+    {id:'iQuartos',   nome:'Número de quartos',             min:90,   max:160,  un:' quartos'},
+    {id:'iOpex',      nome:'Custo de operação',             min:55,   max:68,   un:'% da receita'},
+    {id:'iLugares',   nome:'Lugares em cave',               min:0,    max:160,  un:' lugares'},
+    {id:'iCustoCave', nome:'Custo do subsolo',              min:800,  max:1300, un:' €/m²'},
+    {id:'iMargem',    nome:'Projeto, licenças, imprevistos',min:15,   max:30,   un:'%'}
+  ];
+
+  const cap = p => isFinite(p) ? Math.min(p, TETO) : TETO;
+  const dica = $('dica');
+
+  function mostrarDica(e, html){
+    dica.innerHTML = html;
+    dica.style.left = e.clientX + 'px';
+    dica.style.top  = (e.clientY - 12) + 'px';
+    dica.style.opacity = 1;
+  }
+  const esconderDica = () => { dica.style.opacity = 0; };
+
+  function pintarTornado(base){
+    const linhas = BANDAS.map(b => {
+      const pMin = calcular({[b.id]: b.min}).payback;
+      const pMax = calcular({[b.id]: b.max}).payback;
+      return {...b, pMin, pMax, amp: Math.abs(cap(pMax) - cap(pMin))};
+    }).sort((a,c) => c.amp - a.amp);
+
+    const centro = cap(base.payback);
+    const todos  = linhas.flatMap(l => [cap(l.pMin), cap(l.pMax)]).concat(centro);
+    const lo = Math.max(0, Math.floor(Math.min(...todos) - 1));
+    const hi = Math.ceil(Math.max(...todos) + 1);
+    const pos = p => ((cap(p) - lo) / (hi - lo || 1)) * 100;
+
+    $('eixoMin').textContent = num(lo) + ' anos';
+    $('eixoMax').textContent = num(hi) + (hi >= TETO ? '+ anos' : ' anos');
+
+    const alvo = $('tornado'); alvo.innerHTML = '';
+    const tab  = $('tornadoTab'); tab.innerHTML = '';
+
+    for(const l of linhas){
+      const row = document.createElement('div'); row.className = 't-row';
+
+      const nome = document.createElement('div'); nome.className = 't-nome';
+      nome.innerHTML = l.nome + '<small>' + num(l.min) + l.un + ' → ' + num(l.max) + l.un + '</small>';
+
+      const pista = document.createElement('div'); pista.className = 't-pista';
+      const cMin = pos(l.pMin), cMax = pos(l.pMax), cC = pos(base.payback);
+
+      // um segmento de cada lado do caso central: azul para o lado que
+      // encurta a recuperação, âmbar para o que a alonga
+      for(const lado of [{p:cMin, val:l.pMin, cfg:l.min}, {p:cMax, val:l.pMax, cfg:l.max}]){
+        const barra = document.createElement('div');
+        const melhor = lado.p < cC;
+        barra.className = 't-bar ' + (melhor ? 'melhor' : 'pior');
+        const a = Math.min(lado.p, cC), b = Math.max(lado.p, cC);
+        barra.style.left  = a + '%';
+        barra.style.width = Math.max(0, b - a) + '%';
+        // 2px de fundo a separar os segmentos do marcador central
+        barra.style[melhor ? 'marginRight' : 'marginLeft'] = '2px';
+        const texto = l.nome + ' a <b>' + num(lado.cfg) + l.un + '</b><br>recupera em <b>'
+                    + anos(lado.val) + '</b>';
+        barra.addEventListener('mousemove', e => mostrarDica(e, texto));
+        barra.addEventListener('mouseleave', esconderDica);
+        pista.appendChild(barra);
+      }
+
+      const tick = document.createElement('div');
+      tick.className = 't-centro'; tick.style.left = cC + '%';
+      pista.appendChild(tick);
+
+      // rótulo direto em cada extremo — o contraste do âmbar sobre areia
+      // fica em 3:1, por isso o número tem de estar sempre à vista
+      const esq = cMin <= cMax ? l.pMin : l.pMax;
+      const dir = cMin <= cMax ? l.pMax : l.pMin;
+      const nEsq = document.createElement('span'); nEsq.className = 't-num';
+      nEsq.textContent = anos(esq).replace(' anos','');
+      nEsq.style.right = (100 - Math.min(cMin, cMax)) + '%';
+      nEsq.style.marginRight = '8px';
+      const nDir = document.createElement('span'); nDir.className = 't-num';
+      nDir.textContent = anos(dir).replace(' anos','');
+      nDir.style.left = Math.max(cMin, cMax) + '%';
+      nDir.style.marginLeft = '8px';
+      pista.append(nEsq, nDir);
+
+      row.append(nome, pista);
+      alvo.appendChild(row);
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + l.nome + '</td>'
+        + '<td class="n">' + num(l.min) + l.un + '</td><td class="n">' + anos(l.pMin) + '</td>'
+        + '<td class="n">' + num(l.max) + l.un + '</td><td class="n">' + anos(l.pMax) + '</td>'
+        + '<td class="n">' + num(l.amp,1) + ' anos</td>';
+      tab.appendChild(tr);
+    }
+  }
+
+  function tudo(){ pintarTornado(pintarPainel()); }
+  document.querySelectorAll('input').forEach(i => i.addEventListener('input', tudo));
+  window.addEventListener('scroll', esconderDica, {passive:true});
+  tudo();
+})();
+</script>
+</body>
+</html>
