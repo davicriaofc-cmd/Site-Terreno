@@ -170,6 +170,50 @@ chega perto do limite — não tirar conclusões destes números.
 (`#5E634A`), para a aresta do plano envolvente não se ver. Sem isto, chegar à
 cota de uma pessoa dava meio ecrã de cor chapada.
 
+### Envolvente real — encaixe pronto, à espera do ficheiro
+
+O utilizador viu a maquete e disse que **não estava nada parecida com o vídeo**
+do Spacio.ai que tinha mandado. Tinha razão, e a razão principal é esta: no
+vídeo o lote está dentro de Montemor a sério — curvas de nível no terreno todo,
+as estradas verdadeiras, a rotunda, uns 40 edifícios vizinhos, tudo recortado
+num quadrado com o limite a tracejado. A maquete daqui tem o lote a flutuar
+num plano castanho vazio, porque a envolvente não se inventa. **Foi a decisão
+certa, mas devia ter sido dita à cabeça** — não depois de entregar o trabalho.
+
+As outras duas diferenças, para memória: o Spacio é uma maquete **branca sobre
+fundo branco** (a nossa segue a palete escura do site), e o volume do vídeo é
+**um bloco só**, de 15.356 m² de área bruta, não a implantação do Modelo 1
+(hotel em L + apartamentos + 10 moradias + piscina + pomar).
+
+O caminho combinado é o utilizador **exportar do Spacio** (botão no canto
+superior direito) em `.glb` ou `.gltf` e mandar o ficheiro. O encaixe já está
+feito:
+
+- `vendor/GLTFLoader.js` — o GLTFLoader do three r160.1 convertido de módulo ES
+  para UMD (o bloco de `import` passou a desestruturação de `window.THREE`, o
+  `export` passou a `THREE.GLTFLoader`, o corpo não foi tocado, e o
+  `toTrianglesDrawMode` do `BufferGeometryUtils` veio copiado). **Não editar à
+  mão** — se for preciso outra versão, refazer a conversão a partir do pacote
+  npm. Ficheiros comprimidos com **Draco ou Meshopt** ainda precisam do
+  descodificador respetivo, que não está vendorizado.
+- `const ENVOLVENTE` no topo do script da maquete: `ficheiro` (caminho, `null`
+  enquanto não houver), `escala`, `rodar` (graus) e `mover` ([x,y,z] em metros).
+- `carregarEnvolvente()` carrega, mede, esconde o plano liso, mete as malhas no
+  `CHAO` (para a roda e o duplo clique poderem mergulhar nelas) e alarga a
+  câmara de sombras e o nevoeiro ao tamanho do que chegou. Se o ficheiro faltar
+  ou vier corrompido, escreve um aviso e **fica tudo como estava** — a maquete
+  nunca deixa de abrir por causa disto.
+- Ao carregar, a consola imprime **as medidas do que veio** ("900,0 × 900,0 m
+  em planta, 18,5 m de altura; centro em 0,0, 1,3, 0,0"). É por aí que se
+  acertam `escala`, `rodar` e `mover` até o lote assentar no sítio certo.
+- O `GLTFLoader.js` (110 KB) **só desce se `ENVOLVENTE.ficheiro` estiver
+  preenchido**. Com ele a `null`, abrir o Modelo 1 continua a pedir só o
+  `three.min.js` — verificado.
+
+Testado de ponta a ponta com um `.glb` gerado para o efeito (terreno de
+900×900 m mais 25 volumes), que **não foi commitado de propósito**: seria
+exatamente a envolvente inventada que não queremos no repositório.
+
 - **Biblioteca:** `vendor/three.min.js` (three r160, build UMD), servida do
   próprio repositório — o site continua sem depender de CDNs. Não trocar por
   um CDN sem pedir.
@@ -287,8 +331,12 @@ contido, sem emojis.
   e desenhadas; falta validar. A pergunta que mais importa é **de que cota se
   mede a altura de fachada** — o lote varia entre 225 e 233 m, e a resposta
   pode valer um piso inteiro.
-- **Envolvente 3D** (Centro Hípico, estádio, pista, armazéns, estradas) —
-  falta um print do Google Earth mais afastado, ou o KML.
+- **Envolvente 3D** (Centro Hípico, estádio, pista, armazéns, estradas) — o
+  encaixe está feito (ver "Envolvente real"), falta o ficheiro `.glb`/`.gltf`
+  exportado do Spacio. Em alternativa, um KML ou um print do Google Earth mais
+  afastado. Nesta sessão não deu para ir buscar os dados a lado nenhum
+  (OpenStreetMap, Overpass e OpenTopography estão bloqueados pela política de
+  rede do sandbox); o npm, esse, chega lá — foi de lá que veio o GLTFLoader.
 - **Fotos reais do terreno** — o site não tem uma única. Servem para o hero,
   não para o 3D.
 - **Pormenor fino da maquete** — janelas individuais, varandas e figuras à

@@ -1372,6 +1372,22 @@
   const VIA_INT = [[-13.1,-82.6],[11.8,-90.3],[20.8,-85.4],[87.1,0.2],[58.0,21.2],
                    [15.2,49.5],[-59.0,113.1],[-60.8,108.8],[-33.3,45.0],[2.9,-30.2],[0.2,-58.1]];
 
+  /* ENVOLVENTE REAL — o encaixe para o ficheiro do Spacio.
+     O vídeo que o utilizador mandou mostra o terreno de Montemor a sério:
+     curvas de nível, estradas e os edifícios vizinhos. Isso não é derivável
+     daqui e não se inventa — vem exportado do Spacio em .glb/.gltf.
+     Enquanto `ficheiro` for null fica o plano liso de sempre; assim que
+     houver ficheiro, basta escrever o caminho aqui.
+     `escala`, `rodar` e `mover` servem para o assentar sobre o polígono do
+     lote: ao carregar, a consola imprime as medidas do que veio, que é por
+     onde se acertam estes três valores. */
+  const ENVOLVENTE = {
+    ficheiro: null,      // ex.: 'models/envolvente-montemor.glb'
+    escala: 1,           // 1 = o ficheiro já vem em metros
+    rodar: 0,            // graus, para alinhar o norte do ficheiro com o do lote
+    mover: [0,-0.05,0]   // x, y, z em metros; y ligeiramente abaixo do lote
+  };
+
   const COR = {
     terra:0x6B6252, relva:0x9DB463, lote:0x7E8C52, alcatrao:0x30352E,
     parede:0xEFE8D8, laje:0xD8CEB6, vidro:0x5E6D77, painel:0x16202B,
@@ -1390,7 +1406,7 @@
   let voo=null;         // animação de aproximação do duplo clique
   const ponteiros = new Map();   // multi-toque: 1 dedo roda, 2 dedos deslocam e aproximam
   let pinchDist=0, pinchX=0, pinchY=0, ultimoHover=0;
-  let destacado=null, fixado=null, ultimaCota=-1;
+  let destacado=null, fixado=null, ultimaCota=-1, planoLiso=null;
 
   const mat = (c,o) => new THREE.MeshStandardMaterial(
     Object.assign({color:c, roughness:0.88, metalness:0.0}, o||{}));
@@ -1643,6 +1659,49 @@
     return t;
   }
 
+  /* Carrega a envolvente real e põe-na no lugar do plano liso. Se o ficheiro
+     falhar (não existe, vem comprimido com Draco, está corrompido), fica tudo
+     como estava — a maquete nunca deixa de abrir por causa disto. */
+  function carregarEnvolvente(){
+    if(!THREE.GLTFLoader){
+      console.warn('Envolvente: falta o vendor/GLTFLoader.js');
+      return;
+    }
+    new THREE.GLTFLoader().load(ENVOLVENTE.ficheiro, function(gltf){
+      const g = gltf.scene;
+      g.scale.setScalar(ENVOLVENTE.escala);
+      g.rotation.y = rad(ENVOLVENTE.rodar);
+      g.position.set(ENVOLVENTE.mover[0], ENVOLVENTE.mover[1], ENVOLVENTE.mover[2]);
+      g.updateMatrixWorld(true);
+
+      const cx = new THREE.Box3().setFromObject(g), t = new THREE.Vector3(), c = new THREE.Vector3();
+      cx.getSize(t); cx.getCenter(c);
+      // as medidas do que veio: é por aqui que se acertam escala, rodar e mover
+      console.info('Envolvente carregada — '
+        + t.x.toFixed(1) + ' × ' + t.z.toFixed(1) + ' m em planta, '
+        + t.y.toFixed(1) + ' m de altura; centro em '
+        + c.x.toFixed(1) + ', ' + c.y.toFixed(1) + ', ' + c.z.toFixed(1) + '.');
+
+      g.traverse(function(o){
+        if(!o.isMesh) return;
+        o.receiveShadow = true;
+        o.castShadow = true;
+        CHAO.push(o);
+      });
+      scene.add(g);
+      if(planoLiso) planoLiso.visible = false;
+
+      // o sol tem de cobrir o que chegou, senão só o lote fica com sombra
+      const raio = Math.max(t.x, t.z)/2 + 40, sc = sol.shadow.camera;
+      sc.left=-raio; sc.right=raio; sc.top=raio; sc.bottom=-raio;
+      sc.far = Math.max(580, raio*3);
+      sc.updateProjectionMatrix();
+      scene.fog.far = Math.max(scene.fog.far, raio*2.2);
+    }, undefined, function(err){
+      console.warn('Envolvente: não deu para carregar', ENVOLVENTE.ficheiro, err);
+    });
+  }
+
   /* ---- construção da cena ---- */
   function construir(){
     alvo = new THREE.Vector3(11,4,6);
@@ -1678,10 +1737,12 @@
     const enche = new THREE.DirectionalLight(0xBFD2E8, 0.35);
     enche.position.set(150,90,-120); scene.add(enche);
 
-    // terreno envolvente
-    const env = new THREE.Mesh(new THREE.PlaneGeometry(2400,2400), MAT.terra);
-    env.rotation.x=-Math.PI/2; env.position.y=-1.4; env.receiveShadow=true; scene.add(env);
-    CHAO.push(env);
+    // terreno envolvente — o plano liso, que sai de cena se houver ficheiro real
+    planoLiso = new THREE.Mesh(new THREE.PlaneGeometry(2400,2400), MAT.terra);
+    planoLiso.rotation.x=-Math.PI/2; planoLiso.position.y=-1.4;
+    planoLiso.receiveShadow=true; scene.add(planoLiso);
+    CHAO.push(planoLiso);
+    if(ENVOLVENTE.ficheiro) carregarEnvolvente();
 
     // o lote
     const forma = new THREE.Shape();
@@ -2184,12 +2245,20 @@
   function carregarThree(){
     if(window.THREE) return Promise.resolve(true);
     if(aCarregar) return aCarregar;
-    aCarregar = new Promise(function(resolve){
-      const el = document.createElement('script');
-      el.src = 'vendor/three.min.js';
-      el.onload  = function(){ resolve(!!window.THREE); };
-      el.onerror = function(){ resolve(false); };
-      document.head.appendChild(el);
+    const desce = function(src){
+      return new Promise(function(resolve){
+        const el = document.createElement('script');
+        el.src = src;
+        el.onload  = function(){ resolve(true); };
+        el.onerror = function(){ resolve(false); };
+        document.head.appendChild(el);
+      });
+    };
+    aCarregar = desce('vendor/three.min.js').then(function(){
+      if(!window.THREE) return false;
+      // o GLTFLoader (110 KB) só desce se houver envolvente para carregar
+      if(!ENVOLVENTE.ficheiro) return true;
+      return desce('vendor/GLTFLoader.js').then(function(){ return true; });
     });
     return aCarregar;
   }
