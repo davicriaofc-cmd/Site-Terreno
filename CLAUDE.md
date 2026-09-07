@@ -6,9 +6,10 @@ projeto e o processo urbanístico à medida que avança.
 
 ## Estado atual
 
-- Branch de trabalho: `claude/site-assistance-pk5n2b` → PR #6 em
-  `davicriaofc-cmd/Site-Terreno` (ver com `git log` se precisares do estado
-  mais recente). O `claude/mano-slfa79` / PR #2 é histórico antigo.
+- Branch de trabalho: `claude/modelo-1-parte-3-jliudo`, que continua o
+  `claude/site-assistance-pk5n2b` (PR #6) em `davicriaofc-cmd/Site-Terreno`.
+  Ver com `git log` se precisares do estado mais recente. O
+  `claude/mano-slfa79` / PR #2 é histórico antigo.
 - Todo o site vive num único `index.html`. Sem framework, sem npm — editar
   diretamente o ficheiro.
 
@@ -108,11 +109,66 @@ houver material real — não é preciso mexer no resto do código.
 
 ## Maquete 3D do Modelo 1 (`#modelos` → vista de modelo)
 
-O Modelo 1 abre com uma maquete 3D navegável (arrastar para rodar, roda para
-aproximar) que **cresce ao abrir**: o lote espalha-se, a via desenha-se, os
-edifícios sobem do chão, a piscina enche e o pomar nasce — cerca de 3 s no
-total. O botão "Ver crescer outra vez" repete. Script:
-`/* MODELO 1 — MAQUETE 3D (cresce ao abrir) */` no fim do `index.html`.
+O Modelo 1 abre com uma maquete 3D navegável que **cresce ao abrir**: o lote
+espalha-se, a via desenha-se, os edifícios sobem do chão, a piscina enche e o
+pomar nasce — cerca de 3 s no total. O botão "Ver crescer outra vez" repete;
+o botão "Vista geral" volta ao enquadramento sem repetir o crescimento.
+Script: `/* MODELO 1 — MAQUETE 3D (cresce ao abrir) */` no fim do `index.html`.
+
+### Navegação livre (pedido a partir do vídeo do Spacio.ai)
+
+O utilizador mandou uma gravação do Spacio.ai a percorrer um modelo, do lote
+inteiro até encostar à fachada, e pediu o mesmo aqui. O que ficou:
+
+- **Rodar** — arrastar com o botão esquerdo. `pitch` entre −20º e 88º.
+- **Deslocar** — botão direito, botão do meio, `shift`+arrastar, ou dois dedos.
+  O passo é o fator exato da perspetiva (`2·tan(fov/2)·dist / altura`), por isso
+  a maquete acompanha o cursor pixel a pixel em qualquer distância.
+- **Aproximar** — roda do rato ou pinça, exponencial, entre 5 m e 900 m. O alvo
+  é puxado para o **ponto debaixo do cursor** (raycast aos volumes e ao chão),
+  que é o que faz mergulhar no edifício em vez de aproximar sempre ao centro.
+  Pontos a mais de 3× a distância atual, ou a mais de 300 m do centro, são
+  ignorados — sem isso apontar ao horizonte atirava a câmara para fora do lote.
+- **Duplo clique** — voa até ao ponto tocado.
+- **Limite do chão** — `porCamara()` levanta o `pitch` o necessário para a
+  câmara nunca descer abaixo de 1,6 m; o valor corrigido é guardado.
+- **Rotação lenta de apresentação** — só corre até alguém tocar na maquete
+  (`interagiu`), senão era impossível ficar parado a olhar para uma fachada.
+- **Cota da câmara** — canto inferior direito do canvas (`#modelo3dCota`).
+
+### Identificar volumes
+
+Passar o cursor por cima (ou tocar, no telemóvel) acende o contorno a ouro da
+implantação e abre um rótulo com nome, dimensões, implantação e área bruta.
+As áreas são **medidas na maquete** (o rótulo di-lo) — são o volume de estudo,
+não programa confirmado. Clicar fixa o contorno; clicar outra vez larga.
+O contorno tem `depthTest:false` para se ver mesmo com o edifício à frente.
+
+### Pormenor de perto
+
+Como agora se chega à fachada, os edifícios deixaram de ser caixas com faixas
+de vidro. `edificio()` abre os vãos um a um (caixilho escuro + vidro à frente,
+vão de 4,0 m, mais alto no rés-do-chão), põe friso de laje entre pisos,
+varandas com guarda de vidro de três em três vãos nas fachadas compridas
+acima do rés-do-chão, e entrada com pala onde `op.entrada` o pedir. Há figuras
+humanas de 1,75 m (numa varanda de cada edifício com varandas, e duas no deck)
+só para dar escala.
+
+Tudo o que se repete — caixilhos, vidros, lajes e guardas de varanda, painéis
+fotovoltaicos — entra por `instanciar()` numa `InstancedMesh` por família: são
+centenas de peças com meia dúzia de chamadas de desenho. Os vãos **não lançam
+sombra** (a parede já lança a dela), o que poupa metade do trabalho do mapa de
+sombras sem se notar.
+
+Custo medido no sandbox, com SwiftShader (rasterizador por CPU, sem placa
+gráfica): 15 fps antes, 10–11 fps depois, na vista geral a 1440×900. A
+diferença é quase toda o passo das sombras. Num GPU real nenhum dos dois
+chega perto do limite — não tirar conclusões destes números.
+
+**Céu** — gradiente vertical gerado em canvas (`ceu()`), usado como
+`scene.background` equirretangular. A cor no horizonte é igual à do nevoeiro
+(`#5E634A`), para a aresta do plano envolvente não se ver. Sem isto, chegar à
+cota de uma pessoa dava meio ecrã de cor chapada.
 
 - **Biblioteca:** `vendor/three.min.js` (three r160, build UMD), servida do
   próprio repositório — o site continua sem depender de CDNs. Não trocar por
@@ -235,8 +291,10 @@ contido, sem emojis.
   falta um print do Google Earth mais afastado, ou o KML.
 - **Fotos reais do terreno** — o site não tem uma única. Servem para o hero,
   não para o 3D.
-- **Pormenor fino da maquete** (janelas individuais, varandas, caminhos,
-  estacionamento, espreguiçadeiras). O teto sem `.glb` de arquiteto mantém-se.
+- **Pormenor fino da maquete** — janelas individuais, varandas e figuras à
+  escala já estão feitas. Faltam caminhos, estacionamento e espreguiçadeiras.
+  O teto sem `.glb` de arquiteto mantém-se: andar **por dentro** dos edifícios
+  continua a precisar do ficheiro 3D do arquiteto.
 - **Envolvente do 3D continua à espera do KML.** Tentei ir buscá-la a
   cartografia aberta (Overpass/Nominatim) — está bloqueado pelo proxy de rede
   desta sessão. Tem mesmo de vir do utilizador.
