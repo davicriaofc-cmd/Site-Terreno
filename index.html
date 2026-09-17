@@ -188,6 +188,14 @@
     transition:background 0.25s, border-color 0.25s;
   }
   .modelo-3d-replay:hover{ background:rgba(239,232,216,0.1); border-color:var(--gold-soft); }
+  .modelo-3d-acoes{ display:flex; gap:10px; align-items:center; }
+  .modelo-3d-explorar{
+    background:var(--gold); border:1px solid var(--gold); border-radius:100px;
+    color:var(--night); font-family:inherit; font-size:11px; letter-spacing:0.08em;
+    text-transform:uppercase; text-decoration:none; padding:9px 16px; white-space:nowrap;
+    transition:filter 0.25s;
+  }
+  .modelo-3d-explorar:hover{ filter:brightness(1.1); }
   .render-legenda{
     font-family:'IBM Plex Mono', monospace; font-size:11px;
     letter-spacing:0.12em; text-transform:uppercase; opacity:0.4;
@@ -517,6 +525,7 @@
   <a class="model-row" href="#plot"><span class="name"><span class="model-i">04</span>O que se pode construir</span><span class="tag">VER</span></a>
   <a class="model-row" href="#modelos"><span class="name"><span class="model-i">05</span>5 estudos volumétricos</span><span class="tag">VER</span></a>
   <a class="model-row" href="#porque-agora"><span class="name"><span class="model-i">06</span>Porquê agora e o roteiro</span><span class="tag">VER</span></a>
+  <a class="model-row" href="maquete.html"><span class="name"><span class="model-i">07</span>Maquete 3D navegável</span><span class="tag">ABRIR</span></a>
   <button class="model-row model-row--toggle" id="modelosToggle" aria-expanded="false" aria-controls="modelosSubmenu">
     <span class="name"><span class="model-i">10</span>Modelos</span><span class="chev">›</span>
   </button>
@@ -542,7 +551,10 @@
       <canvas id="modelo3dCanvas"></canvas>
       <div class="modelo-3d-bar">
         <span class="modelo-3d-hint">ARRASTA PARA RODAR · RODA DO RATO PARA APROXIMAR</span>
-        <button class="modelo-3d-replay" id="modelo3dReplay" type="button">Ver crescer outra vez</button>
+        <span class="modelo-3d-acoes">
+          <button class="modelo-3d-replay" id="modelo3dReplay" type="button">Ver crescer outra vez</button>
+          <a class="modelo-3d-explorar" href="maquete.html">Explorar com a envolvente ›</a>
+        </span>
       </div>
     </div>
     <span class="render-legenda" id="modeloRenderLegenda" hidden>Implantação de referência</span>
@@ -1323,19 +1335,17 @@
   const canvas = document.getElementById('modelo3dCanvas');
   if(!host || !canvas) return;
 
-  /* --- lote real, traçado sobre o Google Earth e escalado para 17.500 m² --- */
-  const LOTE = [[-30.6,-89.7],[13.1,-103.2],[28.7,-94.8],[104.2,2.7],[64.8,31.1],
-                [22.4,59.1],[-63.7,132.9],[-73.8,108.7],[-44.2,40.0],[-9.4,-32.4],[-11.5,-54.5]];
-  /* --- 10 moradias em banda, paralelas ao limite nascente --- */
-  const CASAS = [[23.8,-78.3],[30.5,-69.6],[37.2,-60.9],[44.0,-52.2],[50.7,-43.5],
-                 [57.4,-34.8],[64.2,-26.1],[70.9,-17.4],[77.6,-8.7],[84.4,0.0]];
-  const CASA_ROT = 37.8, CASA_W = 8.0;
-  /* Via perimetral: anel de 8 m entre os recuos de 4 m e 12 m ao limite,
-     calculado por bissetriz para acompanhar o contorno do lote. */
-  const VIA_EXT = [[-24.8,-87.3],[12.7,-98.9],[26.1,-91.7],[98.5,1.9],[62.5,27.8],
-                   [20.0,55.9],[-62.1,126.3],[-69.5,108.7],[-40.6,41.7],[-5.3,-31.7],[-7.6,-55.7]];
-  const VIA_INT = [[-13.1,-82.6],[11.8,-90.3],[20.8,-85.4],[87.1,0.2],[58.0,21.2],
-                   [15.2,49.5],[-59.0,113.1],[-60.8,108.8],[-33.3,45.0],[2.9,-30.2],[0.2,-58.1]];
+  /* --- A implantação vive em js/implantacao.js: o polígono do lote, a via
+     perimetral e a posição de cada volume. A cena navegável do maquete.html
+     lê o mesmo ficheiro, para as duas não divergirem. --- */
+  let IMP, LOTE, CASAS, CASA_ROT, CASA_W, VIA_EXT, VIA_INT;
+  function lerImplantacao(){
+    IMP = window.IMPLANTACAO;
+    LOTE = IMP.LOTE; CASAS = IMP.CASAS;
+    CASA_ROT = IMP.CASA_ROT_VOL;   // cada moradia está atravessada à fila
+    CASA_W = IMP.CASA_W;
+    VIA_EXT = IMP.VIA_EXT; VIA_INT = IMP.VIA_INT;
+  }
 
   const COR = {
     terra:0x6B6252, relva:0x9DB463, lote:0x7E8C52, alcatrao:0x30352E,
@@ -1392,7 +1402,7 @@
   }
 
   function moradia(){
-    const g = new THREE.Group(), w=CASA_W, d=12, h=3.4;
+    const g = new THREE.Group(), w=CASA_W, d=IMP.CASA_D, h=IMP.CASA_H_PISO;
     for(let i=0;i<2;i++){
       const v = caixa(w-0.7,h-0.9,d-0.7,MAT.vidro); v.position.y=i*h+(h-0.9)/2; g.add(v);
       const l = caixa(w,0.9,d,MAT.parede);          l.position.y=i*h+h-0.45;    g.add(l);
@@ -1419,6 +1429,7 @@
 
   /* ---- construção da cena ---- */
   function construir(){
+    lerImplantacao();
     alvo = new THREE.Vector3(11,4,6);
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x222A1C);
@@ -1487,14 +1498,15 @@
     scene.add(via); nasce(via,0.30,0.35);
 
     // hotel em L, a poente/sul — com cobertura fotovoltaica
-    const hA = edificio(56,16,3,4.0); hA.grupo.position.set(-40,0,96); hA.grupo.rotation.y=rad(-42);
-    paineis(hA.grupo,56,16,hA.topo); scene.add(hA.grupo); sobe(hA.grupo,0.45,0.55);
-    const hB = edificio(16,22,3,4.0); hB.grupo.position.set(-37.9,0,68.5); hB.grupo.rotation.y=rad(-42);
-    paineis(hB.grupo,16,22,hB.topo); scene.add(hB.grupo); sobe(hB.grupo,0.60,0.50);
+    const A = IMP.HOTEL_A, B = IMP.HOTEL_B, AP = IMP.APART, hp = IMP.H_PISO;
+    const hA = edificio(A.w,A.d,A.pisos,hp); hA.grupo.position.set(A.x,0,A.z); hA.grupo.rotation.y=rad(A.rot);
+    paineis(hA.grupo,A.w,A.d,hA.topo); scene.add(hA.grupo); sobe(hA.grupo,0.45,0.55);
+    const hB = edificio(B.w,B.d,B.pisos,hp); hB.grupo.position.set(B.x,0,B.z); hB.grupo.rotation.y=rad(B.rot);
+    paineis(hB.grupo,B.w,B.d,hB.topo); scene.add(hB.grupo); sobe(hB.grupo,0.60,0.50);
 
     // edifício de apartamentos a norte — também fotovoltaico
-    const ap = edificio(52,14,3,4.0); ap.grupo.position.set(2.0,0,-69.5); ap.grupo.rotation.y=rad(8);
-    paineis(ap.grupo,52,14,ap.topo); scene.add(ap.grupo); sobe(ap.grupo,0.75,0.55);
+    const ap = edificio(AP.w,AP.d,AP.pisos,hp); ap.grupo.position.set(AP.x,0,AP.z); ap.grupo.rotation.y=rad(AP.rot);
+    paineis(ap.grupo,AP.w,AP.d,ap.topo); scene.add(ap.grupo); sobe(ap.grupo,0.75,0.55);
 
     // 10 moradias em banda, a nascente
     CASAS.forEach(([x,z],i)=>{
@@ -1503,26 +1515,27 @@
     });
 
     // deck + piscina de 200 m² + bar de apoio, ao centro
-    const deck = caixa(34,0.5,24,MAT.deck);
-    deck.position.set(10,0.25,-38); scene.add(deck); nasce(deck,1.45,0.35);
+    const DK = IMP.DECK, PC = IMP.PISCINA, BR = IMP.BAR, RL = IMP.RELVADO;
+    const deck = caixa(DK.w,0.5,DK.d,MAT.deck);
+    deck.position.set(DK.x,0.25,DK.z); scene.add(deck); nasce(deck,1.45,0.35);
 
-    const agua = caixa(20,0.9,10,MAT.agua);
-    agua.position.set(10,0.35,-38); scene.add(agua);
+    const agua = caixa(PC.w,0.9,PC.d,MAT.agua);
+    agua.position.set(PC.x,0.35,PC.z); scene.add(agua);
     agua.scale.y=0.001; T.push({o:agua,t:1.70,dur:0.45,tipo:'sobe'});
 
     const bar = new THREE.Group();
-    const corpo = caixa(9,3.2,7,MAT.parede); corpo.position.y=1.6; bar.add(corpo);
-    const cob = caixa(11,0.45,9,MAT.vidro);  cob.position.y=3.42; bar.add(cob);
-    bar.position.set(10,0.5,-55);
+    const corpo = caixa(BR.w,3.2,BR.d,MAT.parede); corpo.position.y=1.6; bar.add(corpo);
+    const cob = caixa(BR.w+2,0.45,BR.d+2,MAT.vidro);  cob.position.y=3.42; bar.add(cob);
+    bar.position.set(BR.x,0.5,BR.z);
     scene.add(bar); sobe(bar,1.60,0.40);
 
     // relvado de eventos, a sul
-    const relva = caixa(28,0.3,20,MAT.relva);
-    relva.position.set(-23,0.16,43); relva.rotation.y=rad(-30);
+    const relva = caixa(RL.w,0.3,RL.d,MAT.relva);
+    relva.position.set(RL.x,0.16,RL.z); relva.rotation.y=rad(RL.rot);
     relva.receiveShadow=true; scene.add(relva); nasce(relva,1.50,0.40);
 
     // pomar — só dentro do lote, longe do construído
-    const ocupado = [[-40,96,36],[-37.9,68.5,22],[2.0,-69.5,32],[10,-38,24],[-23,43,20]];
+    const ocupado = [[A.x,A.z,36],[B.x,B.z,22],[AP.x,AP.z,32],[DK.x,DK.z,24],[RL.x,RL.z,20]];
     const dentroDe = (pol,x,z)=>{ let c=false;
       for(let i=0,n=pol.length;i<n;i++){ const [x1,z1]=pol[i], [x2,z2]=pol[(i+1)%n];
         if((z1>z)!==(z2>z) && x < (x2-x1)*(z-z1)/(z2-z1)+x1) c=!c; } return c; };
@@ -1570,12 +1583,12 @@
         FOCO.push(new THREE.Vector3(x,0,z), new THREE.Vector3(x,h,z));
       });
     };
-    foco(-40,96,56,16,-42,13);      // hotel, ala principal
-    foco(-37.9,68.5,16,22,-42,13);  // hotel, ala curta
-    foco(2.0,-69.5,52,14,8,13);     // apartamentos
-    foco(10,-38,34,24,0,2);         // deck e piscina
-    foco(-23,43,28,20,-30,2);       // relvado de eventos
-    CASAS.forEach(function(c){ foco(c[0],c[1],CASA_W,12,CASA_ROT,8); });
+    foco(A.x,A.z,A.w,A.d,A.rot,13);     // hotel, ala principal
+    foco(B.x,B.z,B.w,B.d,B.rot,13);     // hotel, ala curta
+    foco(AP.x,AP.z,AP.w,AP.d,AP.rot,13);// apartamentos
+    foco(DK.x,DK.z,DK.w,DK.d,0,2);      // deck e piscina
+    foco(RL.x,RL.z,RL.w,RL.d,RL.rot,2); // relvado de eventos
+    CASAS.forEach(function(c){ foco(c[0],c[1],CASA_W,IMP.CASA_D,CASA_ROT,8); });
 
     animacoes = T;
     pronto = true;
@@ -1697,16 +1710,22 @@
   /* A biblioteca 3D (660 KB) só desce quando alguém abre a maquete —
      quem nunca abre o Modelo 1 não paga esse peso. */
   let aCarregar = null;
-  function carregarThree(){
-    if(window.THREE) return Promise.resolve(true);
-    if(aCarregar) return aCarregar;
-    aCarregar = new Promise(function(resolve){
+  function injetar(src){
+    return new Promise(function(resolve){
       const el = document.createElement('script');
-      el.src = 'vendor/three.min.js';
-      el.onload  = function(){ resolve(!!window.THREE); };
+      el.src = src;
+      el.onload = function(){ resolve(true); };
       el.onerror = function(){ resolve(false); };
       document.head.appendChild(el);
     });
+  }
+  function carregarThree(){
+    if(window.THREE && window.IMPLANTACAO) return Promise.resolve(true);
+    if(aCarregar) return aCarregar;
+    aCarregar = Promise.all([
+      window.THREE ? true : injetar('vendor/three.min.js'),
+      window.IMPLANTACAO ? true : injetar('js/implantacao.js')
+    ]).then(function(){ return !!(window.THREE && window.IMPLANTACAO); });
     return aCarregar;
   }
 

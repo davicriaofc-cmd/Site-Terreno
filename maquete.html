@@ -1,0 +1,1889 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Maquete 3D — O Terreno · Montemor-o-Novo</title>
+<meta name="description" content="Visualização 3D conceptual do hotel implantado no terreno de 17.500 m² em Montemor-o-Novo, com a envolvente ilustrativa à volta.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sand:#EFE8D8; --sand-dim:#E4DBC6; --ink:#1B2116; --olive:#3F4A32;
+    --gold:#B08D3E; --gold-soft:#D8BE84; --night:#0E1720;
+    --painel: rgba(14,23,32,0.78);
+    --borda: rgba(239,232,216,0.16);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%; overflow:hidden;}
+  body{
+    background:var(--night); color:var(--sand);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overscroll-behavior:none;
+  }
+  canvas#cena{ position:fixed; inset:0; width:100%; height:100%; display:block; touch-action:none; cursor:grab; }
+  canvas#cena.arrastar{ cursor:grabbing; }
+  body.modo-pe canvas#cena{ cursor:crosshair; }
+
+  .mono{ font-family:'IBM Plex Mono', monospace; letter-spacing:0.12em; text-transform:uppercase; font-size:11px; }
+
+  /* ---------- barra de topo ---------- */
+  .topo{
+    position:fixed; top:0; left:0; right:0; z-index:20;
+    display:flex; align-items:center; gap:16px;
+    padding:14px clamp(14px,3vw,28px);
+    padding-top:max(14px, env(safe-area-inset-top));
+    background:linear-gradient(to bottom, rgba(14,23,32,0.82), rgba(14,23,32,0));
+    pointer-events:none;
+  }
+  .topo > *{ pointer-events:auto; }
+  .voltar{
+    color:var(--sand); text-decoration:none; opacity:0.8;
+    border:1px solid var(--borda); border-radius:999px;
+    padding:8px 14px; background:rgba(14,23,32,0.5);
+    transition:opacity .2s, border-color .2s;
+  }
+  .voltar:hover{ opacity:1; border-color:var(--gold); }
+  .titulo{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .titulo h1{ font-family:'Fraunces', serif; font-weight:600; font-size:17px; line-height:1.1; white-space:nowrap; }
+  .titulo h1 em{ font-style:italic; color:var(--gold-soft); font-weight:500; }
+  .titulo .sub{ opacity:0.55; font-size:10px; }
+  .topo-dir{ margin-left:auto; display:flex; gap:8px; align-items:center; }
+
+  .btn{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--sand);
+    background:rgba(14,23,32,0.55); border:1px solid var(--borda);
+    border-radius:999px; padding:9px 14px; cursor:pointer;
+    transition:border-color .2s, background .2s, color .2s;
+    white-space:nowrap;
+  }
+  .btn:hover{ border-color:var(--gold); }
+  .btn.on{ background:var(--gold); border-color:var(--gold); color:var(--night); }
+  .btn.icone{ padding:9px 12px; }
+
+  /* ---------- barra de baixo ---------- */
+  .base{
+    position:fixed; left:0; right:0; bottom:0; z-index:20;
+    padding:18px clamp(12px,3vw,28px);
+    padding-bottom:max(18px, env(safe-area-inset-bottom));
+    background:linear-gradient(to top, rgba(14,23,32,0.88), rgba(14,23,32,0));
+    display:flex; flex-direction:column; gap:10px;
+    pointer-events:none;
+  }
+  .base > *{ pointer-events:auto; }
+  .vistas{
+    display:flex; gap:8px; overflow-x:auto; padding-bottom:2px;
+    scrollbar-width:none;
+  }
+  .vistas::-webkit-scrollbar{ display:none; }
+  .linha-base{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .dica{ opacity:0.5; font-size:10px; margin-left:auto; text-align:right; }
+
+  /* ---------- painel lateral ---------- */
+  .painel{
+    position:fixed; top:0; right:0; bottom:0; width:min(400px,88vw); z-index:30;
+    background:var(--painel); backdrop-filter:blur(14px);
+    border-left:1px solid var(--borda);
+    padding:26px clamp(20px,3vw,28px); padding-top:max(26px, env(safe-area-inset-top));
+    overflow-y:auto; transform:translateX(102%); transition:transform .4s cubic-bezier(.4,0,.2,1);
+  }
+  .painel.open{ transform:none; }
+  .painel h2{ font-family:'Fraunces',serif; font-size:24px; font-weight:600; margin:14px 0 6px; }
+  .painel h3{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.13em;
+              text-transform:uppercase; color:var(--gold-soft); margin:26px 0 10px; }
+  .painel p{ font-size:14px; line-height:1.6; opacity:0.78; margin-bottom:10px; }
+  .painel .fechar{ position:absolute; top:18px; right:18px; }
+  .legenda-item{ display:flex; gap:11px; align-items:flex-start; padding:7px 0; border-bottom:1px solid rgba(239,232,216,0.08); }
+  .swatch{ width:14px; height:14px; border-radius:3px; flex:none; margin-top:3px; border:1px solid rgba(0,0,0,0.25); }
+  .legenda-item strong{ font-weight:600; font-size:13.5px; display:block; }
+  .legenda-item span{ font-size:12px; opacity:0.6; line-height:1.45; }
+  .aviso{
+    border:1px solid rgba(176,141,62,0.4); border-left:3px solid var(--gold);
+    border-radius:4px; padding:14px 16px; margin-top:22px; background:rgba(176,141,62,0.07);
+  }
+  .aviso p{ font-size:12.5px; margin-bottom:8px; opacity:0.85; }
+  .aviso p:last-child{ margin-bottom:0; }
+  .teclas{ display:grid; grid-template-columns:auto 1fr; gap:7px 14px; font-size:12.5px; opacity:0.75; }
+  .teclas b{ font-family:'IBM Plex Mono',monospace; font-weight:500; color:var(--gold-soft); white-space:nowrap; }
+
+  /* ---------- bússola ---------- */
+  .bussola{
+    position:fixed; z-index:15; right:clamp(14px,3vw,28px); top:50%; transform:translateY(-50%);
+    width:56px; height:56px; border-radius:50%;
+    border:1px solid var(--borda); background:rgba(14,23,32,0.5);
+    display:grid; place-items:center; pointer-events:none;
+  }
+  .bussola .agulha{ width:2px; height:34px; position:relative; }
+  .bussola .agulha::before{ content:''; position:absolute; inset:0 0 50% 0; background:var(--gold); }
+  .bussola .agulha::after{ content:''; position:absolute; inset:50% 0 0 0; background:rgba(239,232,216,0.32); }
+  .bussola .n{ position:absolute; top:5px; font-family:'IBM Plex Mono',monospace; font-size:9px; opacity:0.8; }
+
+  /* ---------- andar a pé: comando tátil ---------- */
+  .manche{
+    position:fixed; z-index:18; left:clamp(14px,4vw,34px); bottom:132px;
+    width:112px; height:112px; border-radius:50%;
+    border:1px solid var(--borda); background:rgba(14,23,32,0.42);
+    display:none; place-items:center; touch-action:none;
+  }
+  body.modo-pe.tatil .manche{ display:grid; }
+  .manche .polegar{
+    width:46px; height:46px; border-radius:50%;
+    background:rgba(239,232,216,0.22); border:1px solid var(--borda);
+    transition:transform .08s linear;
+  }
+
+  /* ---------- ecrã de carregamento ---------- */
+  .carregar{
+    position:fixed; inset:0; z-index:60; background:var(--night);
+    display:grid; place-items:center; text-align:center; padding:30px;
+    transition:opacity .6s ease; gap:18px;
+  }
+  .carregar.fora{ opacity:0; pointer-events:none; }
+  .carregar h2{ font-family:'Fraunces',serif; font-size:clamp(26px,5vw,40px); font-weight:600; line-height:1.1; }
+  .carregar h2 em{ font-style:italic; color:var(--gold-soft); font-weight:500; }
+  .barra{ width:min(280px,70vw); height:2px; background:rgba(239,232,216,0.14); overflow:hidden; }
+  .barra i{ display:block; height:100%; width:0%; background:var(--gold); transition:width .35s ease; }
+  .carregar .passo{ opacity:0.55; }
+  .erro{ max-width:44ch; font-size:14px; line-height:1.6; opacity:0.8; }
+  .erro a{ color:var(--gold-soft); }
+
+  .etiqueta{
+    position:fixed; z-index:14; pointer-events:none;
+    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--sand);
+    background:rgba(14,23,32,0.6); border:1px solid var(--borda);
+    padding:3px 8px; border-radius:3px; transform:translate(-50%,-50%);
+    opacity:0; transition:opacity .3s ease; white-space:nowrap;
+  }
+  .etiqueta.ver{ opacity:0.92; }
+
+  @media (max-width:760px){
+    .titulo .sub{ display:none; }
+    .titulo h1{ font-size:15px; }
+    .dica{ display:none; }
+    .bussola{ top:auto; bottom:210px; transform:none; width:46px; height:46px; }
+    .voltar{ padding:8px 11px; }
+    .etiqueta{ display:none; }
+  }
+  @media (max-width:420px){
+    .titulo{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="cena"></canvas>
+
+<div class="topo">
+  <a class="voltar mono" href="index.html">‹ Voltar</a>
+  <div class="titulo">
+    <h1>Maquete <em>3D</em></h1>
+    <span class="sub mono">17.500 m² · Montemor-o-Novo · visualização conceptual</span>
+  </div>
+  <div class="topo-dir">
+    <button class="btn" id="btnLuz" type="button">Noite</button>
+    <button class="btn icone" id="btnInfo" type="button" aria-label="Informação">i</button>
+  </div>
+</div>
+
+<div class="bussola"><span class="n mono">N</span><span class="agulha" id="agulha"></span></div>
+
+<div class="manche" id="manche"><span class="polegar" id="polegar"></span></div>
+
+<div class="base">
+  <div class="vistas mono" id="vistas"></div>
+  <div class="linha-base">
+    <button class="btn on" id="btnOrbita" type="button">Órbita</button>
+    <button class="btn" id="btnPe" type="button">Andar a pé</button>
+    <button class="btn" id="btnLimite" type="button">Limite do lote</button>
+    <span class="dica mono" id="dica">Arrasta para rodar · roda do rato para aproximar</span>
+  </div>
+</div>
+
+<aside class="painel" id="painel" aria-hidden="true">
+  <button class="btn icone fechar" id="btnFechar" type="button" aria-label="Fechar">✕</button>
+  <div class="mono" style="opacity:.55">O que estás a ver</div>
+  <h2>O hotel no terreno, e o que está à volta</h2>
+  <p>Os volumes estão à escala sobre o polígono real do lote — 17.500 m², a mesma
+     implantação do Modelo 1: hotel em L a poente, apartamentos a norte, dez moradias
+     em banda a nascente, piscina e bar ao centro, relvado de eventos a sul.</p>
+
+  <h3>No lote</h3>
+  <div id="legenda"></div>
+
+  <h3>Como andar</h3>
+  <div class="teclas">
+    <b>Arrastar</b><span>Rodar a vista</span>
+    <b>Roda / dois dedos</b><span>Aproximar e afastar</span>
+    <b>W A S D</b><span>Andar, no modo a pé</span>
+    <b>Shift</b><span>Andar mais depressa</span>
+    <b>1 … 7</b><span>Saltar para cada vista</span>
+    <b>N</b><span>Trocar dia e noite</span>
+  </div>
+
+  <div class="aviso">
+    <p><strong>Isto é uma visualização conceptual.</strong> Não é projeto de arquitetura
+       nem substitui o trabalho do arquiteto: são volumes gerados por código, à escala,
+       para se perceber ocupação, distâncias e relação com a envolvente.</p>
+    <p><strong>A envolvente é ilustrativa.</strong> As ruas, casas e parcelas à volta são
+       uma reconstituição de carácter alentejano para o terreno não aparecer isolado —
+       não são levantamento do local. Ficam certas quando chegar o KML do lote e um print
+       mais afastado do Google Earth.</p>
+    <p><strong>O lote está modelado plano.</strong> No terreno há cerca de 8 m de desnível
+       (225,18 m a 233,41 m). Conta para a cota a partir da qual se mede a fachada e para
+       o que é preciso escavar — está por modelar.</p>
+  </div>
+</aside>
+
+<div class="carregar" id="carregar">
+  <h2>A levantar <em>o terreno</em>…</h2>
+  <div class="barra"><i id="barra"></i></div>
+  <div class="passo mono" id="passo">A preparar a cena</div>
+  <div class="erro" id="erro" hidden></div>
+</div>
+
+<span class="etiqueta" id="etiqueta"></span>
+
+<script src="js/implantacao.js"></script>
+<script src="vendor/three.min.js"></script>
+<script>
+/* =========================================================================
+   MAQUETE 3D NAVEGÁVEL — o projeto no lote, e o lote no sítio onde está.
+
+   O que é real: o polígono do lote (17.500 m²) e a implantação dos volumes,
+   ambos lidos de js/implantacao.js, os mesmos que a maquete do Modelo 1 usa.
+   O que é ilustrativo: tudo o resto — ruas, casas, parcelas e vegetação da
+   envolvente são gerados por código, com semente fixa, para dar contexto ao
+   terreno. Não são levantamento. Quando chegar o KML e um print mais
+   afastado do Google Earth, substituem-se as ESTRADAS e as PARCELAS.
+   ========================================================================= */
+(function(){
+'use strict';
+
+var IMP = window.IMPLANTACAO;
+var canvas = document.getElementById('cena');
+var elCarregar = document.getElementById('carregar');
+var elBarra = document.getElementById('barra');
+var elPasso = document.getElementById('passo');
+var elErro  = document.getElementById('erro');
+
+function falhar(msg){
+  elCarregar.classList.remove('fora');
+  elCarregar.querySelector('h2').innerHTML = 'Sem <em>3D</em> neste ecrã';
+  elBarra.parentNode.hidden = true;
+  elPasso.hidden = true;
+  elErro.hidden = false;
+  elErro.innerHTML = msg + ' <a href="index.html">Voltar ao site</a>, onde a implantação ' +
+                     'do Modelo 1 também está em imagem.';
+}
+if(!window.THREE){
+  falhar('A biblioteca 3D não carregou.');
+  return;
+}
+(function(){
+  try{
+    var t = document.createElement('canvas');
+    if(!(window.WebGLRenderingContext && (t.getContext('webgl') || t.getContext('experimental-webgl')))){
+      falhar('O navegador não tem WebGL disponível.'); throw 0;
+    }
+  }catch(e){ if(e===0) return; }
+})();
+if(elErro.hidden === false) return;
+
+/* ---------------------------------------------------------------- 1. base */
+var rad = function(g){ return g*Math.PI/180; };
+var clamp = function(v,a,b){ return v<a?a:(v>b?b:v); };
+
+/* Semente fixa: a envolvente é sempre a mesma, entre sessões e entre ecrãs.
+   Sem isto, cada recarregamento mudava as casas de sítio. */
+function semente(s){
+  return function(){
+    s |= 0; s = s + 0x6D2B79F5 | 0;
+    var t = Math.imul(s ^ s >>> 15, 1 | s);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+var R = semente(20250917);
+var entre = function(a,b){ return a + R()*(b-a); };
+var escolher = function(arr){ return arr[Math.floor(R()*arr.length)|0]; };
+
+function centroide(pol){
+  var x=0,z=0; for(var i=0;i<pol.length;i++){ x+=pol[i][0]; z+=pol[i][1]; }
+  return [x/pol.length, z/pol.length];
+}
+function dentroPol(pol,x,z){
+  var c=false;
+  for(var i=0,n=pol.length,j=n-1;i<n;j=i++){
+    var xi=pol[i][0], zi=pol[i][1], xj=pol[j][0], zj=pol[j][1];
+    if((zi>z)!==(zj>z) && x < (xj-xi)*(z-zi)/(zj-zi)+xi) c=!c;
+  }
+  return c;
+}
+function areaPol(pol){
+  var a=0; for(var i=0,n=pol.length;i<n;i++){
+    var p=pol[i], q=pol[(i+1)%n]; a += p[0]*q[1]-q[0]*p[1]; }
+  return a/2;
+}
+/* Distância de um ponto ao contorno de um polígono (positiva sempre). */
+function aoBordo(pol,x,z){
+  var m = Infinity;
+  for(var i=0,n=pol.length;i<n;i++){
+    var a=pol[i], b=pol[(i+1)%n];
+    var vx=b[0]-a[0], vz=b[1]-a[1];
+    var t = ((x-a[0])*vx + (z-a[1])*vz) / (vx*vx+vz*vz);
+    t = clamp(t,0,1);
+    m = Math.min(m, Math.hypot(x-(a[0]+vx*t), z-(a[1]+vz*t)));
+  }
+  return m;
+}
+/* Afasta o polígono d metros para fora, por bissetriz — é assim que a via
+   perimetral do lote foi calculada, e é assim que as estradas vizinhas
+   acompanham o contorno sem o cortar. */
+function afastar(pol, d){
+  var horario = areaPol(pol) < 0;
+  var n = pol.length, out = [];
+  for(var i=0;i<n;i++){
+    var a = pol[(i-1+n)%n], b = pol[i], c = pol[(i+1)%n];
+    var n1 = normalFora(a,b,horario), n2 = normalFora(b,c,horario);
+    var bx = n1[0]+n2[0], bz = n1[1]+n2[1];
+    var L = Math.hypot(bx,bz) || 1;
+    bx/=L; bz/=L;
+    var proj = bx*n1[0] + bz*n1[1];
+    var t = Math.min(d/Math.max(proj,0.3), d*3);
+    out.push([b[0]+bx*t, b[1]+bz*t]);
+  }
+  return out;
+}
+function normalFora(a,b,horario){
+  var dx=b[0]-a[0], dz=b[1]-a[1], L=Math.hypot(dx,dz)||1;
+  return horario ? [-dz/L, dx/L] : [dz/L, -dx/L];
+}
+/* Prolonga as pontas de uma linha, para uma estrada não acabar no ar. */
+function prolongar(pts, antes, depois){
+  var o = pts.slice();
+  var d0 = [o[0][0]-o[1][0], o[0][1]-o[1][1]];
+  var l0 = Math.hypot(d0[0],d0[1])||1;
+  o.unshift([o[0][0]+d0[0]/l0*antes, o[0][1]+d0[1]/l0*antes]);
+  var k = o.length;
+  var d1 = [o[k-1][0]-o[k-2][0], o[k-1][1]-o[k-2][1]];
+  var l1 = Math.hypot(d1[0],d1[1])||1;
+  o.push([o[k-1][0]+d1[0]/l1*depois, o[k-1][1]+d1[1]/l1*depois]);
+  return o;
+}
+/* Pontos espaçados ao longo de uma linha, com a direção em cada um —
+   serve para plantar candeeiros, casas e árvores a acompanhar a estrada. */
+function aoLongo(pts, passo, offset){
+  var saida=[], resto = offset||0;
+  for(var i=0;i<pts.length-1;i++){
+    var a=pts[i], b=pts[i+1];
+    var dx=b[0]-a[0], dz=b[1]-a[1], L=Math.hypot(dx,dz);
+    if(L<0.001) continue;
+    var ux=dx/L, uz=dz/L, s=resto;
+    while(s < L){
+      saida.push({x:a[0]+ux*s, z:a[1]+uz*s, ux:ux, uz:uz, ang:Math.atan2(ux,uz)});
+      s += passo;
+    }
+    resto = s - L;
+  }
+  return saida;
+}
+function distALinha(pts,x,z){
+  var m=Infinity;
+  for(var i=0;i<pts.length-1;i++){
+    var a=pts[i], b=pts[i+1];
+    var vx=b[0]-a[0], vz=b[1]-a[1];
+    var t = clamp(((x-a[0])*vx+(z-a[1])*vz)/(vx*vx+vz*vz || 1),0,1);
+    m = Math.min(m, Math.hypot(x-(a[0]+vx*t), z-(a[1]+vz*t)));
+  }
+  return m;
+}
+
+/* ------------------------------------------------- 2. o mundo à volta */
+var EXT = 2000;                       // lado do quadrado de mundo desenhado
+var LOTE = IMP.LOTE;
+var LOTE_FOLGA = afastar(LOTE, 26);   // nada de vizinhos encostados ao limite
+
+/* As duas estradas que tocam o lote saem do próprio contorno: a principal
+   corre ao longo do limite nascente/sudeste (é a que lá está), e um caminho
+   secundário fecha o lado poente. As outras são vias da zona. */
+var ANEL = afastar(LOTE, 15);
+var ESTRADAS = [
+  { nome:'nascente', tipo:'asfalto', larg:7.5, lampadas:true,
+    pts: prolongar(ANEL.slice(2,7), 300, 260) },
+  { nome:'poente', tipo:'asfalto', larg:6.0, lampadas:false,
+    pts: prolongar([ANEL[7],ANEL[8],ANEL[9],ANEL[10],ANEL[0],ANEL[1]], 180, 200) },
+  { nome:'norte', tipo:'asfalto', larg:7.0, lampadas:false,
+    pts: [[-620,-232],[-300,-248],[-40,-236],[240,-262],[560,-250],[900,-268]] },
+  { nome:'sul', tipo:'asfalto', larg:6.5, lampadas:false,
+    pts: [[-700,330],[-420,352],[-150,338],[170,368],[520,346],[880,372]] },
+  { nome:'caminho-nascente', tipo:'terra', larg:4.2, lampadas:false,
+    pts: [[210,-62],[330,-96],[470,-88],[640,-140],[820,-146]] },
+  { nome:'caminho-poente', tipo:'terra', larg:4.0, lampadas:false,
+    pts: [[-150,66],[-300,40],[-430,78],[-580,52],[-760,90]] },
+  { nome:'caminho-sul', tipo:'terra', larg:4.0, lampadas:false,
+    pts: [[-70,150],[-120,238],[-90,320],[-140,430],[-100,560]] }
+];
+
+/* Parcelas agrícolas: grelha irregular, saltando o lote e as estradas.
+   O tipo de cultura dita a cor, o riscado da textura e o que se planta. */
+var CULTURAS = [
+  {id:'lavrado', cor:'#7E6A4E', risca:'#6B5840', passo:5.0, arvores:0},
+  {id:'restolho',cor:'#B9A878', risca:'#A8966A', passo:7.0, arvores:0},
+  {id:'pasto',   cor:'#8C9463', risca:null,      passo:0,   arvores:0.10},
+  {id:'olival',  cor:'#79804F', risca:null,      passo:0,   arvores:0.85},
+  {id:'vinha',   cor:'#6E7A4A', risca:'#5C6A3E', passo:3.0, arvores:0},
+  {id:'seara',   cor:'#C4B279', risca:'#B5A268', passo:9.0, arvores:0},
+  {id:'montado', cor:'#93916A', risca:null,      passo:0,   arvores:0.22}
+];
+var PARCELAS = (function(){
+  var out=[], cel=118;
+  for(var gx=-8; gx<=8; gx++){
+    for(var gz=-8; gz<=8; gz++){
+      var cx = gx*cel + entre(-16,16), cz = gz*cel + entre(-16,16);
+      if(Math.abs(cx)>EXT/2-70 || Math.abs(cz)>EXT/2-70) continue;
+      var w = cel*entre(0.62,0.94), d = cel*entre(0.62,0.94);
+      var a = entre(-0.22,0.22);
+      var quad = [[-w/2,-d/2],[w/2,-d/2],[w/2,d/2],[-w/2,d/2]].map(function(p){
+        var jx = p[0]+entre(-9,9), jz = p[1]+entre(-9,9);
+        return [cx + jx*Math.cos(a) - jz*Math.sin(a), cz + jx*Math.sin(a) + jz*Math.cos(a)];
+      });
+      /* Só se salta a parcela cujo centro cai no lote — o resto pinta-se até
+         ao limite. O relvado do lote e as estradas são geometria por cima,
+         e é isso que fecha a leitura; deixar um anel de terra à volta era o
+         que fazia o terreno parecer isolado. */
+      if(dentroPol(LOTE_FOLGA,cx,cz)) continue;
+      out.push({ quad:quad, c:cx, z:cz, ang:a, cultura:escolher(CULTURAS) });
+    }
+  }
+  return out;
+})();
+
+/* ------------------------------------------------------- 3. texturas */
+/* O chão da envolvente é uma só imagem pintada por código — parcelas,
+   caminhos e manchas de árvores — em vez de centenas de polígonos. Custa
+   um desenho no arranque e fica em um único objeto na cena. */
+function c2(x,z,S){ return [ (x+EXT/2)/EXT*S, (z+EXT/2)/EXT*S ]; }
+
+function texturaTerreno(){
+  var S = 2048;
+  var cv = document.createElement('canvas'); cv.width = cv.height = S;
+  var g = cv.getContext('2d');
+
+  g.fillStyle = '#8A7C61'; g.fillRect(0,0,S,S);
+
+  // manchas largas de terra, para o fundo não ser chapado
+  for(var i=0;i<260;i++){
+    var p = c2(entre(-EXT/2,EXT/2), entre(-EXT/2,EXT/2), S);
+    var r = entre(20,130);
+    g.fillStyle = 'rgba('+[0,1,2].map(function(k){ return [140,126,100][k] + (R()*36-18)|0; }).join(',')+',0.20)';
+    g.beginPath(); g.ellipse(p[0],p[1],r,r*entre(0.5,1.3),R()*3.14,0,6.29); g.fill();
+  }
+
+  PARCELAS.forEach(function(par){
+    var pts = par.quad.map(function(p){ return c2(p[0],p[1],S); });
+    g.save();
+    g.beginPath();
+    pts.forEach(function(p,i){ i ? g.lineTo(p[0],p[1]) : g.moveTo(p[0],p[1]); });
+    g.closePath();
+    g.fillStyle = par.cultura.cor; g.fill();
+    g.clip();
+
+    // riscado da lavra / das vinhas, na direção da parcela
+    if(par.cultura.risca){
+      var cc = c2(par.c,par.z,S);
+      g.translate(cc[0],cc[1]); g.rotate(par.ang + (R()<0.5?0:1.57));
+      g.strokeStyle = par.cultura.risca; g.lineWidth = Math.max(1, par.cultura.passo*0.22*S/EXT);
+      var passoPx = par.cultura.passo*S/EXT;
+      for(var y=-140; y<140; y+=Math.max(1.4,passoPx)){
+        g.beginPath(); g.moveTo(-140,y); g.lineTo(140,y); g.stroke();
+      }
+      g.setTransform(1,0,0,1,0,0);
+    }
+    // copas vistas de cima, onde há árvores
+    if(par.cultura.arvores > 0){
+      var n = Math.round(par.cultura.arvores * 46);
+      for(var k=0;k<n;k++){
+        var q = c2(par.c + entre(-52,52), par.z + entre(-52,52), S);
+        g.fillStyle = 'rgba(58,74,42,0.55)';
+        g.beginPath(); g.arc(q[0],q[1], entre(2.4,5.2), 0, 6.29); g.fill();
+      }
+    }
+    g.restore();
+
+    // sebe / vala a marcar o limite da parcela
+    g.strokeStyle = 'rgba(58,66,40,0.38)'; g.lineWidth = 1.6;
+    g.beginPath();
+    pts.forEach(function(p,i){ i ? g.lineTo(p[0],p[1]) : g.moveTo(p[0],p[1]); });
+    g.closePath(); g.stroke();
+  });
+
+  /* As estradas não se pintam aqui: existem em 3D, com berma e marcação.
+     Pintadas por baixo ficavam ao dobro da largura e desfocadas pelo mipmap.
+     O que se pinta é só a terra batida das bermas, a alargar o rasto. */
+  ESTRADAS.forEach(function(e){
+    var pts = e.pts.map(function(p){ return c2(p[0],p[1],S); });
+    g.lineJoin = g.lineCap = 'round';
+    g.strokeStyle = 'rgba(163,146,112,0.75)';
+    g.lineWidth = e.larg*S/EXT * 1.15;
+    g.beginPath();
+    pts.forEach(function(p,i){ i ? g.lineTo(p[0],p[1]) : g.moveTo(p[0],p[1]); });
+    g.stroke();
+  });
+
+  var t = new THREE.CanvasTexture(cv);
+  t.anisotropy = 8;
+  if(THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+/* Textura fina, repetida, por cima da anterior: dá grão ao chão quando se
+   anda a pé, sem estragar a leitura aérea. */
+function texturaGrao(){
+  var S=256, cv=document.createElement('canvas'); cv.width=cv.height=S;
+  var g=cv.getContext('2d');
+  g.fillStyle='rgba(0,0,0,0)'; g.fillRect(0,0,S,S);
+  for(var i=0;i<2600;i++){
+    g.fillStyle = 'rgba('+(R()<0.5?'40,44,30':'190,176,140')+','+(0.03+R()*0.07).toFixed(3)+')';
+    g.fillRect(R()*S, R()*S, 1+R()*2.5, 1+R()*2.5);
+  }
+  var t = new THREE.CanvasTexture(cv);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(EXT/14, EXT/14);
+  return t;
+}
+
+/* --------------------------------------------------- 4. cena e luzes */
+var renderer, scene, camera, sol, hemi, ceu, estrelas;
+var LUZES_NOITE = [];        // focos que só existem de noite
+var EMISSIVOS = [];          // materiais que acendem ao anoitecer
+var nocturno = false;
+
+var COR = {
+  relva:0x93A55E, relvaEsc:0x7E8C52, paviment:0xCFC6AE, pedra:0xBDB49B,
+  parede:0xF2EDE0, paredeQ:0xE8E0CE, laje:0xDCD3BC, vidro:0x33414B,
+  painel:0x18212C, agua:0x3E9BC4, deck:0xD2C5A6, tronco:0x5B4B36,
+  copa:0x4C5E34, copaClara:0x62764A, alcatrao:0x3B3F3C, terra:0x8A7C61,
+  telha:0xA85C3C, telhaEsc:0x8E4A2E, ouro:0xB08D3E, metal:0x8E948F
+};
+
+function mat(c,o){
+  return new THREE.MeshStandardMaterial(Object.assign({color:c, roughness:0.9, metalness:0.0}, o||{}));
+}
+var MAT = {};
+
+function construirMateriais(){
+  for(var k in COR) MAT[k] = mat(COR[k]);
+  MAT.vidro   = mat(COR.vidro,   {roughness:0.22, metalness:0.18});
+  MAT.painel  = mat(COR.painel,  {roughness:0.3,  metalness:0.4});
+  MAT.agua    = mat(COR.agua,    {roughness:0.08, metalness:0.2, transparent:true, opacity:0.9});
+  MAT.metal   = mat(COR.metal,   {roughness:0.45, metalness:0.6});
+  MAT.alcatrao= mat(COR.alcatrao,{roughness:0.97});
+  MAT.branco  = mat(0xFFFFFF);
+  // vidros e janelas acendem à noite
+  MAT.vidro.emissive = new THREE.Color(0xFFCB84); MAT.vidro.emissiveIntensity = 0;
+  EMISSIVOS.push({m:MAT.vidro, i:1.25});
+}
+
+function arrancarRenderer(){
+  renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:true, powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  if(THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.02;
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0xC9D3DA, 520, 1550);
+  scene.background = new THREE.Color(0xC9D3DA);
+
+  camera = new THREE.PerspectiveCamera(42, 1, 0.5, 5200);
+
+  hemi = new THREE.HemisphereLight(0xD9E8F7, 0x7A7452, 1.05);
+  scene.add(hemi);
+
+  sol = new THREE.DirectionalLight(0xFFF0D0, 2.3);
+  sol.position.set(-210, 300, 150);
+  sol.castShadow = true;
+  sol.shadow.mapSize.set(2048,2048);
+  sol.shadow.radius = 2.5;
+  sol.shadow.bias = -0.0008; sol.shadow.normalBias = 0.6;
+  var s = 210, sc = sol.shadow.camera;
+  sc.left=-s; sc.right=s; sc.top=s; sc.bottom=-s; sc.near=1; sc.far=900;
+  scene.add(sol); scene.add(sol.target);
+
+  var enche = new THREE.DirectionalLight(0xBFD4E8, 0.32);
+  enche.position.set(190, 120, -160);
+  scene.add(enche);
+  ceu = enche;
+}
+
+/* Céu: cúpula com degradé, virada para dentro. Muda de cor ao anoitecer. */
+function construirCeu(){
+  var cv = document.createElement('canvas'); cv.width=4; cv.height=256;
+  var g = cv.getContext('2d');
+  var grad = g.createLinearGradient(0,0,0,256);
+  grad.addColorStop(0.00,'#5E8FB8');
+  grad.addColorStop(0.45,'#A9C4D6');
+  grad.addColorStop(0.78,'#D6DCD3');
+  grad.addColorStop(1.00,'#E6DCC6');
+  g.fillStyle = grad; g.fillRect(0,0,4,256);
+  var t = new THREE.CanvasTexture(cv);
+  if(THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace;
+  var m = new THREE.Mesh(
+    new THREE.SphereGeometry(2600, 32, 20),
+    new THREE.MeshBasicMaterial({map:t, side:THREE.BackSide, fog:false, depthWrite:false})
+  );
+  scene.add(m);
+
+  // estrelas, só acesas de noite
+  var n = 900, pos = new Float32Array(n*3);
+  for(var i=0;i<n;i++){
+    var u = R()*6.2832, v = Math.acos(R()*0.92);
+    var r = 2400;
+    pos[i*3]   = r*Math.sin(v)*Math.cos(u);
+    pos[i*3+1] = r*Math.cos(v)*0.9 + 60;
+    pos[i*3+2] = r*Math.sin(v)*Math.sin(u);
+  }
+  var gg = new THREE.BufferGeometry();
+  gg.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  estrelas = new THREE.Points(gg, new THREE.PointsMaterial({
+    color:0xFFF3DA, size:5.5, sizeAttenuation:true, transparent:true, opacity:0.85, fog:false
+  }));
+  estrelas.visible = false;
+  scene.add(estrelas);
+  return m;
+}
+
+/* ------------------------------------------- 5. auxiliares de geometria */
+function caixa(w,h,d,material){
+  var m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), material);
+  m.castShadow = true; m.receiveShadow = true;
+  return m;
+}
+/* Um objeto repetido centenas de vezes é uma só chamada de desenho. É o que
+   torna possível ter um bairro inteiro à volta sem a cena arrastar. */
+var _d = null, _c = null;
+function instanciar(geo, material, itens, opc){
+  if(!itens.length) return null;
+  opc = opc || {};
+  if(!_d){ _d = new THREE.Object3D(); _c = new THREE.Color(); }
+  var m = new THREE.InstancedMesh(geo, material, itens.length);
+  for(var i=0;i<itens.length;i++){
+    var it = itens[i];
+    _d.position.set(it.x, it.y||0, it.z);
+    _d.rotation.set(it.rx||0, it.ry||0, it.rz||0);
+    _d.scale.set(it.sx===undefined?1:it.sx, it.sy===undefined?1:it.sy, it.sz===undefined?1:it.sz);
+    _d.updateMatrix();
+    m.setMatrixAt(i, _d.matrix);
+    if(it.cor!==undefined){ _c.set(it.cor); m.setColorAt(i, _c); }
+  }
+  m.instanceMatrix.needsUpdate = true;
+  if(m.instanceColor) m.instanceColor.needsUpdate = true;
+  m.castShadow = !!opc.sombra;
+  m.receiveShadow = opc.recebe !== false;
+  m.frustumCulled = false;
+  scene.add(m);
+  return m;
+}
+/* Telhado de duas águas: perfil triangular esticado ao longo da cumeeira. */
+function geoTelhado(){
+  var s = new THREE.Shape();
+  s.moveTo(-0.5,0); s.lineTo(0.5,0); s.lineTo(0,1); s.closePath();
+  var g = new THREE.ExtrudeGeometry(s, {depth:1, bevelEnabled:false});
+  g.translate(0,0,-0.5);
+  g.rotateY(Math.PI/2);
+  return g;
+}
+/* Fita de estrada: acompanha a linha, com a largura pedida. */
+function fita(pts, larg, y){
+  var pos=[], idx=[], uv=[], acc=0;
+  for(var i=0;i<pts.length;i++){
+    var a = pts[Math.max(0,i-1)], b = pts[Math.min(pts.length-1,i+1)];
+    var tx = b[0]-a[0], tz = b[1]-a[1], L = Math.hypot(tx,tz)||1;
+    var nx = tz/L, nz = -tx/L;
+    var p = pts[i];
+    if(i>0) acc += Math.hypot(p[0]-pts[i-1][0], p[1]-pts[i-1][1]);
+    pos.push(p[0]+nx*larg/2, y, p[1]+nz*larg/2);
+    pos.push(p[0]-nx*larg/2, y, p[1]-nz*larg/2);
+    uv.push(0, acc/larg, 1, acc/larg);
+    if(i<pts.length-1){
+      var k = i*2;
+      idx.push(k, k+2, k+1, k+1, k+2, k+3);
+    }
+  }
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos,3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv,2));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  // se a linha vier no sentido contrário a face fica virada ao chão: inverte-se
+  var nrm = g.attributes.normal.array, soma = 0;
+  for(var q=1;q<nrm.length;q+=3) soma += nrm[q];
+  if(soma < 0){
+    for(var t=0;t<idx.length;t+=3){ var tmp = idx[t+1]; idx[t+1] = idx[t+2]; idx[t+2] = tmp; }
+    g.setIndex(idx); g.computeVertexNormals();
+  }
+  return g;
+}
+/* Polígono horizontal a partir de uma lista de pontos [x,z]. */
+/* A forma desenha-se no plano XY e deita-se com −90°: com +90° as normais
+   ficavam viradas para baixo e o polígono não chegava a ser desenhado. Por
+   isso o z do mundo entra trocado de sinal. */
+function chapa(pol, y, material, buraco){
+  var f = new THREE.Shape();
+  pol.forEach(function(p,i){ i ? f.lineTo(p[0],-p[1]) : f.moveTo(p[0],-p[1]); });
+  f.closePath();
+  if(buraco){
+    var h = new THREE.Path();
+    buraco.slice().reverse().forEach(function(p,i){ i ? h.lineTo(p[0],-p[1]) : h.moveTo(p[0],-p[1]); });
+    h.closePath(); f.holes.push(h);
+  }
+  var g = new THREE.ShapeGeometry(f);
+  g.rotateX(-Math.PI/2);
+  var m = new THREE.Mesh(g, material);
+  m.position.y = y; m.receiveShadow = true;
+  return m;
+}
+
+/* ------------------------------------------------ 6. chão e estradas */
+function construirChao(){
+  var g = new THREE.PlaneGeometry(EXT, EXT);
+  g.rotateX(-Math.PI/2);
+  var chao = new THREE.Mesh(g, mat(0xFFFFFF, {map:texturaTerreno(), roughness:0.96}));
+  chao.position.y = -0.18; chao.receiveShadow = true;
+  scene.add(chao);
+
+  var g2 = new THREE.PlaneGeometry(EXT, EXT);
+  g2.rotateX(-Math.PI/2);
+  var grao = new THREE.Mesh(g2, new THREE.MeshBasicMaterial({
+    map:texturaGrao(), transparent:true, opacity:0.55, depthWrite:false
+  }));
+  grao.position.y = -0.14; scene.add(grao);
+
+  // fora da imagem, um plano de terra até ao horizonte
+  var longe = new THREE.Mesh(new THREE.RingGeometry(EXT*0.5, 4200, 48), mat(0x8F8365, {roughness:1}));
+  longe.rotation.x = -Math.PI/2; longe.position.y = -0.22; scene.add(longe);
+}
+
+function construirEstradas(){
+  var lampadas = [], postes = [], riscas = [];
+  ESTRADAS.forEach(function(e){
+    var terra = e.tipo === 'terra';
+    var berma = new THREE.Mesh(fita(e.pts, e.larg*1.5, 0.03),
+                  mat(terra ? 0xA08D6B : 0x9A9682, {roughness:1}));
+    berma.receiveShadow = true; scene.add(berma);
+
+    var via = new THREE.Mesh(fita(e.pts, e.larg, 0.06),
+                mat(terra ? 0xAD9B78 : COR.alcatrao, {roughness:terra?1:0.92}));
+    via.receiveShadow = true; scene.add(via);
+
+    if(!terra){
+      aoLongo(e.pts, 14, 4).forEach(function(p){
+        riscas.push({x:p.x, y:0.08, z:p.z, ry:p.ang, sx:0.16, sy:1, sz:5.0});
+      });
+    }
+    if(e.lampadas){
+      aoLongo(e.pts, 34, 12).forEach(function(p,i){
+        var lado = (i%2 ? 1 : -1) * (e.larg/2 + 1.6);
+        var x = p.x + p.uz*lado, z = p.z - p.ux*lado;
+        postes.push({x:x, y:0, z:z, sy:8.4});
+        lampadas.push({x:x, y:8.4, z:z, ry:p.ang});
+      });
+    }
+  });
+  instanciar(new THREE.BoxGeometry(1,0.02,1), MAT.branco, riscas, {sombra:false});
+  instanciar(new THREE.CylinderGeometry(0.11,0.15,1,6).translate(0,0.5,0), MAT.metal, postes, {sombra:true});
+  var globos = instanciar(new THREE.SphereGeometry(0.42,8,6), new THREE.MeshBasicMaterial({color:0xFFE2AE}),
+                          lampadas, {sombra:false, recebe:false});
+  if(globos){ globos.visible = false; LUZES_NOITE.push(globos); }
+}
+
+/* ------------------------------------------------- 7. casas vizinhas */
+/* Casario alentejano: corpo caiado, telhado de duas águas, chaminé larga,
+   por vezes um anexo e um muro baixo. Postas ao longo das vias, viradas
+   para a estrada, com espaçamento irregular. Ilustrativas. */
+function gerarVizinhanca(){
+  var casas = [], ocupado = [];
+  var livre = function(x,z,r){
+    if(dentroPol(LOTE_FOLGA,x,z) || aoBordo(LOTE,x,z) < 46) return false;
+    if(Math.abs(x) > EXT/2-60 || Math.abs(z) > EXT/2-60) return false;
+    for(var i=0;i<ESTRADAS.length;i++){
+      if(distALinha(ESTRADAS[i].pts,x,z) < ESTRADAS[i].larg/2 + 7) return false;
+    }
+    for(var j=0;j<ocupado.length;j++){
+      if(Math.hypot(x-ocupado[j][0], z-ocupado[j][1]) < r + ocupado[j][2]) return false;
+    }
+    return true;
+  };
+  var por = function(x,z,ang,tipo){
+    var armazem = tipo === 'armazem';
+    var w = armazem ? entre(18,34) : entre(8.5,15);
+    var d = armazem ? entre(9,14)  : entre(7,11);
+    var pisos = armazem ? 1 : (R()<0.22 ? 2 : 1);
+    var h = armazem ? entre(4.2,5.6) : pisos*3.0;
+    if(!livre(x,z, Math.max(w,d)*0.8 + 6)) return false;
+    ocupado.push([x,z, Math.max(w,d)*0.8]);
+    casas.push({
+      x:x, z:z, ang:ang, w:w, d:d, h:h, pisos:pisos, armazem:armazem,
+      telhaAlt: armazem ? entre(1.0,1.5) : entre(1.6,2.6),
+      anexo: !armazem && R()<0.42,
+      muro:  !armazem && R()<0.5,
+      piscina: !armazem && R()<0.12,
+      cor: armazem ? escolher([0xD9D4C6,0xC8C4B4,0xE0DACB]) : escolher([0xF4EFE4,0xFFFFFF,0xF0E8D6,0xEFE6D2]),
+      corTelha: escolher([0xA85C3C,0x9B5334,0xB2664A,0x8E4A2E,0xA35E44])
+    });
+    return true;
+  };
+
+  // ao longo das vias
+  ESTRADAS.forEach(function(e){
+    var caminho = e.nome.indexOf('caminho') === 0;
+    var passo = caminho ? 95 : 44;
+    aoLongo(e.pts, passo, 25).forEach(function(p){
+      if(R() < (caminho ? 0.42 : 0.18)) return;
+      var lado = R()<0.5 ? 1 : -1;
+      var rec = entre(e.larg/2 + 12, e.larg/2 + 34);
+      var x = p.x + p.uz*lado*rec, z = p.z - p.ux*lado*rec;
+      var tipo = R()<0.16 ? 'armazem' : 'casa';
+      por(x + entre(-8,8), z + entre(-8,8), p.ang + (lado>0?0:Math.PI) + entre(-0.18,0.18), tipo);
+    });
+  });
+
+  // um pequeno aglomerado a nordeste, com ruas próprias
+  var ax = 315, az = -300;
+  for(var i=0;i<5;i++){
+    for(var j=0;j<4;j++){
+      if(R()<0.28) continue;
+      por(ax + i*34 + entre(-5,5), az + j*30 + entre(-5,5), rad(entre(-8,8)), 'casa');
+    }
+  }
+  // duas quintas isoladas
+  por(-330, 120, rad(24), 'casa');
+  por(-352, 142, rad(24), 'armazem');
+  por(250, 210, rad(-40), 'casa');
+  return casas;
+}
+
+function construirVizinhanca(casas){
+  var corpos=[], telhados=[], chamines=[], anexos=[], muros=[], janelas=[], piscinas=[];
+  var perto = function(c){ return Math.hypot(c.x,c.z) < 320; };
+
+  casas.forEach(function(c){
+    var ry = c.ang;
+    corpos.push({x:c.x, y:c.h/2, z:c.z, ry:ry, sx:c.w, sy:c.h, sz:c.d, cor:c.cor});
+    telhados.push({x:c.x, y:c.h, z:c.z, ry:ry, sx:c.w*1.06, sy:c.telhaAlt, sz:c.d*1.1, cor:c.corTelha});
+    if(!c.armazem){
+      var cx = c.x + Math.cos(ry)*c.w*0.28, cz = c.z - Math.sin(ry)*c.w*0.28;
+      chamines.push({x:cx, y:c.h+c.telhaAlt*0.55, z:cz, ry:ry, sx:1.1, sy:2.1, sz:0.9, cor:c.cor});
+    }
+    if(c.anexo){
+      var ax = c.x + Math.sin(ry+1.57)*(c.w/2+2.6), az = c.z + Math.cos(ry+1.57)*(c.w/2+2.6);
+      anexos.push({x:ax, y:1.35, z:az, ry:ry, sx:5.2, sy:2.7, sz:c.d*0.62, cor:c.cor});
+    }
+    if(c.muro){
+      var rx = c.w*0.5 + 5, rz = c.d*0.5 + 5;
+      [[1,0],[-1,0],[0,1],[0,-1]].forEach(function(lado){
+        var mx = c.x + (Math.cos(ry)*lado[0]*rx + Math.sin(ry)*lado[1]*rz);
+        var mz = c.z + (-Math.sin(ry)*lado[0]*rx + Math.cos(ry)*lado[1]*rz);
+        // a peça tem o comprimento no seu x: os muros dos lados rodam 90°
+        muros.push({x:mx, y:0.5, z:mz, ry:ry + (lado[0] ? Math.PI/2 : 0),
+                    sx:(lado[0] ? rz*2 : rx*2), sy:1.0, sz:0.3, cor:c.cor});
+      });
+    }
+    if(c.piscina){
+      var px = c.x + Math.sin(ry)*(c.d/2+7), pz = c.z + Math.cos(ry)*(c.d/2+7);
+      piscinas.push({x:px, y:0.12, z:pz, ry:ry, sx:7, sy:0.2, sz:3.6});
+    }
+    // janelas acesas: só em parte das casas, e só as viradas a quem vê
+    if(R() < 0.62){
+      var n = c.armazem ? 1 : 2 + (R()<0.5?1:0);
+      for(var k=0;k<n;k++){
+        var u = (k-(n-1)/2)*2.7;
+        var jy = c.pisos>1 && R()<0.5 ? 4.3 : 1.7;
+        [1,-1].forEach(function(f){
+          janelas.push({
+            x: c.x + Math.cos(ry)*u + Math.sin(ry)*f*(c.d/2+0.06),
+            y: jy,
+            z: c.z - Math.sin(ry)*u + Math.cos(ry)*f*(c.d/2+0.06),
+            ry: ry + (f>0?0:Math.PI), sx:1.1, sy:1.35, sz:1,
+            cor: R()<0.3 ? 0xFFD9A0 : 0xFFC682
+          });
+        });
+      }
+    }
+  });
+
+  var caixa1 = new THREE.BoxGeometry(1,1,1);
+  var comSombra = {sombra:true};
+  instanciar(caixa1, MAT.branco, corpos.filter(perto), comSombra);
+  instanciar(caixa1, MAT.branco, corpos.filter(function(c){ return !perto(c); }), {sombra:false});
+  var gt = geoTelhado();
+  instanciar(gt, mat(0xFFFFFF,{roughness:0.85}), telhados, {sombra:false});
+  instanciar(caixa1, MAT.branco, chamines, {sombra:false});
+  instanciar(caixa1, MAT.branco, anexos, {sombra:false});
+  instanciar(caixa1, MAT.branco, muros, {sombra:false});
+  instanciar(caixa1, MAT.agua, piscinas, {sombra:false});
+
+  var luzJanelas = instanciar(new THREE.PlaneGeometry(1,1), new THREE.MeshBasicMaterial({
+    color:0xFFFFFF, side:THREE.DoubleSide
+  }), janelas, {sombra:false, recebe:false});
+  if(luzJanelas){ luzJanelas.visible = false; LUZES_NOITE.push(luzJanelas); }
+}
+
+/* ------------------------------------------------ 8. árvores da zona */
+function construirVegetacao(){
+  var troncos=[], copas=[], ciprestes=[];
+  PARCELAS.forEach(function(par){
+    var dens = par.cultura.arvores;
+    if(dens <= 0) return;
+    var olival = par.cultura.id === 'olival';
+    var n = Math.round(dens * 34);
+    for(var i=0;i<n;i++){
+      var lx, lz;
+      if(olival){                                   // olival planta-se em grelha
+        lx = (i%6 - 2.5)*11 + entre(-1.2,1.2);
+        lz = (Math.floor(i/6) - 2.5)*11 + entre(-1.2,1.2);
+      } else {
+        lx = entre(-48,48); lz = entre(-48,48);
+      }
+      var x = par.c + lx*Math.cos(par.ang) - lz*Math.sin(par.ang);
+      var z = par.z + lx*Math.sin(par.ang) + lz*Math.cos(par.ang);
+      if(dentroPol(LOTE_FOLGA,x,z)) continue;
+      if(!dentroPol(par.quad,x,z)) continue;
+      var s = olival ? entre(0.62,0.85) : entre(0.9,1.5);
+      troncos.push({x:x, z:z, sx:s, sy:s, sz:s});
+      copas.push({x:x, y:0, z:z, sx:s*entre(0.9,1.15), sy:s*entre(0.8,1.1), sz:s*entre(0.9,1.15),
+                  ry:R()*3.14, cor: olival ? 0x7E8C63 : escolher([0x4C5E34,0x56683B,0x62764A])});
+    }
+  });
+  // renque de ciprestes a marcar dois caminhos
+  [ESTRADAS[4], ESTRADAS[6]].forEach(function(e){
+    aoLongo(e.pts, 13, 6).forEach(function(p){
+      var lado = e.larg/2 + 4;
+      var x = p.x + p.uz*lado, z = p.z - p.ux*lado;
+      if(dentroPol(LOTE_FOLGA,x,z) || aoBordo(LOTE,x,z) < 30) return;
+      ciprestes.push({x:x, z:z, sx:entre(0.8,1.1), sy:entre(0.85,1.25), sz:entre(0.8,1.1)});
+    });
+  });
+
+  var gTronco = new THREE.CylinderGeometry(0.22,0.34,2.6,5).translate(0,1.3,0);
+  var gCopa = new THREE.IcosahedronGeometry(2.3,0).translate(0,4.0,0);
+  instanciar(gTronco, MAT.tronco, troncos, {sombra:false});
+  instanciar(gCopa, mat(0xFFFFFF,{roughness:0.95, flatShading:true}), copas, {sombra:false});
+  instanciar(new THREE.ConeGeometry(1.5,9,6).translate(0,4.5,0), mat(0x40532F,{flatShading:true}),
+             ciprestes, {sombra:false});
+}
+
+/* ================================================== 9. O LOTE E O PROJETO
+   A partir daqui é o projeto: os volumes da Imagem 2, nas posições que
+   js/implantacao.js guarda. Nada aqui é inventado de novo — o que muda em
+   relação à maquete do Modelo 1 é o grau de pormenor. */
+var PONTOS = {};       // sítios de interesse, para as vistas predefinidas
+var OBSTACULOS = [];   // troncos e copas, para nenhuma vista abrir com uma árvore à frente
+var FOOTPRINTS = [];   // pegadas dos volumes, para colisão a pé
+var VIA_ACESSO = [];
+
+function pegada(x,z,w,d,rotDeg,altura){
+  FOOTPRINTS.push({x:x, z:z, w:w, d:d, r:rad(rotDeg), h:altura||0});
+}
+function dentroPegada(f, x, z, folga){
+  var dx = x-f.x, dz = z-f.z, c = Math.cos(-f.r), s = Math.sin(-f.r);
+  var lx = dx*c - dz*s, lz = dx*s + dz*c;
+  return Math.abs(lx) < f.w/2+folga && Math.abs(lz) < f.d/2+folga;
+}
+
+/* A via interna não é um anel cego a 8 m do limite: onde há edifício, ela
+   contorna-o por dentro, como um arruamento de acesso a sério. É também o
+   que se vê no render — a via passa por fora do construído, não por baixo. */
+function tracarVia(){
+  var base = afastar(LOTE, 8), pts = [];
+  for(var i=0;i<base.length;i++){                 // densificar
+    var a = base[i], b = base[(i+1)%base.length];
+    var L = Math.hypot(b[0]-a[0], b[1]-a[1]), n = Math.max(1, Math.round(L/6));
+    for(var k=0;k<n;k++) pts.push([a[0]+(b[0]-a[0])*k/n, a[1]+(b[1]-a[1])*k/n]);
+  }
+  var cen = centroide(LOTE);
+  pts = pts.map(function(p){
+    var x=p[0], z=p[1];
+    for(var t=0;t<60;t++){
+      var bate = FOOTPRINTS.some(function(f){ return dentroPegada(f,x,z,5.5); });
+      if(!bate) break;
+      var dx = cen[0]-x, dz = cen[1]-z, L = Math.hypot(dx,dz)||1;
+      x += dx/L*1.4; z += dz/L*1.4;
+    }
+    return [x,z];
+  });
+  for(var s=0;s<4;s++){                            // suavizar
+    pts = pts.map(function(p,i){
+      var a = pts[(i-1+pts.length)%pts.length], b = pts[(i+1)%pts.length];
+      return [(a[0]+p[0]*2+b[0])/4, (a[1]+p[1]*2+b[1])/4];
+    });
+  }
+  pts.push(pts[0].slice());
+  return pts;
+}
+
+function construirLote(){
+  // relvado geral do lote
+  var relva = chapa(LOTE, 0.0, mat(COR.relva, {roughness:0.98}));
+  scene.add(relva);
+  // contorno a ouro, ligável e desligável
+  var pts = LOTE.map(function(p){ return new THREE.Vector3(p[0], 0.55, p[1]); });
+  pts.push(pts[0].clone());
+  var linha = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),
+                new THREE.LineBasicMaterial({color:COR.ouro}));
+  linha.name = 'limite';
+  scene.add(linha);
+  // e um muro baixo a acompanhar o limite, que é o que lá estaria
+  var muros = [];
+  aoLongo(LOTE.concat([LOTE[0]]), 4.0, 0).forEach(function(p){
+    muros.push({x:p.x, y:0.35, z:p.z, ry:p.ang, sx:0.3, sy:0.7, sz:4.3, cor:0xE9E2D0});
+  });
+  instanciar(new THREE.BoxGeometry(1,1,1), MAT.branco, muros, {sombra:false});
+  return linha;
+}
+
+/* Edifício de 3 pisos: laje branca a marcar cada piso, vão envidraçado
+   recuado, varanda corrida do lado de dentro, platibanda e fotovoltaico
+   na cobertura — a leitura do render. */
+function bloco(spec, opc){
+  opc = opc || {};
+  var g = new THREE.Group();
+  var hP = IMP.H_PISO, w = spec.w, d = spec.d, n = spec.pisos;
+  var lado = opc.interior === undefined ? 1 : opc.interior;
+
+  var base = caixa(w+1.4, 0.5, d+1.4, MAT.paviment);
+  base.position.y = 0.25; g.add(base);
+
+  for(var i=0;i<n;i++){
+    var y = 0.5 + i*hP;
+    var v = caixa(w-0.5, hP-1.0, d-0.5, MAT.vidro);
+    v.position.y = y + (hP-1.0)/2; g.add(v);
+    var l = caixa(w, 1.0, d, MAT.laje);
+    l.position.y = y + hP - 0.5; g.add(l);
+    // montantes verticais, a dar ritmo à fachada
+    var passo = 4.2, m = Math.floor(w/passo);
+    for(var k=0;k<=m;k++){
+      [1,-1].forEach(function(f){
+        var p = caixa(0.34, hP-1.0, 0.34, MAT.parede);
+        p.position.set(-w/2 + k*(w/m), y+(hP-1.0)/2, f*(d/2-0.2));
+        g.add(p);
+      });
+    }
+    [1,-1].forEach(function(f){
+      var emp = caixa(0.5, hP-1.0, d-0.5, MAT.parede);
+      emp.position.set(f*(w/2-0.25), y+(hP-1.0)/2, 0); g.add(emp);
+    });
+    if(opc.varandas){
+      var vl = caixa(w-1.0, 0.24, 2.1, MAT.laje);
+      vl.position.set(0, y+0.12, lado*(d/2+1.05)); g.add(vl);
+      var guarda = caixa(w-1.0, 1.05, 0.08, mat(0xBFD6DF,{transparent:true, opacity:0.4, roughness:0.15}));
+      guarda.position.set(0, y+0.75, lado*(d/2+2.05)); g.add(guarda);
+    }
+  }
+  var topo = 0.5 + n*hP;
+  var e = 0.45, hp = 1.15;
+  [[0,(d-e)/2],[0,-(d-e)/2]].forEach(function(o){
+    var p = caixa(w,hp,e,MAT.parede); p.position.set(o[0],topo+hp/2,o[1]); g.add(p); });
+  [[(w-e)/2,0],[-(w-e)/2,0]].forEach(function(o){
+    var p = caixa(e,hp,d-e*2,MAT.parede); p.position.set(o[0],topo+hp/2,o[1]); g.add(p); });
+
+  // fotovoltaico
+  var pw=3.3, pd=2.0, mx=Math.floor((w-7)/(pw+0.7)), mz=Math.max(1,Math.floor((d-6)/(pd+0.7)));
+  var paineis = [];
+  for(var a=0;a<mx;a++) for(var b=0;b<mz;b++){
+    paineis.push({x:(a-(mx-1)/2)*(pw+0.7), y:topo+0.6, z:(b-(mz-1)/2)*(pd+0.7), rx:rad(-16)});
+  }
+  if(paineis.length){
+    var pm = new THREE.InstancedMesh(new THREE.BoxGeometry(pw,0.25,pd), MAT.painel, paineis.length);
+    var o3 = new THREE.Object3D();
+    paineis.forEach(function(p,i){
+      o3.position.set(p.x,p.y,p.z); o3.rotation.set(p.rx,0,0); o3.updateMatrix();
+      pm.setMatrixAt(i, o3.matrix);
+    });
+    pm.instanceMatrix.needsUpdate = true; pm.castShadow = true; pm.frustumCulled = false;
+    g.add(pm);
+  }
+  // casa das máquinas na cobertura
+  var tec = caixa(Math.min(9,w*0.2), 2.4, Math.min(5,d*0.45), MAT.paredeQ);
+  tec.position.set(w*0.24, topo+1.2, 0); g.add(tec);
+
+  if(opc.entrada){
+    var pala = caixa(13, 0.4, 7, MAT.laje);
+    pala.position.set(-w/2+9, 4.0, -lado*(d/2+3.0)); g.add(pala);
+    [-5,5].forEach(function(o){
+      var pil = caixa(0.4,3.8,0.4,MAT.parede);
+      pil.position.set(-w/2+9+o, 2.0, -lado*(d/2+5.6)); g.add(pil);
+    });
+  }
+  g.position.set(spec.x, 0, spec.z);
+  g.rotation.y = rad(spec.rot);
+  scene.add(g);
+  pegada(spec.x, spec.z, w+1.4, d+1.4, spec.rot, topo+hp);
+  return {grupo:g, topo:topo};
+}
+
+/* Moradia: dois pisos, terraço de cobertura com jacuzzi e pérgula, virada
+   ao interior do lote. */
+function moradia(x, z, rotDeg){
+  var g = new THREE.Group();
+  var w = IMP.CASA_W, d = IMP.CASA_D, h = IMP.CASA_H_PISO;
+  var base = caixa(w+1.6, 0.4, d+1.6, MAT.paviment); base.position.y=0.2; g.add(base);
+  for(var i=0;i<IMP.CASA_PISOS;i++){
+    var y = 0.4 + i*h;
+    var v = caixa(w-0.6, h-0.9, d-0.6, MAT.vidro); v.position.y = y+(h-0.9)/2; g.add(v);
+    var l = caixa(w, 0.9, d, MAT.parede);          l.position.y = y+h-0.45;    g.add(l);
+    // empenas cheias, para não ser uma caixa de vidro
+    [1,-1].forEach(function(f){
+      var p = caixa(0.45, h-0.9, d-0.6, MAT.parede);
+      p.position.set(f*(w/2-0.22), y+(h-0.9)/2, 0); g.add(p);
+    });
+  }
+  var topo = 0.4 + IMP.CASA_PISOS*h;
+  [[0,(d-0.4)/2],[0,-(d-0.4)/2]].forEach(function(o){
+    var p = caixa(w,1.0,0.4,MAT.parede); p.position.set(o[0],topo+0.5,o[1]); g.add(p); });
+  [[(w-0.4)/2,0],[-(w-0.4)/2,0]].forEach(function(o){
+    var p = caixa(0.4,1.0,d-0.8,MAT.parede); p.position.set(o[0],topo+0.5,o[1]); g.add(p); });
+
+  var jac = caixa(2.8,0.75,2.8, MAT.agua);
+  jac.position.set(0, topo+0.45, -d/2+2.6); g.add(jac);
+  var deckTopo = caixa(w-1.2, 0.12, 4.2, MAT.deck);
+  deckTopo.position.set(0, topo+0.12, -d/2+5.6); g.add(deckTopo);
+  // pérgula
+  var perg = caixa(w-1.6, 0.16, 3.0, MAT.parede);
+  perg.position.set(0, topo+2.5, d/2-2.4); g.add(perg);
+  [-1,1].forEach(function(f){
+    var pil = caixa(0.18,2.4,0.18,MAT.parede);
+    pil.position.set(f*(w/2-1.0), topo+1.3, d/2-2.4); g.add(pil);
+  });
+  // terraço térreo virado ao interior (−z local)
+  var ter = caixa(w+1.0, 0.16, 3.4, MAT.deck);
+  ter.position.set(0, 0.46, -d/2-1.7); g.add(ter);
+
+  g.position.set(x,0,z);
+  g.rotation.y = rad(rotDeg);
+  scene.add(g);
+  pegada(x, z, w+1.6, d+1.6, rotDeg, topo+1);
+  return g;
+}
+
+/* Junta várias geometrias numa só — uma palmeira inteira passa a ser um
+   objeto repetível, em vez de dez. */
+function juntar(lista){
+  var pos=[], nor=[], uvs=[];
+  lista.forEach(function(g){
+    var n = g.index ? g.toNonIndexed() : g;
+    n.computeVertexNormals();
+    var p = n.attributes.position.array, q = n.attributes.normal.array;
+    var u = n.attributes.uv ? n.attributes.uv.array : null;
+    for(var i=0;i<p.length;i++){ pos.push(p[i]); nor.push(q[i]); }
+    for(var k=0;k<(p.length/3)*2;k++) uvs.push(u ? u[k] : 0);
+  });
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos,3));
+  g.setAttribute('normal',   new THREE.Float32BufferAttribute(nor,3));
+  g.setAttribute('uv',       new THREE.Float32BufferAttribute(uvs,2));
+  return g;
+}
+function geoFronde(){
+  var n = 9, comp = 3.1, pos = [], idx = [];
+  for(var i=0;i<=n;i++){
+    var t = i/n;
+    var x = t*comp;
+    var y = -1.9*t*t*t - 0.12*t;                       // arqueia a pender
+    var w = Math.sin(Math.PI*Math.pow(t,0.6))*0.40;    // larga a meio, fecha na ponta
+    var nervura = w*0.55;                              // secção em V, como a folha real
+    pos.push(x, y, -w,  x, y+nervura, 0,  x, y, w);
+    if(i<n){
+      var k = i*3;
+      idx.push(k,k+3,k+1,  k+1,k+3,k+4,  k+1,k+4,k+2,  k+2,k+4,k+5);
+    }
+  }
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos,3));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  return g;
+}
+function geoCoroaPalmeira(){
+  var fronde = geoFronde(), partes = [];
+  for(var i=0;i<12;i++){
+    var f = fronde.clone();
+    f.rotateZ(rad(i%2 ? 16 : -6));       // umas erguidas, outras já a cair
+    f.rotateY(i/12*Math.PI*2 + (i%2?0.26:0));
+    partes.push(f);
+  }
+  partes.push(new THREE.CylinderGeometry(0.42,0.26,0.9,7).translate(0,-0.35,0));
+  return juntar(partes);
+}
+
+/* --------------------------------------------- 10. montar o projeto */
+function construirProjeto(){
+  var palmeiras=[], sebes=[], balizas=[], candeeiros=[], globos=[];
+  var espreg=[], sombras=[], carros=[], tectos=[];
+
+  var hotelA = bloco(IMP.HOTEL_A, {interior:-1, varandas:true, entrada:true});
+  var hotelB = bloco(IMP.HOTEL_B, {interior:-1, varandas:true});
+  var apart  = bloco(IMP.APART,   {interior: 1, varandas:true});
+  IMP.CASAS.forEach(function(c){ moradia(c[0], c[1], IMP.CASA_ROT_VOL); });
+
+  /* --- piscina, deck e bar, ao centro --- */
+  var D = IMP.DECK, P = IMP.PISCINA, B = IMP.BAR;
+  var deck = caixa(D.w, 0.4, D.d, MAT.deck);
+  deck.position.set(D.x, 0.2, D.z); scene.add(deck);
+  pegada(D.x, D.z, D.w, D.d, 0, 0);
+
+  // remate em quatro peças à volta do tanque — em caixa inteira tapava a água
+  [[P.w+2.4,1.2,0,P.d/2+0.6],[P.w+2.4,1.2,0,-P.d/2-0.6],
+   [1.2,P.d,P.w/2+0.6,0],[1.2,P.d,-P.w/2-0.6,0]].forEach(function(b){
+    var m = caixa(b[0], 0.5, b[1], MAT.pedra);
+    m.position.set(P.x+b[2], 0.45, P.z+b[3]); scene.add(m);
+  });
+  var tanque = caixa(P.w, 1.6, P.d, mat(0x2C6C86,{roughness:0.5}));
+  tanque.position.set(P.x, -0.4, P.z); scene.add(tanque);
+  var agua = caixa(P.w-0.5, 1.5, P.d-0.5, MAT.agua);
+  agua.position.set(P.x, -0.25, P.z); scene.add(agua);
+  MAT.agua.emissive = new THREE.Color(0x2FA8D6); MAT.agua.emissiveIntensity = 0;
+  EMISSIVOS.push({m:MAT.agua, i:0.75});
+  var luzPiscina = new THREE.PointLight(0x62C8EE, 0, 46, 2);
+  luzPiscina.position.set(P.x, 2.2, P.z);
+  scene.add(luzPiscina); LUZES_NOITE.push(luzPiscina);
+
+  // bar de apoio, cobertura escura como no render
+  var bar = new THREE.Group();
+  var corpo = caixa(B.w, 3.3, B.d, MAT.vidro); corpo.position.y = 1.65; bar.add(corpo);
+  var cob = caixa(B.w+2.6, 0.5, B.d+2.6, mat(0x3A3E38)); cob.position.y = 3.55; bar.add(cob);
+  var terraco = caixa(B.w+7, 0.18, B.d+3, MAT.deck); terraco.position.set(-B.w/2-2.5, 0.5, 0); bar.add(terraco);
+  bar.position.set(B.x, 0.4, B.z); scene.add(bar);
+  pegada(B.x, B.z, B.w+2.6, B.d+2.6, 0, 4);
+
+  // espreguiçadeiras e chapéus à volta do tanque
+  for(var i=0;i<11;i++){
+    [1,-1].forEach(function(f){
+      var x = P.x + (i-5)*2.6, z = P.z + f*(P.d/2+3.1);
+      espreg.push({x:x, y:0.52, z:z, ry:f>0?0:Math.PI, sx:0.72, sy:0.24, sz:2.0});
+      tectos.push({x:x, y:0.74, z:z - f*0.72, ry:f>0?0:Math.PI, rx:rad(-32), sx:0.72, sy:0.2, sz:0.9});
+      if(i%3===1){
+        sombras.push({x:x+1.3, y:0.5, z:z + f*1.5});
+      }
+    });
+  }
+
+  /* --- relvado de eventos --- */
+  var RL = IMP.RELVADO;
+  var contorno = caixa(RL.w+2.4, 0.26, RL.d+2.4, MAT.pedra);
+  contorno.position.set(RL.x, 0.13, RL.z); contorno.rotation.y = rad(RL.rot);
+  contorno.receiveShadow = true; scene.add(contorno);
+  var relvado = caixa(RL.w, 0.34, RL.d, mat(0x6FA83F,{roughness:0.95}));
+  relvado.position.set(RL.x, 0.15, RL.z); relvado.rotation.y = rad(RL.rot);
+  relvado.receiveShadow = true; scene.add(relvado);
+
+  /* --- via de acesso, estacionamento e portão --- */
+  VIA_ACESSO = tracarVia();
+  var viaMesh = new THREE.Mesh(fita(VIA_ACESSO, 5.6, 0.16), mat(0x4C5049,{roughness:0.95}));
+  viaMesh.receiveShadow = true; scene.add(viaMesh);
+  var bermaMesh = new THREE.Mesh(fita(VIA_ACESSO, 6.6, 0.13), mat(0xBCB39C,{roughness:1}));
+  bermaMesh.receiveShadow = true; scene.add(bermaMesh);
+
+  // ligação à estrada pública, do lado nascente
+  var maisPerto = null;
+  VIA_ACESSO.forEach(function(p){
+    var d = distALinha(ESTRADAS[0].pts, p[0], p[1]);
+    if(!maisPerto || d < maisPerto.d) maisPerto = {d:d, p:p};
+  });
+  var alvoEstrada = (function(){
+    var melhor = null;
+    aoLongo(ESTRADAS[0].pts, 4, 0).forEach(function(q){
+      var d = Math.hypot(q.x-maisPerto.p[0], q.z-maisPerto.p[1]);
+      if(!melhor || d < melhor.d) melhor = {d:d, x:q.x, z:q.z};
+    });
+    return melhor;
+  })();
+  var entrada = [[maisPerto.p[0], maisPerto.p[1]], [alvoEstrada.x, alvoEstrada.z]];
+  var acesso = new THREE.Mesh(fita(entrada, 6.0, 0.15), mat(0x4C5049,{roughness:0.95}));
+  acesso.receiveShadow = true; scene.add(acesso);
+  PONTOS.entrada = new THREE.Vector3(
+    (entrada[0][0]+entrada[1][0])/2, 0, (entrada[0][1]+entrada[1][1])/2);
+  // pilares do portão
+  [[-1],[1]].forEach(function(s, k){
+    var dx = entrada[1][0]-entrada[0][0], dz = entrada[1][1]-entrada[0][1];
+    var L = Math.hypot(dx,dz)||1, nx = dz/L*5.0, nz = -dx/L*5.0;
+    var pil = caixa(1.1, 2.6, 1.1, MAT.parede);
+    pil.position.set(PONTOS.entrada.x + (k?nx:-nx), 1.3, PONTOS.entrada.z + (k?nz:-nz));
+    scene.add(pil);
+  });
+
+  // estacionamento junto ao hotel, do lado de fora do L
+  var hr = rad(IMP.HOTEL_A.rot);
+  var ex = IMP.HOTEL_A.x + Math.sin(hr)*(IMP.HOTEL_A.d/2+7.5);
+  var ez = IMP.HOTEL_A.z + Math.cos(hr)*(IMP.HOTEL_A.d/2+7.5);
+  var parque = caixa(IMP.HOTEL_A.w-6, 0.14, 11, MAT.pedra);
+  parque.position.set(ex, 0.2, ez); parque.rotation.y = hr; scene.add(parque);
+  for(var c=0;c<12;c++){
+    var u = (c-5.5)*3.6;
+    carros.push({
+      x: ex + Math.cos(hr)*u, z: ez - Math.sin(hr)*u, y:0.27, ry: hr,
+      cor: escolher([0x2B2F33,0xB6BAC0,0x8A9099,0x5B2A2A,0x243A52,0xD8D4CC])
+    });
+  }
+
+  /* --- pomar, palmeiras e sebes --- */
+  var livre = function(x,z,folga){
+    if(!dentroPol(LOTE,x,z)) return false;
+    if(aoBordo(LOTE,x,z) < 5) return false;
+    if(distALinha(VIA_ACESSO,x,z) < 6.5) return false;
+    if(distALinha(entrada,x,z) < 7) return false;
+    for(var i=0;i<FOOTPRINTS.length;i++) if(dentroPegada(FOOTPRINTS[i],x,z,folga||4)) return false;
+    return true;
+  };
+
+  /* Pomar em grelha na metade sul do lote, que é a que fica livre depois do
+     construído — é onde o render o mostra. O centro, junto à piscina, fica
+     aberto. */
+  var troncos=[], copas=[];
+  var gr = rad(-20), cg = Math.cos(gr), sg = Math.sin(gr), passo = 8.5, postas = 0;
+  for(var a=-16; a<=16 && postas<120; a++){
+    for(var b=-18; b<=18 && postas<120; b++){
+      var x = a*passo*cg - b*passo*sg + 6, z = a*passo*sg + b*passo*cg + 6;
+      if(z < -16) continue;                       // a norte é a piscina e as moradias
+      if(aoBordo(LOTE,x,z) < 10) continue;
+      if(!livre(x,z,7)) continue;
+      var s = 0.82 + ((a*7+b*13)%5)*0.09;
+      troncos.push({x:x, z:z, sx:s, sy:s, sz:s});
+      copas.push({x:x, z:z, sx:s, sy:s, sz:s, ry:R()*3.14, cor:escolher([0x4C5E34,0x56683B,0x5E7040])});
+      postas++;
+    }
+  }
+  troncos.forEach(function(t){ OBSTACULOS.push({x:t.x, z:t.z, r:4.2}); });
+  instanciar(new THREE.CylinderGeometry(0.24,0.36,2.6,6).translate(0,1.3,0), MAT.tronco, troncos, {sombra:true});
+  instanciar(new THREE.IcosahedronGeometry(2.2,1).translate(0,4.1,0),
+             mat(0xFFFFFF,{roughness:0.95, flatShading:true}), copas, {sombra:true});
+
+  // palmeiras: a acompanhar a via, a orlar o deck e entre as moradias
+  var porPalmeira = function(x,z){
+    if(!dentroPol(LOTE,x,z)) return;
+    palmeiras.push({x:x, z:z, alt: entre(5.4,8.2), ry:R()*3.14});
+  };
+  aoLongo(VIA_ACESSO, 15, 6).forEach(function(p){
+    [1,-1].forEach(function(f){
+      var x = p.x + p.uz*f*6.2, z = p.z - p.ux*f*6.2;
+      if(distALinha(VIA_ACESSO,x,z) < 4.5) return;
+      for(var i=0;i<FOOTPRINTS.length;i++) if(dentroPegada(FOOTPRINTS[i],x,z,2.5)) return;
+      if(aoBordo(LOTE,x,z) < 4) return;
+      porPalmeira(x,z);
+    });
+  });
+  for(var t=0;t<16;t++){
+    var ang = (t+0.5)/16*6.2832;   // meio passo, para deixar os eixos livres
+    porPalmeira(D.x + Math.cos(ang)*(D.w/2+3.6), D.z + Math.sin(ang)*(D.d/2+3.6));
+  }
+  for(var m=0;m<IMP.CASAS.length-1;m++){
+    var c1 = IMP.CASAS[m], c2 = IMP.CASAS[m+1];
+    porPalmeira((c1[0]+c2[0])/2 - Math.cos(rad(IMP.CASA_ROT))*2.0,
+                (c1[1]+c2[1])/2 + Math.sin(rad(IMP.CASA_ROT))*2.0);
+  }
+  palmeiras.forEach(function(p){ OBSTACULOS.push({x:p.x, z:p.z, r:5.0}); });
+  instanciar(new THREE.CylinderGeometry(0.22,0.40,1,7).translate(0,0.5,0),
+             mat(0x7A6A4E,{roughness:0.95}),
+             palmeiras.map(function(p){ return {x:p.x, z:p.z, sx:1, sy:p.alt, sz:1}; }), {sombra:true});
+  instanciar(geoCoroaPalmeira(), mat(0x53763A,{roughness:0.85, side:THREE.DoubleSide}),
+             palmeiras.map(function(p){ return {x:p.x, y:p.alt, z:p.z, ry:p.ry, sx:0.92, sy:0.92, sz:0.92}; }),
+             {sombra:true});
+
+  // sebes a rematar os edifícios e o deck
+  var porSebe = function(x,z,ang,comp){ sebes.push({x:x, y:0.55, z:z, ry:ang, sx:0.9, sy:1.1, sz:comp}); };
+  [IMP.HOTEL_A, IMP.APART].forEach(function(v){
+    var r = rad(v.rot);
+    [1,-1].forEach(function(f){
+      for(var k=-3;k<=3;k++){
+        var u = k*(v.w/7);
+        var lx = v.x + Math.cos(r)*u + Math.sin(r)*f*(v.d/2+3.4);
+        var lz = v.z - Math.sin(r)*u + Math.cos(r)*f*(v.d/2+3.4);
+        if(!dentroPol(LOTE,lx,lz) || distALinha(VIA_ACESSO,lx,lz) < 4.4) continue;
+        porSebe(lx, lz, r, v.w/7*0.9);
+      }
+    });
+  });
+  instanciar(new THREE.BoxGeometry(1,1,1), mat(0x4F6238,{roughness:1}), sebes, {sombra:true});
+
+  // candeeiros da via interna e balizadores do deck
+  aoLongo(VIA_ACESSO, 26, 10).forEach(function(p){
+    var x = p.x + p.uz*4.6, z = p.z - p.ux*4.6;
+    candeeiros.push({x:x, z:z, sy:5.2});
+    globos.push({x:x, y:5.2, z:z});
+  });
+  for(var s=0;s<22;s++){
+    var an = s/22*6.2832;
+    var bx = D.x + Math.cos(an)*(D.w/2+1.2), bz = D.z + Math.sin(an)*(D.d/2+1.2);
+    balizas.push({x:bx, y:0.4, z:bz});
+  }
+  instanciar(new THREE.CylinderGeometry(0.09,0.12,1,6).translate(0,0.5,0), MAT.metal, candeeiros, {sombra:true});
+  instanciar(new THREE.CylinderGeometry(0.1,0.1,0.55,6), mat(0xCFC7B4), balizas, {sombra:false});
+  var gl = instanciar(new THREE.SphereGeometry(0.34,8,6), new THREE.MeshBasicMaterial({color:0xFFE0AB}), globos, {sombra:false, recebe:false});
+  if(gl){ gl.visible = false; LUZES_NOITE.push(gl); }
+  var bl = instanciar(new THREE.SphereGeometry(0.16,6,5), new THREE.MeshBasicMaterial({color:0xFFD79A}),
+                      balizas.map(function(b){ return {x:b.x, y:0.68, z:b.z}; }), {sombra:false, recebe:false});
+  if(bl){ bl.visible = false; LUZES_NOITE.push(bl); }
+
+  // mobiliário e carros
+  instanciar(new THREE.BoxGeometry(1,1,1), mat(0xEFE7D6), espreg, {sombra:true});
+  instanciar(new THREE.BoxGeometry(1,1,1), mat(0xEFE7D6), tectos, {sombra:false});
+  instanciar(new THREE.CylinderGeometry(0.05,0.05,2.4,5).translate(0,1.2,0), MAT.metal, sombras, {sombra:false});
+  instanciar(new THREE.ConeGeometry(1.8,0.7,10).translate(0,2.6,0), mat(0xF6F1E4), sombras, {sombra:true});
+  instanciar(new THREE.BoxGeometry(4.3,0.85,1.85), MAT.branco, carros, {sombra:true});
+  instanciar(new THREE.BoxGeometry(2.3,0.72,1.68), mat(0x20262B,{roughness:0.35, metalness:0.2}),
+             carros.map(function(c){ return {x:c.x, y:1.12, z:c.z, ry:c.ry}; }), {sombra:false});
+
+  // meia dúzia de focos quentes, para a noite ter luz e não só brilho
+  [[IMP.HOTEL_A.x, IMP.HOTEL_A.z, 70],
+   [IMP.HOTEL_B.x, IMP.HOTEL_B.z, 55],
+   [IMP.APART.x,   IMP.APART.z,   60],
+   [B.x, B.z, 40],
+   [IMP.CASAS[2][0], IMP.CASAS[2][1], 45],
+   [IMP.CASAS[7][0], IMP.CASAS[7][1], 45]].forEach(function(l){
+    var luz = new THREE.PointLight(0xFFCE92, 0, l[2], 2);
+    luz.position.set(l[0], 7, l[1]);
+    scene.add(luz); LUZES_NOITE.push(luz);
+  });
+
+  // pontos de interesse para as vistas
+  PONTOS.hotel   = new THREE.Vector3(IMP.HOTEL_A.x, 8, IMP.HOTEL_A.z);
+  PONTOS.piscina = new THREE.Vector3(P.x, 2, P.z);
+  PONTOS.apart   = new THREE.Vector3(IMP.APART.x, 8, IMP.APART.z);
+  PONTOS.moradias= new THREE.Vector3(IMP.CASAS[4][0], 5, IMP.CASAS[4][1]);
+  PONTOS.centro  = new THREE.Vector3(centroide(LOTE)[0], 4, centroide(LOTE)[1]);
+}
+
+/* ============================================ 11. CÂMARA E NAVEGAÇÃO
+   Dois modos com o mesmo rato: em órbita a câmara roda à volta de um ponto;
+   a pé anda-se ao nível do solo, com as paredes a travar. */
+var orb = { alvo:new THREE.Vector3(0,6,0), yaw:rad(-118), pitch:rad(40), dist:330 };
+var pe  = { pos:new THREE.Vector3(0,1.7,0), yaw:rad(-118), pitch:rad(-2) };
+var modo = 'orbita';
+var tween = null, parado = 0, arrastar = false, ultX=0, ultY=0, toques=null;
+var teclas = {};
+var joystick = {x:0, y:0, ativo:false};
+var menosMovimento = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+var VISTAS = [
+  {t:'Aérea',      desc:'O terreno visto de cima, com o norte para cima',
+   alvo:[6,6,6],      yaw:0,    pitch:66, dist:430},
+  {t:'Vista larga', desc:'O lote no meio do que está à volta',
+   alvo:[10,6,10],    yaw:-42,  pitch:30, dist:560},
+  {t:'Entrada',    desc:'Do portão, a olhar para dentro do lote',
+   ponto:'entrada',   yaw:118,  pitch:3,  dist:58, altura:3.0},
+  {t:'Hotel',      desc:'O hotel em L e a esplanada, a poente',
+   ponto:'hotel',     yaw:32,   pitch:9,  dist:96, altura:6},
+  {t:'Piscina',    desc:'Do deck, sobre a piscina de 200 m²',
+   ponto:'piscina',   de:[-9, 2.6, -38.5], altura:1.3},
+  {t:'Moradias',   desc:'As dez moradias, viradas ao interior',
+   ponto:'moradias',  de:[22, 6, -20],     altura:5},
+  {t:'Envolvente', desc:'Os campos, as ruas e o casario à volta',
+   alvo:[0,6,0],      yaw:-96,  pitch:22, dist:900}
+];
+
+/* Empurra um ponto para fora de qualquer tronco ou copa. As vistas ao nível
+   do solo são escolhidas à mão, mas as árvores são geradas: sem isto, uma
+   vista abria com uma palmeira a tapar meio ecrã. */
+function desimpedir(de){
+  for(var passo=0; passo<24; passo++){
+    var bateu = false;
+    for(var i=0;i<OBSTACULOS.length;i++){
+      var o = OBSTACULOS[i];
+      var dx = de[0]-o.x, dz = de[2]-o.z, d = Math.hypot(dx,dz);
+      if(d < o.r){
+        var f = (o.r - d + 0.4)/(d || 1);
+        de[0] += dx*f; de[2] += dz*f; bateu = true;
+      }
+    }
+    if(!bateu) break;
+  }
+  return de;
+}
+
+function aplicarCamara(){
+  if(modo === 'pe'){
+    camera.position.copy(pe.pos);
+    var cp = Math.cos(pe.pitch);
+    camera.lookAt(pe.pos.x + cp*Math.sin(pe.yaw+Math.PI),
+                  pe.pos.y + Math.sin(pe.pitch),
+                  pe.pos.z + cp*Math.cos(pe.yaw+Math.PI));
+  } else {
+    var c = Math.cos(orb.pitch);
+    camera.position.set(orb.alvo.x + orb.dist*c*Math.sin(orb.yaw),
+                        orb.alvo.y + orb.dist*Math.sin(orb.pitch),
+                        orb.alvo.z + orb.dist*c*Math.cos(orb.yaw));
+    if(camera.position.y < 1.7) camera.position.y = 1.7;
+    camera.lookAt(orb.alvo);
+  }
+  var ag = document.getElementById('agulha');
+  if(ag) ag.style.transform = 'rotate(' + ((modo==='pe'?pe.yaw:orb.yaw)*180/Math.PI).toFixed(1) + 'deg)';
+}
+
+function irPara(v, instantaneo){
+  var alvo = v.ponto && PONTOS[v.ponto]
+    ? PONTOS[v.ponto].clone() : new THREE.Vector3(v.alvo[0], v.alvo[1], v.alvo[2]);
+  if(v.altura !== undefined) alvo.y = v.altura;
+  var destino;
+  if(v.de) desimpedir(v.de);
+  if(v.de){
+    // a vista é dada pelo sítio onde a câmara está; o resto deduz-se
+    var d = new THREE.Vector3(v.de[0], v.de[1], v.de[2]).sub(alvo);
+    var comp = d.length() || 1;
+    destino = {alvo:alvo, yaw:Math.atan2(d.x, d.z),
+               pitch:Math.asin(clamp(d.y/comp,-1,1)), dist:comp};
+  } else {
+    destino = {alvo:alvo, yaw:rad(v.yaw), pitch:rad(v.pitch), dist:v.dist};
+  }
+  if(modo === 'pe') trocarModo('orbita', true);
+  // o caminho mais curto na rotação, para não dar a volta ao mundo
+  var dy = destino.yaw - orb.yaw;
+  while(dy >  Math.PI) destino.yaw -= Math.PI*2, dy = destino.yaw - orb.yaw;
+  while(dy < -Math.PI) destino.yaw += Math.PI*2, dy = destino.yaw - orb.yaw;
+  if(instantaneo || menosMovimento){
+    orb.alvo.copy(destino.alvo); orb.yaw = destino.yaw;
+    orb.pitch = destino.pitch; orb.dist = destino.dist; tween = null;
+  } else {
+    tween = {de:{alvo:orb.alvo.clone(), yaw:orb.yaw, pitch:orb.pitch, dist:orb.dist},
+             para:destino, t:0, dur:1.25};
+  }
+  parado = 0;
+  mostrarEtiqueta(v.desc);
+}
+
+var tEtiqueta = null;
+function mostrarEtiqueta(txt){
+  var el = document.getElementById('etiqueta');
+  el.textContent = txt;
+  el.style.left = '50%'; el.style.top = '96px';
+  el.classList.add('ver');
+  clearTimeout(tEtiqueta);
+  tEtiqueta = setTimeout(function(){ el.classList.remove('ver'); }, 2600);
+}
+
+/* Altura do chão onde se está: o lote é uma plataforma, o deck outra. */
+function superficie(x,z){
+  var D = IMP.DECK;
+  if(Math.abs(x-D.x) < D.w/2 && Math.abs(z-D.z) < D.d/2) return 0.4;
+  if(dentroPol(LOTE,x,z)) return 0.0;
+  return -0.15;
+}
+function podeEstar(x,z){
+  for(var i=0;i<FOOTPRINTS.length;i++){
+    var f = FOOTPRINTS[i];
+    if(f.h <= 0.5) continue;                 // decks e relvados atravessam-se
+    if(dentroPegada(f,x,z,0.9)) return false;
+  }
+  return true;
+}
+function andar(dt){
+  var frente = (teclas.w?1:0) - (teclas.s?1:0) + (joystick.ativo ? -joystick.y : 0);
+  var lado   = (teclas.d?1:0) - (teclas.a?1:0) + (joystick.ativo ?  joystick.x : 0);
+  if(!frente && !lado) return;
+  var vel = (teclas.shift ? 11 : 4.6) * dt;
+  var s = Math.sin(pe.yaw+Math.PI), c = Math.cos(pe.yaw+Math.PI);
+  var dx = (s*frente + c*lado) * vel;
+  var dz = (c*frente - s*lado) * vel;
+  var nx = pe.pos.x + dx, nz = pe.pos.z + dz;
+  if(Math.hypot(nx,nz) > 620) return;
+  if(podeEstar(nx, pe.pos.z)) pe.pos.x = nx;
+  if(podeEstar(pe.pos.x, nz)) pe.pos.z = nz;
+  pe.pos.y += (superficie(pe.pos.x,pe.pos.z) + 1.7 - pe.pos.y) * Math.min(1, dt*9);
+}
+
+function trocarModo(novo, silencioso){
+  if(novo === modo) return;
+  if(novo === 'pe'){
+    // entra-se a pé no sítio para onde se está a olhar
+    var dir = new THREE.Vector3();
+    camera.getWorldDirection(dir);
+    var p = orb.alvo.clone();
+    p.x -= dir.x * Math.min(orb.dist*0.55, 26);
+    p.z -= dir.z * Math.min(orb.dist*0.55, 26);
+    for(var t=0;t<40 && !podeEstar(p.x,p.z);t++){ p.x -= dir.x*1.5; p.z -= dir.z*1.5; }
+    pe.pos.set(p.x, superficie(p.x,p.z)+1.7, p.z);
+    pe.yaw = orb.yaw; pe.pitch = Math.max(rad(-20), Math.min(rad(12), orb.pitch*0.3));
+    if(!silencioso) mostrarEtiqueta('W A S D para andar · shift para correr');
+  } else {
+    orb.alvo.set(pe.pos.x, 5, pe.pos.z);
+    orb.yaw = pe.yaw; orb.pitch = rad(24); orb.dist = 90;
+  }
+  modo = novo; tween = null;
+  document.body.classList.toggle('modo-pe', modo==='pe');
+  document.getElementById('btnPe').classList.toggle('on', modo==='pe');
+  document.getElementById('btnOrbita').classList.toggle('on', modo==='orbita');
+  document.getElementById('dica').textContent = modo==='pe'
+    ? 'W A S D para andar · arrasta para olhar · shift para correr'
+    : 'Arrasta para rodar · roda do rato para aproximar';
+}
+
+/* ------------------------------------------------- 12. dia e noite */
+function aplicarLuz(){
+  var n = nocturno;
+  var corFundo = new THREE.Color(n ? 0x0B1119 : 0xC9D3DA);
+  scene.background = corFundo;
+  scene.fog.color = corFundo;
+  scene.fog.near = n ? 360 : 520;
+  scene.fog.far  = n ? 1200 : 1550;
+  sol.intensity = n ? 0.22 : 2.3;
+  sol.color.set(n ? 0x8FA8C8 : 0xFFF0D0);
+  sol.position.set(n ? 190 : -210, n ? 250 : 300, n ? -180 : 150);
+  hemi.intensity = n ? 0.38 : 1.05;
+  hemi.color.set(n ? 0x2E4363 : 0xD9E8F7);
+  hemi.groundColor.set(n ? 0x181C1E : 0x7A7452);
+  ceu.intensity = n ? 0.05 : 0.32;
+  renderer.toneMappingExposure = n ? 1.25 : 1.02;
+  estrelas.visible = n;
+  EMISSIVOS.forEach(function(e){ e.m.emissiveIntensity = n ? e.i : 0; });
+  LUZES_NOITE.forEach(function(o){
+    if(o.isLight) o.intensity = n ? 420 : 0;
+    else o.visible = n;
+  });
+  document.getElementById('btnLuz').textContent = n ? 'Dia' : 'Noite';
+  document.getElementById('btnLuz').classList.toggle('on', n);
+}
+
+/* ---------------------------------------------- 13. laço de desenho */
+var relogio = null, raf = null;
+function redimensionar(){
+  var w = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(w,h,false);
+  camera.aspect = w/h; camera.updateProjectionMatrix();
+}
+function laco(){
+  raf = requestAnimationFrame(laco);
+  var agora = performance.now();
+  var dt = Math.min(0.05, (agora - relogio)/1000); relogio = agora;
+
+  if(tween){
+    tween.t += dt/tween.dur;
+    var p = Math.min(1, tween.t);
+    var e = p<0.5 ? 4*p*p*p : 1-Math.pow(-2*p+2,3)/2;   // entra e sai suave
+    orb.alvo.lerpVectors(tween.de.alvo, tween.para.alvo, e);
+    orb.yaw   = tween.de.yaw   + (tween.para.yaw   - tween.de.yaw)*e;
+    orb.pitch = tween.de.pitch + (tween.para.pitch - tween.de.pitch)*e;
+    orb.dist  = tween.de.dist  + (tween.para.dist  - tween.de.dist)*e;
+    if(p >= 1) tween = null;
+  } else if(modo === 'orbita' && !arrastar && !menosMovimento){
+    parado += dt;
+    if(parado > 6) orb.yaw += dt*0.02;      // rotação lenta, quando se larga
+  }
+  if(modo === 'pe') andar(dt);
+  aplicarCamara();
+  renderer.render(scene, camera);
+}
+
+/* ------------------------------------------------- 14. entradas */
+function ligarControlos(){
+  var tatil = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  if(tatil) document.body.classList.add('tatil');
+
+  canvas.addEventListener('pointerdown', function(e){
+    if(e.pointerType === 'touch' && toques) return;
+    arrastar = true; parado = 0; tween = null;
+    ultX = e.clientX; ultY = e.clientY;
+    canvas.classList.add('arrastar');
+    try{ canvas.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  canvas.addEventListener('pointermove', function(e){
+    if(!arrastar) return;
+    var dx = e.clientX-ultX, dy = e.clientY-ultY;
+    ultX = e.clientX; ultY = e.clientY; parado = 0;
+    if(modo === 'pe'){
+      pe.yaw   += dx*0.0042;
+      pe.pitch -= dy*0.0034;
+      pe.pitch = clamp(pe.pitch, rad(-42), rad(42));
+    } else {
+      orb.yaw   -= dx*0.0055;
+      orb.pitch += dy*0.0045;
+      orb.pitch = clamp(orb.pitch, rad(-4), rad(86));
+    }
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){
+    canvas.addEventListener(ev, function(e){
+      arrastar = false; canvas.classList.remove('arrastar');
+      try{ canvas.releasePointerCapture(e.pointerId); }catch(_){}
+    });
+  });
+  canvas.addEventListener('wheel', function(e){
+    e.preventDefault();
+    if(modo === 'pe') return;
+    tween = null; parado = 0;
+    orb.dist = clamp(orb.dist + e.deltaY*0.5, 26, 1500);
+  }, {passive:false});
+
+  // dois dedos: aproximar e afastar
+  canvas.addEventListener('touchstart', function(e){
+    if(e.touches.length === 2){
+      arrastar = false;
+      toques = Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
+                          e.touches[0].clientY-e.touches[1].clientY);
+    }
+  }, {passive:true});
+  canvas.addEventListener('touchmove', function(e){
+    if(e.touches.length === 2 && toques){
+      e.preventDefault();
+      var d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
+                         e.touches[0].clientY-e.touches[1].clientY);
+      if(modo === 'orbita') orb.dist = clamp(orb.dist * (toques/d), 26, 1500);
+      toques = d; parado = 0; tween = null;
+    }
+  }, {passive:false});
+  canvas.addEventListener('touchend', function(e){ if(e.touches.length < 2) toques = null; }, {passive:true});
+
+  // manche tátil, para andar a pé no telemóvel
+  var manche = document.getElementById('manche'), polegar = document.getElementById('polegar');
+  var centro = null;
+  manche.addEventListener('pointerdown', function(e){
+    var r = manche.getBoundingClientRect();
+    centro = {x:r.left+r.width/2, y:r.top+r.height/2, r:r.width/2};
+    joystick.ativo = true;
+    manche.setPointerCapture(e.pointerId);
+  });
+  manche.addEventListener('pointermove', function(e){
+    if(!joystick.ativo || !centro) return;
+    var dx = clamp((e.clientX-centro.x)/centro.r, -1, 1);
+    var dy = clamp((e.clientY-centro.y)/centro.r, -1, 1);
+    joystick.x = dx; joystick.y = dy;
+    polegar.style.transform = 'translate('+(dx*30).toFixed(0)+'px,'+(dy*30).toFixed(0)+'px)';
+  });
+  ['pointerup','pointercancel'].forEach(function(ev){
+    manche.addEventListener(ev, function(){
+      joystick.ativo=false; joystick.x=joystick.y=0; polegar.style.transform='none';
+    });
+  });
+
+  document.addEventListener('keydown', function(e){
+    var k = e.key.toLowerCase();
+    if(k==='w'||k==='a'||k==='s'||k==='d') teclas[k] = true;
+    if(k==='arrowup') teclas.w = true;
+    if(k==='arrowdown') teclas.s = true;
+    if(k==='arrowleft') teclas.a = true;
+    if(k==='arrowright') teclas.d = true;
+    teclas.shift = e.shiftKey;
+    if(k>='1' && k<='7'){ var v = VISTAS[+k-1]; if(v){ irPara(v); marcarVista(+k-1); } }
+    if(k==='n'){ nocturno = !nocturno; aplicarLuz(); }
+    if(k==='escape') fecharPainel();
+  });
+  document.addEventListener('keyup', function(e){
+    var k = e.key.toLowerCase();
+    if(k==='w'||k==='a'||k==='s'||k==='d') teclas[k] = false;
+    if(k==='arrowup') teclas.w = false;
+    if(k==='arrowdown') teclas.s = false;
+    if(k==='arrowleft') teclas.a = false;
+    if(k==='arrowright') teclas.d = false;
+    teclas.shift = e.shiftKey;
+  });
+  window.addEventListener('blur', function(){ teclas = {}; });
+  window.addEventListener('resize', redimensionar);
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){ if(raf){ cancelAnimationFrame(raf); raf = null; } }
+    else if(!raf){ relogio = performance.now(); raf = requestAnimationFrame(laco); }
+  });
+}
+
+/* --------------------------------------------------- 15. interface */
+var LEGENDA = [
+  ['#F2EDE0','Hotel em L, a poente','Três pisos e cobertura fotovoltaica, com esplanada e estacionamento do lado da estrada.'],
+  ['#E4DBC6','Apartamentos, a norte','Também três pisos e fotovoltaico, com varanda corrida virada ao interior.'],
+  ['#FFFFFF','Dez moradias, a nascente','Dois pisos, terraço de cobertura com jacuzzi, viradas à piscina.'],
+  ['#3E9BC4','Piscina de 200 m² e bar','Deck, espreguiçadeiras e bar de apoio, ao centro do lote.'],
+  ['#86A455','Relvado de eventos','A sul, entre o hotel e o pomar.'],
+  ['#4C5E34','Pomar e palmeiras','Plantados na faixa junto ao limite, deixando o centro aberto.'],
+  ['#3B3F3C','Via de acesso','Contorna o construído e liga à estrada pública a nascente.'],
+  ['#B08D3E','Limite do lote','O polígono real, 17.500 m². Liga e desliga na barra de baixo.']
+];
+function montarInterface(linhaLimite){
+  var vistas = document.getElementById('vistas');
+  VISTAS.forEach(function(v,i){
+    var b = document.createElement('button');
+    b.className = 'btn' + (i===0 ? ' on' : '');
+    b.type = 'button'; b.textContent = (i+1) + ' · ' + v.t;
+    b.addEventListener('click', function(){ irPara(v); marcarVista(i); });
+    vistas.appendChild(b);
+  });
+  var leg = document.getElementById('legenda');
+  LEGENDA.forEach(function(l){
+    var d = document.createElement('div');
+    d.className = 'legenda-item';
+    d.innerHTML = '<span class="swatch" style="background:'+l[0]+'"></span>' +
+                  '<span><strong>'+l[1]+'</strong><span>'+l[2]+'</span></span>';
+    leg.appendChild(d);
+  });
+
+  document.getElementById('btnOrbita').addEventListener('click', function(){ trocarModo('orbita'); });
+  document.getElementById('btnPe').addEventListener('click', function(){ trocarModo('pe'); });
+  document.getElementById('btnLuz').addEventListener('click', function(){ nocturno = !nocturno; aplicarLuz(); });
+  var limiteVisivel = true;
+  document.getElementById('btnLimite').addEventListener('click', function(){
+    limiteVisivel = !limiteVisivel;
+    linhaLimite.visible = limiteVisivel;
+    this.textContent = limiteVisivel ? 'Limite do lote' : 'Mostrar limite';
+  });
+  var painel = document.getElementById('painel');
+  document.getElementById('btnInfo').addEventListener('click', function(){
+    painel.classList.toggle('open');
+    painel.setAttribute('aria-hidden', painel.classList.contains('open') ? 'false' : 'true');
+  });
+  document.getElementById('btnFechar').addEventListener('click', fecharPainel);
+}
+function fecharPainel(){
+  var p = document.getElementById('painel');
+  p.classList.remove('open'); p.setAttribute('aria-hidden','true');
+}
+function marcarVista(i){
+  var bs = document.getElementById('vistas').children;
+  for(var k=0;k<bs.length;k++) bs[k].classList.toggle('on', k===i);
+}
+
+/* ------------------------------------------------ 16. arranque */
+var linhaLimite = null;
+var ETAPAS = [
+  ['A abrir o terreno',      function(){ arrancarRenderer(); construirMateriais(); construirCeu(); }],
+  ['A desenhar os campos',   function(){ construirChao(); }],
+  ['A abrir as estradas',    function(){ construirEstradas(); }],
+  ['A levantar o casario',   function(){ construirVizinhanca(gerarVizinhanca()); }],
+  ['A plantar a zona',       function(){ construirVegetacao(); }],
+  ['A implantar o lote',     function(){ linhaLimite = construirLote(); }],
+  ['A construir o hotel',    function(){ construirProjeto(); }],
+  ['A acender a luz',        function(){
+      aplicarLuz(); redimensionar(); ligarControlos(); montarInterface(linhaLimite);
+      irPara(VISTAS[0], true);
+      if(!menosMovimento){
+        tween = {de:{alvo:orb.alvo.clone(), yaw:orb.yaw-rad(26), pitch:rad(78), dist:1000},
+                 para:{alvo:orb.alvo.clone(), yaw:orb.yaw, pitch:rad(66), dist:430},
+                 t:0, dur:2.6};
+      }
+      relogio = performance.now();
+      raf = requestAnimationFrame(laco);
+  }]
+];
+(function correr(i){
+  if(i >= ETAPAS.length){
+    elCarregar.classList.add('fora');
+    setTimeout(function(){ elCarregar.style.display = 'none'; }, 700);
+    return;
+  }
+  elPasso.textContent = ETAPAS[i][0];
+  elBarra.style.width = Math.round(i/ETAPAS.length*100) + '%';
+  setTimeout(function(){
+    try{
+      ETAPAS[i][1]();
+    }catch(err){
+      console.error(err);
+      falhar('A cena não conseguiu montar: ' + (err && err.message ? err.message : err) + '.');
+      return;
+    }
+    correr(i+1);
+  }, 30);
+})(0);
+
+})();
+</script>
+</body>
+</html>

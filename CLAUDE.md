@@ -6,11 +6,14 @@ projeto e o processo urbanístico à medida que avança.
 
 ## Estado atual
 
-- Branch de trabalho: `claude/site-assistance-pk5n2b` → PR #6 em
-  `davicriaofc-cmd/Site-Terreno` (ver com `git log` se precisares do estado
-  mais recente). O `claude/mano-slfa79` / PR #2 é histórico antigo.
-- Todo o site vive num único `index.html`. Sem framework, sem npm — editar
-  diretamente o ficheiro.
+- Branch de trabalho: `claude/zen-curie-lr4ixr`, saído de `main` já com o
+  trabalho do PR #6 integrado (confirmar sempre com `git log`). Os
+  `claude/site-assistance-pk5n2b` / PR #6 e `claude/mano-slfa79` / PR #2 são
+  histórico.
+- Ficheiros: `index.html` (o site, autocontido), `precos.html` (as contas),
+  `maquete.html` (a cena 3D navegável), `js/implantacao.js` (a implantação,
+  partilhada) e `vendor/three.min.js`. Sem framework, sem npm — editar
+  diretamente os ficheiros.
 
 ## Dados reais do projeto (não inventar/alterar sem confirmação do utilizador)
 
@@ -59,6 +62,64 @@ projeto e o processo urbanístico à medida que avança.
 Regra importante ao editar conteúdo: distinguir sempre o que está **confirmado**
 (índice 40%, 3 pisos, etc.) do que está **em avaliação/pendente** (índice 60%,
 tipologia mista). Não apresentar o cenário pendente como decidido.
+
+## A implantação vive num sítio só: `js/implantacao.js`
+
+O polígono do lote, a via perimetral, as posições das moradias e o centro,
+dimensões e rotação de cada volume estão em `js/implantacao.js`
+(`window.IMPLANTACAO`). A maquete do Modelo 1 dentro do `index.html` e a cena
+navegável do `maquete.html` leem o mesmo ficheiro — antes era código duplicado
+e já tinha começado a divergir. **Mexer na implantação é mexer neste
+ficheiro**, e obriga a revalidar recuos e colisões (há um cálculo rápido em
+Node no histórico desta sessão).
+
+Duas coisas medidas, para não se repetir a conta:
+
+- **As moradias estão atravessadas à fila.** `CASA_ROT` (37,8°) é a direção da
+  fila; `CASA_ROT_VOL` (−52,2°) é a rotação de cada volume. Cada moradia tem
+  8 m ao longo da fila e 12 m de profundidade virada ao interior, com 3 m
+  entre vizinhas — destacadas, como no render. Antes os 12 m corriam ao longo
+  da fila, com espaçamento de 11 m: as dez sobrepunham-se 1 m e liam-se como
+  um só bloco corrido. A fila foi recuada 1 m para o recuo mínimo passar de
+  6,88 m para 7,88 m.
+- **O recuo de 7 m não é o que os volumes grandes cumprem.** Medido: hotel
+  3,9 m, braço do L 3,7 m, apartamentos 2,3 m ao limite. Ou seja, o hotel e os
+  apartamentos assentam sobre o anel 4–12 m onde a maquete antiga desenhava a
+  via perimetral. **Não é erro de modelação — é o que o render mostra**, e não
+  foi alterado sem o utilizador decidir. O que mudou foi a via: no
+  `maquete.html` ela contorna o construído em vez de lhe passar por baixo
+  (`tracarVia()`). Se algum dia se quiser mesmo 7 m para toda a gente, os
+  volumes têm de recuar e a implantação deixa de ser a do render.
+
+## Cena 3D navegável (`maquete.html`)
+
+Página à parte, a ecrã inteiro, ligada no menu (`07 · Maquete 3D navegável`) e
+por um botão dentro da vista do Modelo 1. O que tem:
+
+- **O projeto da Imagem 2 de referência**, nas posições de `js/implantacao.js`:
+  hotel em L com esplanada e estacionamento, apartamentos, dez moradias com
+  jacuzzi no terraço, piscina de 200 m² com deck, bar e espreguiçadeiras,
+  relvado de eventos, pomar, palmeiras, sebes e via de acesso com portão para
+  a estrada pública.
+- **Envolvente ilustrativa**: estradas, casario alentejano, parcelas agrícolas
+  (lavrado, vinha, olival, montado, seara), olivais e ciprestes — tudo gerado
+  por código com semente fixa (`semente(20250917)`), para ser sempre igual.
+  **Não é levantamento.** Quando chegar o KML do lote e um print mais afastado
+  do Google Earth, substituem-se `ESTRADAS` e `PARCELAS`.
+- **Navegação**: órbita (arrastar, roda, dois dedos) e modo a pé (WASD, shift
+  para correr, manche tátil no telemóvel, colisão contra as pegadas dos
+  volumes). Sete vistas predefinidas nas teclas 1 a 7, dia/noite na tecla N.
+- **Como está feita**: o chão da envolvente é uma imagem pintada por código
+  (`texturaTerreno()`), não centenas de polígonos; tudo o que se repete —
+  casas, árvores, candeeiros, carros, palmeiras — passa por `instanciar()`,
+  que é `InstancedMesh`. Os materiais que acendem de noite estão em
+  `EMISSIVOS`, os objetos que só existem de noite em `LUZES_NOITE`.
+
+Duas armadilhas já apanhadas, para não voltarem: `ShapeGeometry` deitada com
+`rotateX(+90°)` fica com as normais para baixo e **não se desenha** (por isso
+`chapa()` passa o z trocado de sinal e roda −90°); e pintar as estradas também
+na textura do chão dá bandas ao dobro da largura e desfocadas por cima das
+estradas 3D — a textura só leva o rasto das bermas.
 
 ## Estrutura do site (ordem das secções)
 
@@ -231,8 +292,9 @@ contido, sem emojis.
   e desenhadas; falta validar. A pergunta que mais importa é **de que cota se
   mede a altura de fachada** — o lote varia entre 225 e 233 m, e a resposta
   pode valer um piso inteiro.
-- **Envolvente 3D** (Centro Hípico, estádio, pista, armazéns, estradas) —
-  falta um print do Google Earth mais afastado, ou o KML.
+- **Envolvente 3D real** (Centro Hípico, estádio, pista, armazéns, estradas
+  verdadeiras) — o `maquete.html` já tem uma envolvente, mas é inventada por
+  código. Falta um print do Google Earth mais afastado, ou o KML.
 - **Fotos reais do terreno** — o site não tem uma única. Servem para o hero,
   não para o 3D.
 - **Pormenor fino da maquete** (janelas individuais, varandas, caminhos,
