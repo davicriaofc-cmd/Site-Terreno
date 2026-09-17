@@ -6,8 +6,9 @@ projeto e o processo urbanístico à medida que avança.
 
 ## Estado atual
 
-- Branch de trabalho: `claude/zen-curie-lr4ixr`, saído de `main` já com o
-  trabalho do PR #6 integrado (confirmar sempre com `git log`). Os
+- Branch de trabalho: `claude/zen-curie-lr4ixr` → PR #8, saído de `main` já
+  com o trabalho do PR #6 integrado (confirmar sempre com `git log`). O #8
+  atualiza-se sozinho a cada push — não abrir PRs novos. Os
   `claude/site-assistance-pk5n2b` / PR #6 e `claude/mano-slfa79` / PR #2 são
   histórico.
 - Ficheiros: `index.html` (o site, autocontido), `precos.html` (as contas),
