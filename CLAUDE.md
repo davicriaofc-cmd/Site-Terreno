@@ -127,8 +127,11 @@ implantação. Esquecer isso foi um erro já cometido.
 
 ## O Modelo 1 é a cena 3D
 
-`maquete.html` a ecrã inteiro, aberto pelo menu (`07 · Maquete 3D navegável`)
-e **dentro da vista do Modelo 1, num iframe**. Havia aqui uma segunda maquete
+`maquete.html` a ecrã inteiro, aberto **dentro da vista do Modelo 1, num
+iframe**, e daí pelo botão "Abrir em ecrã inteiro". Houve uma entrada de menu
+`07 · Maquete 3D navegável` a apontar para a mesma cena: o utilizador mandou
+apagá-la, por ser rota a dobrar. **O menu vai de 01 a 06 e depois 10 ·
+Modelos** — não é gralha. Havia aqui uma segunda maquete
 construída por código dentro do `index.html`: foi removida. Duas cenas com a
 mesma implantação divergem sempre, e só uma tinha o terreno real. Com ela
 foi-se a animação de "crescer ao abrir" — se o utilizador der pela falta,
@@ -272,7 +275,9 @@ contido, sem emojis.
   continua no rodapé.
 - **Site encurtado: 9 secções → 6, 1.160 → 868 palavras.** Fundidas
   `#plot`+`#expansao` e `#corte`+`#concept` e `#porque-agora`+`#proximos-passos`.
-  No `#modelos` cada estudo ficou com uma linha. Menu refeito com 6 entradas, mais `07 · As contas` a apontar ao `precos.html`.
+  No `#modelos` cada estudo ficou com uma linha. Menu com 6 entradas (01 a 06)
+  mais `10 · Modelos`. As entradas `07` que existiram — primeiro as contas,
+  depois a maquete — foram ambas removidas a pedido do utilizador.
 - **`three.js` só a pedido** — `carregarThree()` injeta o script quando o
   Modelo 1 abre. Não há pedido nenhum no arranque da página.
 - **Maquete mais realista** — MeshStandardMaterial com rugosidade, sol mais
