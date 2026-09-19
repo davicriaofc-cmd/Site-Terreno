@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Maquete 3D — O Terreno · Montemor-o-Novo</title>
-<meta name="description" content="Visualização 3D conceptual do hotel implantado no terreno de 17.500 m² em Montemor-o-Novo, com a envolvente ilustrativa à volta.">
+<meta name="description" content="Visualização 3D conceptual do hotel implantado no terreno real em Montemor-o-Novo, sobre a fotografia aérea da envolvente.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -181,7 +181,7 @@
   <a class="voltar mono" href="index.html">‹ Voltar</a>
   <div class="titulo">
     <h1>Maquete <em>3D</em></h1>
-    <span class="sub mono">17.500 m² · Montemor-o-Novo · visualização conceptual</span>
+    <span class="sub mono">16.288 m² medidos · Montemor-o-Novo · visualização conceptual</span>
   </div>
   <div class="topo-dir">
     <button class="btn" id="btnLuz" type="button">Noite</button>
@@ -207,9 +207,14 @@
   <button class="btn icone fechar" id="btnFechar" type="button" aria-label="Fechar">✕</button>
   <div class="mono" style="opacity:.55">O que estás a ver</div>
   <h2>O hotel no terreno, e o que está à volta</h2>
-  <p>Os volumes estão à escala sobre o polígono real do lote — 17.500 m², a mesma
-     implantação do Modelo 1: hotel em L a poente, apartamentos a norte, dez moradias
-     em banda a nascente, piscina e bar ao centro, relvado de eventos a sul.</p>
+  <p>O terreno é o que foi medido no Google Earth: <strong>16.288 m²</strong> e 617 m
+     de perímetro. O chão à volta é essa mesma fotografia aérea, classificada por tipo
+     de ocupação — as estradas, a pista de atletismo, o campo, o centro hípico e as
+     parcelas agrícolas estão onde estão na realidade.</p>
+  <p>Os volumes do projeto foram reencaixados neste polígono, que é mais estreito do
+     que o assumido antes: hotel em L a poente, apartamentos a norte, dez moradias ao
+     longo do limite nascente, piscina e bar ao centro, relvado a sul. Nenhum deles
+     sai do lote — o recuo mínimo é de 7 m nos edifícios.</p>
 
   <h3>No lote</h3>
   <div id="legenda"></div>
@@ -228,13 +233,15 @@
     <p><strong>Isto é uma visualização conceptual.</strong> Não é projeto de arquitetura
        nem substitui o trabalho do arquiteto: são volumes gerados por código, à escala,
        para se perceber ocupação, distâncias e relação com a envolvente.</p>
-    <p><strong>A envolvente é ilustrativa.</strong> As ruas, casas e parcelas à volta são
-       uma reconstituição de carácter alentejano para o terreno não aparecer isolado —
-       não são levantamento do local. Ficam certas quando chegar o KML do lote e um print
-       mais afastado do Google Earth.</p>
-    <p><strong>O lote está modelado plano.</strong> No terreno há cerca de 8 m de desnível
-       (225,18 m a 233,41 m). Conta para a cota a partir da qual se mede a fachada e para
+    <p><strong>A envolvente é real em planta, estimada em altura.</strong> Posição, forma
+       e orientação vêm da fotografia aérea. A altura de cada edifício vizinho não vem —
+       uma fotografia de cima não a dá — e está estimada pela área de implantação.</p>
+    <p><strong>O lote está modelado plano.</strong> No terreno há cerca de 9 m de desnível
+       (225,19 m a 234,02 m). Conta para a cota a partir da qual se mede a fachada e para
        o que é preciso escavar — está por modelar.</p>
+    <p><strong>A área não bate com a do site.</strong> Aqui está o polígono medido,
+       16.288 m². O resto do site escreve 17.500 m², que vem de outra fonte. São 7% de
+       diferença e falta decidir qual prevalece.</p>
   </div>
 </aside>
 
@@ -248,17 +255,30 @@
 <span class="etiqueta" id="etiqueta"></span>
 
 <script src="js/implantacao.js"></script>
+<script src="js/envolvente.js"></script>
 <script src="vendor/three.min.js"></script>
 <script>
 /* =========================================================================
-   MAQUETE 3D NAVEGÁVEL — o projeto no lote, e o lote no sítio onde está.
+   MAQUETE 3D NAVEGÁVEL — o hotel no terreno real, e o terreno no sítio onde
+   está.
 
-   O que é real: o polígono do lote (17.500 m²) e a implantação dos volumes,
-   ambos lidos de js/implantacao.js, os mesmos que a maquete do Modelo 1 usa.
-   O que é ilustrativo: tudo o resto — ruas, casas, parcelas e vegetação da
-   envolvente são gerados por código, com semente fixa, para dar contexto ao
-   terreno. Não são levantamento. Quando chegar o KML e um print mais
-   afastado do Google Earth, substituem-se as ESTRADAS e as PARCELAS.
+   Tudo o que se vê está georreferenciado sobre a fotografia aérea do Google
+   Earth que o utilizador mediu (16/10/2025), à mesma escala:
+
+   - O LOTE é o polígono que ele mediu: 16 287,82 m², 616,77 m de perímetro.
+     Extraído da imagem por deteção da linha de medição e escalado para dar
+     exatamente essa área. Está em js/implantacao.js.
+   - A ENVOLVENTE é essa fotografia, classificada por tipo de ocupação e
+     repintada na paleta do site, mais os edifícios e as árvores detetados
+     nela. As estradas, os caminhos, a pista de atletismo, o campo, o centro
+     hípico e as parcelas estão onde estão — não há nada desenhado à mão.
+     Está em js/envolvente.js.
+   - O PROJETO é o do render de referência, reencaixado neste polígono por um
+     solver de recuo e colisão: nenhum canto de nenhum volume sai do lote.
+
+   O que continua aproximado, e está dito no painel da página: a altura dos
+   volumes da envolvente (uma fotografia de cima não a dá) e o relevo — o
+   lote tem cerca de 9 m de desnível e está modelado plano.
    ========================================================================= */
 (function(){
 'use strict';
@@ -362,18 +382,6 @@ function normalFora(a,b,horario){
   var dx=b[0]-a[0], dz=b[1]-a[1], L=Math.hypot(dx,dz)||1;
   return horario ? [-dz/L, dx/L] : [dz/L, -dx/L];
 }
-/* Prolonga as pontas de uma linha, para uma estrada não acabar no ar. */
-function prolongar(pts, antes, depois){
-  var o = pts.slice();
-  var d0 = [o[0][0]-o[1][0], o[0][1]-o[1][1]];
-  var l0 = Math.hypot(d0[0],d0[1])||1;
-  o.unshift([o[0][0]+d0[0]/l0*antes, o[0][1]+d0[1]/l0*antes]);
-  var k = o.length;
-  var d1 = [o[k-1][0]-o[k-2][0], o[k-1][1]-o[k-2][1]];
-  var l1 = Math.hypot(d1[0],d1[1])||1;
-  o.push([o[k-1][0]+d1[0]/l1*depois, o[k-1][1]+d1[1]/l1*depois]);
-  return o;
-}
 /* Pontos espaçados ao longo de uma linha, com a direção em cada um —
    serve para plantar candeeiros, casas e árvores a acompanhar a estrada. */
 function aoLongo(pts, passo, offset){
@@ -402,157 +410,38 @@ function distALinha(pts,x,z){
   return m;
 }
 
-/* ------------------------------------------------- 2. o mundo à volta */
-var EXT = 2000;                       // lado do quadrado de mundo desenhado
+/* ------------------------------------------- 2. o terreno e o que o rodeia */
 var LOTE = IMP.LOTE;
-var LOTE_FOLGA = afastar(LOTE, 26);   // nada de vizinhos encostados ao limite
-
-/* As duas estradas que tocam o lote saem do próprio contorno: a principal
-   corre ao longo do limite nascente/sudeste (é a que lá está), e um caminho
-   secundário fecha o lado poente. As outras são vias da zona. */
-var ANEL = afastar(LOTE, 15);
-var ESTRADAS = [
-  { nome:'nascente', tipo:'asfalto', larg:7.5, lampadas:true,
-    pts: prolongar(ANEL.slice(2,7), 300, 260) },
-  { nome:'poente', tipo:'asfalto', larg:6.0, lampadas:false,
-    pts: prolongar([ANEL[7],ANEL[8],ANEL[9],ANEL[10],ANEL[0],ANEL[1]], 180, 200) },
-  { nome:'norte', tipo:'asfalto', larg:7.0, lampadas:false,
-    pts: [[-620,-232],[-300,-248],[-40,-236],[240,-262],[560,-250],[900,-268]] },
-  { nome:'sul', tipo:'asfalto', larg:6.5, lampadas:false,
-    pts: [[-700,330],[-420,352],[-150,338],[170,368],[520,346],[880,372]] },
-  { nome:'caminho-nascente', tipo:'terra', larg:4.2, lampadas:false,
-    pts: [[210,-62],[330,-96],[470,-88],[640,-140],[820,-146]] },
-  { nome:'caminho-poente', tipo:'terra', larg:4.0, lampadas:false,
-    pts: [[-150,66],[-300,40],[-430,78],[-580,52],[-760,90]] },
-  { nome:'caminho-sul', tipo:'terra', larg:4.0, lampadas:false,
-    pts: [[-70,150],[-120,238],[-90,320],[-140,430],[-100,560]] }
-];
-
-/* Parcelas agrícolas: grelha irregular, saltando o lote e as estradas.
-   O tipo de cultura dita a cor, o riscado da textura e o que se planta. */
-var CULTURAS = [
-  {id:'lavrado', cor:'#7E6A4E', risca:'#6B5840', passo:5.0, arvores:0},
-  {id:'restolho',cor:'#B9A878', risca:'#A8966A', passo:7.0, arvores:0},
-  {id:'pasto',   cor:'#8C9463', risca:null,      passo:0,   arvores:0.10},
-  {id:'olival',  cor:'#79804F', risca:null,      passo:0,   arvores:0.85},
-  {id:'vinha',   cor:'#6E7A4A', risca:'#5C6A3E', passo:3.0, arvores:0},
-  {id:'seara',   cor:'#C4B279', risca:'#B5A268', passo:9.0, arvores:0},
-  {id:'montado', cor:'#93916A', risca:null,      passo:0,   arvores:0.22}
-];
-var PARCELAS = (function(){
-  var out=[], cel=118;
-  for(var gx=-8; gx<=8; gx++){
-    for(var gz=-8; gz<=8; gz++){
-      var cx = gx*cel + entre(-16,16), cz = gz*cel + entre(-16,16);
-      if(Math.abs(cx)>EXT/2-70 || Math.abs(cz)>EXT/2-70) continue;
-      var w = cel*entre(0.62,0.94), d = cel*entre(0.62,0.94);
-      var a = entre(-0.22,0.22);
-      var quad = [[-w/2,-d/2],[w/2,-d/2],[w/2,d/2],[-w/2,d/2]].map(function(p){
-        var jx = p[0]+entre(-9,9), jz = p[1]+entre(-9,9);
-        return [cx + jx*Math.cos(a) - jz*Math.sin(a), cz + jx*Math.sin(a) + jz*Math.cos(a)];
-      });
-      /* Só se salta a parcela cujo centro cai no lote — o resto pinta-se até
-         ao limite. O relvado do lote e as estradas são geometria por cima,
-         e é isso que fecha a leitura; deixar um anel de terra à volta era o
-         que fazia o terreno parecer isolado. */
-      if(dentroPol(LOTE_FOLGA,cx,cz)) continue;
-      out.push({ quad:quad, c:cx, z:cz, ang:a, cultura:escolher(CULTURAS) });
-    }
-  }
-  return out;
-})();
+var ENV  = window.ENVOLVENTE;
+var TEX  = ENV.TEXTURA;
+/* Extensão coberta pela fotografia aérea. Para lá disto o chão passa a ser
+   terra seca lisa, e o nevoeiro fecha — não se inventa o que não se viu. */
+var EXT_X = TEX.x1 - TEX.x0, EXT_Z = TEX.z1 - TEX.z0;
+var CENTRO_TEX = [(TEX.x0+TEX.x1)/2, (TEX.z0+TEX.z1)/2];
 
 /* ------------------------------------------------------- 3. texturas */
-/* O chão da envolvente é uma só imagem pintada por código — parcelas,
-   caminhos e manchas de árvores — em vez de centenas de polígonos. Custa
-   um desenho no arranque e fica em um único objeto na cena. */
-function c2(x,z,S){ return [ (x+EXT/2)/EXT*S, (z+EXT/2)/EXT*S ]; }
-
-function texturaTerreno(){
-  var S = 2048;
-  var cv = document.createElement('canvas'); cv.width = cv.height = S;
-  var g = cv.getContext('2d');
-
-  g.fillStyle = '#8A7C61'; g.fillRect(0,0,S,S);
-
-  // manchas largas de terra, para o fundo não ser chapado
-  for(var i=0;i<260;i++){
-    var p = c2(entre(-EXT/2,EXT/2), entre(-EXT/2,EXT/2), S);
-    var r = entre(20,130);
-    g.fillStyle = 'rgba('+[0,1,2].map(function(k){ return [140,126,100][k] + (R()*36-18)|0; }).join(',')+',0.20)';
-    g.beginPath(); g.ellipse(p[0],p[1],r,r*entre(0.5,1.3),R()*3.14,0,6.29); g.fill();
-  }
-
-  PARCELAS.forEach(function(par){
-    var pts = par.quad.map(function(p){ return c2(p[0],p[1],S); });
-    g.save();
-    g.beginPath();
-    pts.forEach(function(p,i){ i ? g.lineTo(p[0],p[1]) : g.moveTo(p[0],p[1]); });
-    g.closePath();
-    g.fillStyle = par.cultura.cor; g.fill();
-    g.clip();
-
-    // riscado da lavra / das vinhas, na direção da parcela
-    if(par.cultura.risca){
-      var cc = c2(par.c,par.z,S);
-      g.translate(cc[0],cc[1]); g.rotate(par.ang + (R()<0.5?0:1.57));
-      g.strokeStyle = par.cultura.risca; g.lineWidth = Math.max(1, par.cultura.passo*0.22*S/EXT);
-      var passoPx = par.cultura.passo*S/EXT;
-      for(var y=-140; y<140; y+=Math.max(1.4,passoPx)){
-        g.beginPath(); g.moveTo(-140,y); g.lineTo(140,y); g.stroke();
-      }
-      g.setTransform(1,0,0,1,0,0);
-    }
-    // copas vistas de cima, onde há árvores
-    if(par.cultura.arvores > 0){
-      var n = Math.round(par.cultura.arvores * 46);
-      for(var k=0;k<n;k++){
-        var q = c2(par.c + entre(-52,52), par.z + entre(-52,52), S);
-        g.fillStyle = 'rgba(58,74,42,0.55)';
-        g.beginPath(); g.arc(q[0],q[1], entre(2.4,5.2), 0, 6.29); g.fill();
-      }
-    }
-    g.restore();
-
-    // sebe / vala a marcar o limite da parcela
-    g.strokeStyle = 'rgba(58,66,40,0.38)'; g.lineWidth = 1.6;
-    g.beginPath();
-    pts.forEach(function(p,i){ i ? g.lineTo(p[0],p[1]) : g.moveTo(p[0],p[1]); });
-    g.closePath(); g.stroke();
-  });
-
-  /* As estradas não se pintam aqui: existem em 3D, com berma e marcação.
-     Pintadas por baixo ficavam ao dobro da largura e desfocadas pelo mipmap.
-     O que se pinta é só a terra batida das bermas, a alargar o rasto. */
-  ESTRADAS.forEach(function(e){
-    var pts = e.pts.map(function(p){ return c2(p[0],p[1],S); });
-    g.lineJoin = g.lineCap = 'round';
-    g.strokeStyle = 'rgba(163,146,112,0.75)';
-    g.lineWidth = e.larg*S/EXT * 1.15;
-    g.beginPath();
-    pts.forEach(function(p,i){ i ? g.lineTo(p[0],p[1]) : g.moveTo(p[0],p[1]); });
-    g.stroke();
-  });
-
-  var t = new THREE.CanvasTexture(cv);
+/* O chão da envolvente é a própria fotografia aérea, classificada por tipo
+   de ocupação e repintada na paleta do site (ver js/envolvente.js). Não há
+   estradas nem parcelas desenhadas à mão: estão todas na imagem, no sítio
+   onde estão na realidade. */
+function carregarSolo(aoAcabar){
+  var t = new THREE.TextureLoader().load(TEX.ficheiro, aoAcabar, undefined, aoAcabar);
   t.anisotropy = 8;
   if(THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 
-/* Textura fina, repetida, por cima da anterior: dá grão ao chão quando se
-   anda a pé, sem estragar a leitura aérea. */
+/* Grão fino por cima, para o chão não ficar liso quando se anda a pé. */
 function texturaGrao(){
   var S=256, cv=document.createElement('canvas'); cv.width=cv.height=S;
   var g=cv.getContext('2d');
-  g.fillStyle='rgba(0,0,0,0)'; g.fillRect(0,0,S,S);
   for(var i=0;i<2600;i++){
     g.fillStyle = 'rgba('+(R()<0.5?'40,44,30':'190,176,140')+','+(0.03+R()*0.07).toFixed(3)+')';
     g.fillRect(R()*S, R()*S, 1+R()*2.5, 1+R()*2.5);
   }
   var t = new THREE.CanvasTexture(cv);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(EXT/14, EXT/14);
+  t.repeat.set(EXT_X/14, EXT_Z/14);
   return t;
 }
 
@@ -563,7 +452,7 @@ var EMISSIVOS = [];          // materiais que acendem ao anoitecer
 var nocturno = false;
 
 var COR = {
-  relva:0x93A55E, relvaEsc:0x7E8C52, paviment:0xCFC6AE, pedra:0xBDB49B,
+  relva:0x879A5F, relvaEsc:0x76855A, paviment:0xCFC6AE, pedra:0xBDB49B,
   parede:0xF2EDE0, paredeQ:0xE8E0CE, laje:0xDCD3BC, vidro:0x33414B,
   painel:0x18212C, agua:0x3E9BC4, deck:0xD2C5A6, tronco:0x5B4B36,
   copa:0x4C5E34, copaClara:0x62764A, alcatrao:0x3B3F3C, terra:0x8A7C61,
@@ -676,7 +565,7 @@ function instanciar(geo, material, itens, opc){
   for(var i=0;i<itens.length;i++){
     var it = itens[i];
     _d.position.set(it.x, it.y||0, it.z);
-    _d.rotation.set(it.rx||0, it.ry||0, it.rz||0);
+    _d.rotation.set(it.rx||0, it.ry||0, it.rz||0, it.ordem || 'XYZ');
     _d.scale.set(it.sx===undefined?1:it.sx, it.sy===undefined?1:it.sy, it.sz===undefined?1:it.sz);
     _d.updateMatrix();
     m.setMatrixAt(i, _d.matrix);
@@ -750,233 +639,77 @@ function chapa(pol, y, material, buraco){
   return m;
 }
 
-/* ------------------------------------------------ 6. chão e estradas */
-function construirChao(){
-  var g = new THREE.PlaneGeometry(EXT, EXT);
-  g.rotateX(-Math.PI/2);
-  var chao = new THREE.Mesh(g, mat(0xFFFFFF, {map:texturaTerreno(), roughness:0.96}));
-  chao.position.y = -0.18; chao.receiveShadow = true;
-  scene.add(chao);
+/* ------------------------------------------- 6. chão e envolvente real */
+function construirChao(pronto){
+  // terra seca até ao horizonte, por baixo de tudo
+  var g0 = new THREE.PlaneGeometry(5200,5200); g0.rotateX(-Math.PI/2);
+  var fundo = new THREE.Mesh(g0, mat(TEX.fundo,{roughness:1}));
+  fundo.position.set(CENTRO_TEX[0], -0.28, CENTRO_TEX[1]);
+  fundo.receiveShadow = true; scene.add(fundo);
 
-  var g2 = new THREE.PlaneGeometry(EXT, EXT);
-  g2.rotateX(-Math.PI/2);
+  // a fotografia aérea classificada, à escala e no sítio
+  var g = new THREE.PlaneGeometry(EXT_X, EXT_Z); g.rotateX(-Math.PI/2);
+  var chao = new THREE.Mesh(g, mat(0xFFFFFF,{map:carregarSolo(pronto), roughness:0.97, transparent:true}));
+  chao.position.set(CENTRO_TEX[0], -0.18, CENTRO_TEX[1]);
+  chao.receiveShadow = true; scene.add(chao);
+
+  var g2 = new THREE.PlaneGeometry(EXT_X, EXT_Z); g2.rotateX(-Math.PI/2);
   var grao = new THREE.Mesh(g2, new THREE.MeshBasicMaterial({
-    map:texturaGrao(), transparent:true, opacity:0.55, depthWrite:false
-  }));
-  grao.position.y = -0.14; scene.add(grao);
-
-  // fora da imagem, um plano de terra até ao horizonte
-  var longe = new THREE.Mesh(new THREE.RingGeometry(EXT*0.5, 4200, 48), mat(0x8F8365, {roughness:1}));
-  longe.rotation.x = -Math.PI/2; longe.position.y = -0.22; scene.add(longe);
+    map:texturaGrao(), transparent:true, opacity:0.42, depthWrite:false}));
+  grao.position.set(CENTRO_TEX[0], -0.14, CENTRO_TEX[1]); scene.add(grao);
 }
 
-function construirEstradas(){
-  var lampadas = [], postes = [], riscas = [];
-  ESTRADAS.forEach(function(e){
-    var terra = e.tipo === 'terra';
-    var berma = new THREE.Mesh(fita(e.pts, e.larg*1.5, 0.03),
-                  mat(terra ? 0xA08D6B : 0x9A9682, {roughness:1}));
-    berma.receiveShadow = true; scene.add(berma);
+/* ------------------------------- 7. o que existe à volta, onde existe ----
+   Edifícios e árvores lidos da fotografia: posição, dimensão em planta,
+   orientação e cor de cobertura medidas. A altura é estimada — é a única
+   coisa que uma fotografia de cima não dá. */
+function construirEnvolvente(){
+  var corpos=[], telhados=[], remates=[], troncos=[], copas=[], janelas=[];
+  var perto = function(o){ return Math.hypot(o.x,o.z) < 300; };
 
-    var via = new THREE.Mesh(fita(e.pts, e.larg, 0.06),
-                mat(terra ? 0xAD9B78 : COR.alcatrao, {roughness:terra?1:0.92}));
-    via.receiveShadow = true; scene.add(via);
-
-    if(!terra){
-      aoLongo(e.pts, 14, 4).forEach(function(p){
-        riscas.push({x:p.x, y:0.08, z:p.z, ry:p.ang, sx:0.16, sy:1, sz:5.0});
-      });
+  ENV.EDIFICIOS.forEach(function(b){
+    var ry = rad(b.r);
+    corpos.push({x:b.x, y:b.h/2, z:b.z, ry:ry, sx:b.w, sy:b.h, sz:b.d, cor:b.c});
+    if(b.t){                                   // cobertura de telha
+      telhados.push({x:b.x, y:b.h, z:b.z, ry:ry,
+                     sx:b.w*1.06, sy:Math.min(2.5, Math.min(b.w,b.d)*0.34), sz:b.d*1.12,
+                     cor:0xA85C3C});
+    } else {                                   // terraço: remate da platibanda
+      remates.push({x:b.x, y:b.h+0.25, z:b.z, ry:ry, sx:b.w+0.5, sy:0.5, sz:b.d+0.5, cor:b.c});
     }
-    if(e.lampadas){
-      aoLongo(e.pts, 34, 12).forEach(function(p,i){
-        var lado = (i%2 ? 1 : -1) * (e.larg/2 + 1.6);
-        var x = p.x + p.uz*lado, z = p.z - p.ux*lado;
-        postes.push({x:x, y:0, z:z, sy:8.4});
-        lampadas.push({x:x, y:8.4, z:z, ry:p.ang});
-      });
-    }
-  });
-  instanciar(new THREE.BoxGeometry(1,0.02,1), MAT.branco, riscas, {sombra:false});
-  instanciar(new THREE.CylinderGeometry(0.11,0.15,1,6).translate(0,0.5,0), MAT.metal, postes, {sombra:true});
-  var globos = instanciar(new THREE.SphereGeometry(0.42,8,6), new THREE.MeshBasicMaterial({color:0xFFE2AE}),
-                          lampadas, {sombra:false, recebe:false});
-  if(globos){ globos.visible = false; LUZES_NOITE.push(globos); }
-}
-
-/* ------------------------------------------------- 7. casas vizinhas */
-/* Casario alentejano: corpo caiado, telhado de duas águas, chaminé larga,
-   por vezes um anexo e um muro baixo. Postas ao longo das vias, viradas
-   para a estrada, com espaçamento irregular. Ilustrativas. */
-function gerarVizinhanca(){
-  var casas = [], ocupado = [];
-  var livre = function(x,z,r){
-    if(dentroPol(LOTE_FOLGA,x,z) || aoBordo(LOTE,x,z) < 46) return false;
-    if(Math.abs(x) > EXT/2-60 || Math.abs(z) > EXT/2-60) return false;
-    for(var i=0;i<ESTRADAS.length;i++){
-      if(distALinha(ESTRADAS[i].pts,x,z) < ESTRADAS[i].larg/2 + 7) return false;
-    }
-    for(var j=0;j<ocupado.length;j++){
-      if(Math.hypot(x-ocupado[j][0], z-ocupado[j][1]) < r + ocupado[j][2]) return false;
-    }
-    return true;
-  };
-  var por = function(x,z,ang,tipo){
-    var armazem = tipo === 'armazem';
-    var w = armazem ? entre(18,34) : entre(8.5,15);
-    var d = armazem ? entre(9,14)  : entre(7,11);
-    var pisos = armazem ? 1 : (R()<0.22 ? 2 : 1);
-    var h = armazem ? entre(4.2,5.6) : pisos*3.0;
-    if(!livre(x,z, Math.max(w,d)*0.8 + 6)) return false;
-    ocupado.push([x,z, Math.max(w,d)*0.8]);
-    casas.push({
-      x:x, z:z, ang:ang, w:w, d:d, h:h, pisos:pisos, armazem:armazem,
-      telhaAlt: armazem ? entre(1.0,1.5) : entre(1.6,2.6),
-      anexo: !armazem && R()<0.42,
-      muro:  !armazem && R()<0.5,
-      piscina: !armazem && R()<0.12,
-      cor: armazem ? escolher([0xD9D4C6,0xC8C4B4,0xE0DACB]) : escolher([0xF4EFE4,0xFFFFFF,0xF0E8D6,0xEFE6D2]),
-      corTelha: escolher([0xA85C3C,0x9B5334,0xB2664A,0x8E4A2E,0xA35E44])
-    });
-    return true;
-  };
-
-  // ao longo das vias
-  ESTRADAS.forEach(function(e){
-    var caminho = e.nome.indexOf('caminho') === 0;
-    var passo = caminho ? 95 : 44;
-    aoLongo(e.pts, passo, 25).forEach(function(p){
-      if(R() < (caminho ? 0.42 : 0.18)) return;
-      var lado = R()<0.5 ? 1 : -1;
-      var rec = entre(e.larg/2 + 12, e.larg/2 + 34);
-      var x = p.x + p.uz*lado*rec, z = p.z - p.ux*lado*rec;
-      var tipo = R()<0.16 ? 'armazem' : 'casa';
-      por(x + entre(-8,8), z + entre(-8,8), p.ang + (lado>0?0:Math.PI) + entre(-0.18,0.18), tipo);
-    });
-  });
-
-  // um pequeno aglomerado a nordeste, com ruas próprias
-  var ax = 315, az = -300;
-  for(var i=0;i<5;i++){
-    for(var j=0;j<4;j++){
-      if(R()<0.28) continue;
-      por(ax + i*34 + entre(-5,5), az + j*30 + entre(-5,5), rad(entre(-8,8)), 'casa');
-    }
-  }
-  // duas quintas isoladas
-  por(-330, 120, rad(24), 'casa');
-  por(-352, 142, rad(24), 'armazem');
-  por(250, 210, rad(-40), 'casa');
-  return casas;
-}
-
-function construirVizinhanca(casas){
-  var corpos=[], telhados=[], chamines=[], anexos=[], muros=[], janelas=[], piscinas=[];
-  var perto = function(c){ return Math.hypot(c.x,c.z) < 320; };
-
-  casas.forEach(function(c){
-    var ry = c.ang;
-    corpos.push({x:c.x, y:c.h/2, z:c.z, ry:ry, sx:c.w, sy:c.h, sz:c.d, cor:c.cor});
-    telhados.push({x:c.x, y:c.h, z:c.z, ry:ry, sx:c.w*1.06, sy:c.telhaAlt, sz:c.d*1.1, cor:c.corTelha});
-    if(!c.armazem){
-      var cx = c.x + Math.cos(ry)*c.w*0.28, cz = c.z - Math.sin(ry)*c.w*0.28;
-      chamines.push({x:cx, y:c.h+c.telhaAlt*0.55, z:cz, ry:ry, sx:1.1, sy:2.1, sz:0.9, cor:c.cor});
-    }
-    if(c.anexo){
-      var ax = c.x + Math.sin(ry+1.57)*(c.w/2+2.6), az = c.z + Math.cos(ry+1.57)*(c.w/2+2.6);
-      anexos.push({x:ax, y:1.35, z:az, ry:ry, sx:5.2, sy:2.7, sz:c.d*0.62, cor:c.cor});
-    }
-    if(c.muro){
-      var rx = c.w*0.5 + 5, rz = c.d*0.5 + 5;
-      [[1,0],[-1,0],[0,1],[0,-1]].forEach(function(lado){
-        var mx = c.x + (Math.cos(ry)*lado[0]*rx + Math.sin(ry)*lado[1]*rz);
-        var mz = c.z + (-Math.sin(ry)*lado[0]*rx + Math.cos(ry)*lado[1]*rz);
-        // a peça tem o comprimento no seu x: os muros dos lados rodam 90°
-        muros.push({x:mx, y:0.5, z:mz, ry:ry + (lado[0] ? Math.PI/2 : 0),
-                    sx:(lado[0] ? rz*2 : rx*2), sy:1.0, sz:0.3, cor:c.cor});
-      });
-    }
-    if(c.piscina){
-      var px = c.x + Math.sin(ry)*(c.d/2+7), pz = c.z + Math.cos(ry)*(c.d/2+7);
-      piscinas.push({x:px, y:0.12, z:pz, ry:ry, sx:7, sy:0.2, sz:3.6});
-    }
-    // janelas acesas: só em parte das casas, e só as viradas a quem vê
-    if(R() < 0.62){
-      var n = c.armazem ? 1 : 2 + (R()<0.5?1:0);
+    if(R() < 0.5){                             // luz acesa em parte das janelas
+      var n = 1 + (R()<0.5?1:0);
       for(var k=0;k<n;k++){
-        var u = (k-(n-1)/2)*2.7;
-        var jy = c.pisos>1 && R()<0.5 ? 4.3 : 1.7;
+        var u = (k-(n-1)/2)*3.0;
         [1,-1].forEach(function(f){
-          janelas.push({
-            x: c.x + Math.cos(ry)*u + Math.sin(ry)*f*(c.d/2+0.06),
-            y: jy,
-            z: c.z - Math.sin(ry)*u + Math.cos(ry)*f*(c.d/2+0.06),
-            ry: ry + (f>0?0:Math.PI), sx:1.1, sy:1.35, sz:1,
-            cor: R()<0.3 ? 0xFFD9A0 : 0xFFC682
-          });
+          janelas.push({x:b.x + Math.cos(ry)*u + Math.sin(ry)*f*(b.d/2+0.06),
+                        y: Math.min(1.8, b.h*0.55),
+                        z:b.z - Math.sin(ry)*u + Math.cos(ry)*f*(b.d/2+0.06),
+                        ry: ry + (f>0?0:Math.PI), sx:1.1, sy:1.3, sz:1});
         });
       }
     }
   });
 
-  var caixa1 = new THREE.BoxGeometry(1,1,1);
-  var comSombra = {sombra:true};
-  instanciar(caixa1, MAT.branco, corpos.filter(perto), comSombra);
-  instanciar(caixa1, MAT.branco, corpos.filter(function(c){ return !perto(c); }), {sombra:false});
-  var gt = geoTelhado();
-  instanciar(gt, mat(0xFFFFFF,{roughness:0.85}), telhados, {sombra:false});
-  instanciar(caixa1, MAT.branco, chamines, {sombra:false});
-  instanciar(caixa1, MAT.branco, anexos, {sombra:false});
-  instanciar(caixa1, MAT.branco, muros, {sombra:false});
-  instanciar(caixa1, MAT.agua, piscinas, {sombra:false});
-
-  var luzJanelas = instanciar(new THREE.PlaneGeometry(1,1), new THREE.MeshBasicMaterial({
-    color:0xFFFFFF, side:THREE.DoubleSide
-  }), janelas, {sombra:false, recebe:false});
-  if(luzJanelas){ luzJanelas.visible = false; LUZES_NOITE.push(luzJanelas); }
-}
-
-/* ------------------------------------------------ 8. árvores da zona */
-function construirVegetacao(){
-  var troncos=[], copas=[], ciprestes=[];
-  PARCELAS.forEach(function(par){
-    var dens = par.cultura.arvores;
-    if(dens <= 0) return;
-    var olival = par.cultura.id === 'olival';
-    var n = Math.round(dens * 34);
-    for(var i=0;i<n;i++){
-      var lx, lz;
-      if(olival){                                   // olival planta-se em grelha
-        lx = (i%6 - 2.5)*11 + entre(-1.2,1.2);
-        lz = (Math.floor(i/6) - 2.5)*11 + entre(-1.2,1.2);
-      } else {
-        lx = entre(-48,48); lz = entre(-48,48);
-      }
-      var x = par.c + lx*Math.cos(par.ang) - lz*Math.sin(par.ang);
-      var z = par.z + lx*Math.sin(par.ang) + lz*Math.cos(par.ang);
-      if(dentroPol(LOTE_FOLGA,x,z)) continue;
-      if(!dentroPol(par.quad,x,z)) continue;
-      var s = olival ? entre(0.62,0.85) : entre(0.9,1.5);
-      troncos.push({x:x, z:z, sx:s, sy:s, sz:s});
-      copas.push({x:x, y:0, z:z, sx:s*entre(0.9,1.15), sy:s*entre(0.8,1.1), sz:s*entre(0.9,1.15),
-                  ry:R()*3.14, cor: olival ? 0x7E8C63 : escolher([0x4C5E34,0x56683B,0x62764A])});
-    }
-  });
-  // renque de ciprestes a marcar dois caminhos
-  [ESTRADAS[4], ESTRADAS[6]].forEach(function(e){
-    aoLongo(e.pts, 13, 6).forEach(function(p){
-      var lado = e.larg/2 + 4;
-      var x = p.x + p.uz*lado, z = p.z - p.ux*lado;
-      if(dentroPol(LOTE_FOLGA,x,z) || aoBordo(LOTE,x,z) < 30) return;
-      ciprestes.push({x:x, z:z, sx:entre(0.8,1.1), sy:entre(0.85,1.25), sz:entre(0.8,1.1)});
-    });
+  ENV.ARVORES.forEach(function(t){
+    var e = Math.max(0.45, Math.min(1.7, t.r/2.4));
+    troncos.push({x:t.x, z:t.z, sx:e, sy:e*(0.85+R()*0.4), sz:e});
+    copas.push({x:t.x, y:0, z:t.z, ry:R()*3.14, sx:e, sy:e*(0.8+R()*0.4), sz:e,
+                cor: R()<0.25 ? 0x6E7C4C : (R()<0.5 ? 0x53643A : 0x475A33)});
   });
 
-  var gTronco = new THREE.CylinderGeometry(0.22,0.34,2.6,5).translate(0,1.3,0);
-  var gCopa = new THREE.IcosahedronGeometry(2.3,0).translate(0,4.0,0);
-  instanciar(gTronco, MAT.tronco, troncos, {sombra:false});
-  instanciar(gCopa, mat(0xFFFFFF,{roughness:0.95, flatShading:true}), copas, {sombra:false});
-  instanciar(new THREE.ConeGeometry(1.5,9,6).translate(0,4.5,0), mat(0x40532F,{flatShading:true}),
-             ciprestes, {sombra:false});
+  var cx1 = new THREE.BoxGeometry(1,1,1);
+  instanciar(cx1, MAT.branco, corpos.filter(perto), {sombra:true});
+  instanciar(cx1, MAT.branco, corpos.filter(function(o){ return !perto(o); }), {sombra:false});
+  instanciar(cx1, MAT.branco, remates, {sombra:false});
+  instanciar(geoTelhado(), mat(0xFFFFFF,{roughness:0.85}), telhados, {sombra:false});
+  instanciar(new THREE.CylinderGeometry(0.22,0.34,2.6,5).translate(0,1.3,0), MAT.tronco, troncos, {sombra:false});
+  instanciar(new THREE.IcosahedronGeometry(2.3,0).translate(0,4.0,0),
+             mat(0xFFFFFF,{roughness:0.95, flatShading:true}), copas, {sombra:false});
+  var luz = instanciar(new THREE.PlaneGeometry(1,1),
+             new THREE.MeshBasicMaterial({color:0xFFC98A, side:THREE.DoubleSide}), janelas,
+             {sombra:false, recebe:false});
+  if(luz){ luz.visible = false; LUZES_NOITE.push(luz); }
 }
 
 /* ================================================== 9. O LOTE E O PROJETO
@@ -998,34 +731,10 @@ function dentroPegada(f, x, z, folga){
 }
 
 /* A via interna não é um anel cego a 8 m do limite: onde há edifício, ela
-   contorna-o por dentro, como um arruamento de acesso a sério. É também o
-   que se vê no render — a via passa por fora do construído, não por baixo. */
+   contorna-o por dentro, como um arruamento de acesso a sério. O traçado
+   está em js/implantacao.js, para a maquete do Modelo 1 usar o mesmo. */
 function tracarVia(){
-  var base = afastar(LOTE, 8), pts = [];
-  for(var i=0;i<base.length;i++){                 // densificar
-    var a = base[i], b = base[(i+1)%base.length];
-    var L = Math.hypot(b[0]-a[0], b[1]-a[1]), n = Math.max(1, Math.round(L/6));
-    for(var k=0;k<n;k++) pts.push([a[0]+(b[0]-a[0])*k/n, a[1]+(b[1]-a[1])*k/n]);
-  }
-  var cen = centroide(LOTE);
-  pts = pts.map(function(p){
-    var x=p[0], z=p[1];
-    for(var t=0;t<60;t++){
-      var bate = FOOTPRINTS.some(function(f){ return dentroPegada(f,x,z,5.5); });
-      if(!bate) break;
-      var dx = cen[0]-x, dz = cen[1]-z, L = Math.hypot(dx,dz)||1;
-      x += dx/L*1.4; z += dz/L*1.4;
-    }
-    return [x,z];
-  });
-  for(var s=0;s<4;s++){                            // suavizar
-    pts = pts.map(function(p,i){
-      var a = pts[(i-1+pts.length)%pts.length], b = pts[(i+1)%pts.length];
-      return [(a[0]+p[0]*2+b[0])/4, (a[1]+p[1]*2+b[1])/4];
-    });
-  }
-  pts.push(pts[0].slice());
-  return pts;
+  return IMP.viaDeAcesso(LOTE, FOOTPRINTS, 8, 5.5);
 }
 
 function construirLote(){
@@ -1042,7 +751,7 @@ function construirLote(){
   // e um muro baixo a acompanhar o limite, que é o que lá estaria
   var muros = [];
   aoLongo(LOTE.concat([LOTE[0]]), 4.0, 0).forEach(function(p){
-    muros.push({x:p.x, y:0.35, z:p.z, ry:p.ang, sx:0.3, sy:0.7, sz:4.3, cor:0xE9E2D0});
+    muros.push({x:p.x, y:0.25, z:p.z, ry:p.ang, sx:0.25, sy:0.5, sz:4.3, cor:0xE0D8C4});
   });
   instanciar(new THREE.BoxGeometry(1,1,1), MAT.branco, muros, {sombra:false});
   return linha;
@@ -1234,20 +943,26 @@ function construirProjeto(){
 
   /* --- piscina, deck e bar, ao centro --- */
   var D = IMP.DECK, P = IMP.PISCINA, B = IMP.BAR;
+  /* O deck, o tanque e tudo o que os rodeia acompanham a rotação da
+     implantação: no lote real nada está alinhado com os eixos. */
+  var pr = rad(P.rot), pc = Math.cos(pr), ps = Math.sin(pr);
+  var noDeck = function(lx,lz){ return [P.x + lx*pc - lz*ps, P.z + lx*ps + lz*pc]; };
+
   var deck = caixa(D.w, 0.4, D.d, MAT.deck);
-  deck.position.set(D.x, 0.2, D.z); scene.add(deck);
-  pegada(D.x, D.z, D.w, D.d, 0, 0);
+  deck.position.set(D.x, 0.2, D.z); deck.rotation.y = rad(D.rot); scene.add(deck);
+  pegada(D.x, D.z, D.w, D.d, D.rot, 0);
 
   // remate em quatro peças à volta do tanque — em caixa inteira tapava a água
   [[P.w+2.4,1.2,0,P.d/2+0.6],[P.w+2.4,1.2,0,-P.d/2-0.6],
    [1.2,P.d,P.w/2+0.6,0],[1.2,P.d,-P.w/2-0.6,0]].forEach(function(b){
     var m = caixa(b[0], 0.5, b[1], MAT.pedra);
-    m.position.set(P.x+b[2], 0.45, P.z+b[3]); scene.add(m);
+    var q = noDeck(b[2], b[3]);
+    m.position.set(q[0], 0.45, q[1]); m.rotation.y = pr; scene.add(m);
   });
   var tanque = caixa(P.w, 1.6, P.d, mat(0x2C6C86,{roughness:0.5}));
-  tanque.position.set(P.x, -0.4, P.z); scene.add(tanque);
+  tanque.position.set(P.x, -0.4, P.z); tanque.rotation.y = pr; scene.add(tanque);
   var agua = caixa(P.w-0.5, 1.5, P.d-0.5, MAT.agua);
-  agua.position.set(P.x, -0.25, P.z); scene.add(agua);
+  agua.position.set(P.x, -0.25, P.z); agua.rotation.y = pr; scene.add(agua);
   MAT.agua.emissive = new THREE.Color(0x2FA8D6); MAT.agua.emissiveIntensity = 0;
   EMISSIVOS.push({m:MAT.agua, i:0.75});
   var luzPiscina = new THREE.PointLight(0x62C8EE, 0, 46, 2);
@@ -1259,17 +974,20 @@ function construirProjeto(){
   var corpo = caixa(B.w, 3.3, B.d, MAT.vidro); corpo.position.y = 1.65; bar.add(corpo);
   var cob = caixa(B.w+2.6, 0.5, B.d+2.6, mat(0x3A3E38)); cob.position.y = 3.55; bar.add(cob);
   var terraco = caixa(B.w+7, 0.18, B.d+3, MAT.deck); terraco.position.set(-B.w/2-2.5, 0.5, 0); bar.add(terraco);
-  bar.position.set(B.x, 0.4, B.z); scene.add(bar);
-  pegada(B.x, B.z, B.w+2.6, B.d+2.6, 0, 4);
+  bar.position.set(B.x, 0.4, B.z); bar.rotation.y = rad(B.rot); scene.add(bar);
+  pegada(B.x, B.z, B.w+2.6, B.d+2.6, B.rot, 4);
 
   // espreguiçadeiras e chapéus à volta do tanque
   for(var i=0;i<11;i++){
     [1,-1].forEach(function(f){
-      var x = P.x + (i-5)*2.6, z = P.z + f*(P.d/2+3.1);
-      espreg.push({x:x, y:0.52, z:z, ry:f>0?0:Math.PI, sx:0.72, sy:0.24, sz:2.0});
-      tectos.push({x:x, y:0.74, z:z - f*0.72, ry:f>0?0:Math.PI, rx:rad(-32), sx:0.72, sy:0.2, sz:0.9});
+      var q  = noDeck((i-5)*2.6, f*(P.d/2+3.1));
+      var q2 = noDeck((i-5)*2.6, f*(P.d/2+3.1-0.72));
+      espreg.push({x:q[0], y:0.52, z:q[1], ry:pr+(f>0?0:Math.PI), sx:0.72, sy:0.24, sz:2.0});
+      tectos.push({x:q2[0], y:0.74, z:q2[1], ry:pr+(f>0?0:Math.PI), rx:rad(-32),
+                   ordem:'YXZ', sx:0.72, sy:0.2, sz:0.9});
       if(i%3===1){
-        sombras.push({x:x+1.3, y:0.5, z:z + f*1.5});
+        var q3 = noDeck((i-5)*2.6+1.3, f*(P.d/2+4.6));
+        sombras.push({x:q3[0], y:0.5, z:q3[1]});
       }
     });
   }
@@ -1279,7 +997,7 @@ function construirProjeto(){
   var contorno = caixa(RL.w+2.4, 0.26, RL.d+2.4, MAT.pedra);
   contorno.position.set(RL.x, 0.13, RL.z); contorno.rotation.y = rad(RL.rot);
   contorno.receiveShadow = true; scene.add(contorno);
-  var relvado = caixa(RL.w, 0.34, RL.d, mat(0x6FA83F,{roughness:0.95}));
+  var relvado = caixa(RL.w, 0.34, RL.d, mat(0x74994A,{roughness:0.95}));
   relvado.position.set(RL.x, 0.15, RL.z); relvado.rotation.y = rad(RL.rot);
   relvado.receiveShadow = true; scene.add(relvado);
 
@@ -1290,37 +1008,39 @@ function construirProjeto(){
   var bermaMesh = new THREE.Mesh(fita(VIA_ACESSO, 6.6, 0.13), mat(0xBCB39C,{roughness:1}));
   bermaMesh.receiveShadow = true; scene.add(bermaMesh);
 
-  // ligação à estrada pública, do lado nascente
+  /* Ligação à estrada pública. O ponto de acesso está em js/implantacao.js
+     e é o limite sudeste, que é por onde a estrada passa encostada ao lote
+     na fotografia aérea — não é escolha de composição. */
+  var portao = [IMP.ACESSO.x, IMP.ACESSO.z];
   var maisPerto = null;
-  VIA_ACESSO.forEach(function(p){
-    var d = distALinha(ESTRADAS[0].pts, p[0], p[1]);
-    if(!maisPerto || d < maisPerto.d) maisPerto = {d:d, p:p};
+  VIA_ACESSO.forEach(function(q){
+    var d = Math.hypot(q[0]-portao[0], q[1]-portao[1]);
+    if(!maisPerto || d < maisPerto.d) maisPerto = {d:d, p:q};
   });
-  var alvoEstrada = (function(){
-    var melhor = null;
-    aoLongo(ESTRADAS[0].pts, 4, 0).forEach(function(q){
-      var d = Math.hypot(q.x-maisPerto.p[0], q.z-maisPerto.p[1]);
-      if(!melhor || d < melhor.d) melhor = {d:d, x:q.x, z:q.z};
-    });
-    return melhor;
+  var fora = (function(){                      // 16 m para lá do limite
+    var cen = centroide(LOTE);
+    var vx = portao[0]-cen[0], vz = portao[1]-cen[1], L = Math.hypot(vx,vz)||1;
+    return [portao[0]+vx/L*16, portao[1]+vz/L*16];
   })();
-  var entrada = [[maisPerto.p[0], maisPerto.p[1]], [alvoEstrada.x, alvoEstrada.z]];
+  var entrada = [[maisPerto.p[0], maisPerto.p[1]], portao, fora];
   var acesso = new THREE.Mesh(fita(entrada, 6.0, 0.15), mat(0x4C5049,{roughness:0.95}));
   acesso.receiveShadow = true; scene.add(acesso);
-  PONTOS.entrada = new THREE.Vector3(
-    (entrada[0][0]+entrada[1][0])/2, 0, (entrada[0][1]+entrada[1][1])/2);
+  PONTOS.entrada = new THREE.Vector3(portao[0], 3.0, portao[1]);
+  PONTOS.entrada_de = [fora[0], 3.4, fora[1]];
   // pilares do portão
-  [[-1],[1]].forEach(function(s, k){
-    var dx = entrada[1][0]-entrada[0][0], dz = entrada[1][1]-entrada[0][1];
+  [-1,1].forEach(function(k){
+    var dx = fora[0]-portao[0], dz = fora[1]-portao[1];
     var L = Math.hypot(dx,dz)||1, nx = dz/L*5.0, nz = -dx/L*5.0;
     var pil = caixa(1.1, 2.6, 1.1, MAT.parede);
-    pil.position.set(PONTOS.entrada.x + (k?nx:-nx), 1.3, PONTOS.entrada.z + (k?nz:-nz));
+    pil.position.set(portao[0] + k*nx, 1.3, portao[1] + k*nz);
     scene.add(pil);
   });
 
   // estacionamento junto ao hotel, do lado de fora do L
+  /* Do lado de dentro do L: no lote real o hotel está a 11 m do limite e
+     um parque do lado de fora saía cá para fora. */
   var hr = rad(IMP.HOTEL_A.rot);
-  var ex = IMP.HOTEL_A.x + Math.sin(hr)*(IMP.HOTEL_A.d/2+7.5);
+  var ex = IMP.HOTEL_A.x - Math.sin(hr)*(IMP.HOTEL_A.d/2+7.5);
   var ez = IMP.HOTEL_A.z + Math.cos(hr)*(IMP.HOTEL_A.d/2+7.5);
   var parque = caixa(IMP.HOTEL_A.w-6, 0.14, 11, MAT.pedra);
   parque.position.set(ex, 0.2, ez); parque.rotation.y = hr; scene.add(parque);
@@ -1380,7 +1100,8 @@ function construirProjeto(){
   });
   for(var t=0;t<16;t++){
     var ang = (t+0.5)/16*6.2832;   // meio passo, para deixar os eixos livres
-    porPalmeira(D.x + Math.cos(ang)*(D.w/2+3.6), D.z + Math.sin(ang)*(D.d/2+3.6));
+    var qq = noDeck(Math.cos(ang)*(D.w/2+3.6), Math.sin(ang)*(D.d/2+3.6));
+    porPalmeira(qq[0], qq[1]);
   }
   for(var m=0;m<IMP.CASAS.length-1;m++){
     var c1 = IMP.CASAS[m], c2 = IMP.CASAS[m+1];
@@ -1419,8 +1140,8 @@ function construirProjeto(){
   });
   for(var s=0;s<22;s++){
     var an = s/22*6.2832;
-    var bx = D.x + Math.cos(an)*(D.w/2+1.2), bz = D.z + Math.sin(an)*(D.d/2+1.2);
-    balizas.push({x:bx, y:0.4, z:bz});
+    var qb = noDeck(Math.cos(an)*(D.w/2+1.2), Math.sin(an)*(D.d/2+1.2));
+    balizas.push({x:qb[0], y:0.4, z:qb[1]});
   }
   instanciar(new THREE.CylinderGeometry(0.09,0.12,1,6).translate(0,0.5,0), MAT.metal, candeeiros, {sombra:true});
   instanciar(new THREE.CylinderGeometry(0.1,0.1,0.55,6), mat(0xCFC7B4), balizas, {sombra:false});
@@ -1451,12 +1172,33 @@ function construirProjeto(){
     scene.add(luz); LUZES_NOITE.push(luz);
   });
 
-  // pontos de interesse para as vistas
-  PONTOS.hotel   = new THREE.Vector3(IMP.HOTEL_A.x, 8, IMP.HOTEL_A.z);
-  PONTOS.piscina = new THREE.Vector3(P.x, 2, P.z);
+  /* Pontos de interesse e, para as vistas ao nível do solo, o sítio onde a
+     câmara se põe. Saem da implantação, não de coordenadas escritas à mão:
+     quando os volumes se mexem, as vistas acompanham. */
+  var cen = centroide(LOTE);
+  PONTOS.centro  = new THREE.Vector3(cen[0], 4, cen[1]);
   PONTOS.apart   = new THREE.Vector3(IMP.APART.x, 8, IMP.APART.z);
-  PONTOS.moradias= new THREE.Vector3(IMP.CASAS[4][0], 5, IMP.CASAS[4][1]);
-  PONTOS.centro  = new THREE.Vector3(centroide(LOTE)[0], 4, centroide(LOTE)[1]);
+
+  PONTOS.piscina = new THREE.Vector3(P.x, 1.2, P.z);
+  /* Ao longo do eixo maior do tanque, do topo poente: a piscina à frente e
+     as moradias atrás. Do lado sul não há recuo — a fila de moradias está a
+     7 m do deck e a câmara acabava dentro de uma delas. */
+  var qp = noDeck(-(P.w/2 + 14), 5);
+  PONTOS.piscina_de = [qp[0], 2.4, qp[1]];
+
+  /* O hotel vê-se do miolo aberto do lote, na direção do deck: de frente,
+     perpendicular, o braço do L tapava a ala e não há recuo que chegue —
+     para sul o lote estreita. */
+  PONTOS.hotel = new THREE.Vector3(IMP.HOTEL_A.x, 9, IMP.HOTEL_A.z);
+  var vh = [D.x - IMP.HOTEL_A.x, D.z - IMP.HOTEL_A.z];
+  var lh = Math.hypot(vh[0], vh[1]) || 1;
+  PONTOS.hotel_de = [IMP.HOTEL_A.x + vh[0]/lh*58, 15, IMP.HOTEL_A.z + vh[1]/lh*58];
+
+  var rv = rad(IMP.CASA_ROT_VOL);
+  var mix = Math.sin(rv), miz = -Math.cos(rv);            // lado interior das moradias
+  var c5 = IMP.CASAS[4];
+  PONTOS.moradias = new THREE.Vector3(c5[0], 5, c5[1]);
+  PONTOS.moradias_de = [c5[0] + mix*38, 7, c5[1] + miz*38];
 }
 
 /* ============================================ 11. CÂMARA E NAVEGAÇÃO
@@ -1472,26 +1214,26 @@ var menosMovimento = !!(window.matchMedia && window.matchMedia('(prefers-reduced
 
 var VISTAS = [
   {t:'Aérea',      desc:'O terreno visto de cima, com o norte para cima',
-   alvo:[6,6,6],      yaw:0,    pitch:66, dist:430},
-  {t:'Vista larga', desc:'O lote no meio do que está à volta',
-   alvo:[10,6,10],    yaw:-42,  pitch:30, dist:560},
+   ponto:'centro',    yaw:0,    pitch:66, dist:400, altura:6},
+  {t:'Vista larga',desc:'O lote no meio do que está à volta',
+   ponto:'centro',    yaw:-42,  pitch:30, dist:540, altura:6},
   {t:'Entrada',    desc:'Do portão, a olhar para dentro do lote',
-   ponto:'entrada',   yaw:118,  pitch:3,  dist:58, altura:3.0},
-  {t:'Hotel',      desc:'O hotel em L e a esplanada, a poente',
-   ponto:'hotel',     yaw:32,   pitch:9,  dist:96, altura:6},
+   ponto:'entrada',   de:'entrada_de'},
+  {t:'Hotel',      desc:'O hotel em L, ao longo do limite poente',
+   ponto:'hotel',     de:'hotel_de'},
   {t:'Piscina',    desc:'Do deck, sobre a piscina de 200 m²',
-   ponto:'piscina',   de:[-9, 2.6, -38.5], altura:1.3},
-  {t:'Moradias',   desc:'As dez moradias, viradas ao interior',
-   ponto:'moradias',  de:[22, 6, -20],     altura:5},
-  {t:'Envolvente', desc:'Os campos, as ruas e o casario à volta',
-   alvo:[0,6,0],      yaw:-96,  pitch:22, dist:900}
+   ponto:'piscina',   de:'piscina_de'},
+  {t:'Moradias',   desc:'As dez moradias, ao longo do limite nascente',
+   ponto:'moradias',  de:'moradias_de'},
+  {t:'Envolvente', desc:'O estádio, o centro hípico e os campos à volta',
+   ponto:'centro',    yaw:-96,  pitch:24, dist:880, altura:6}
 ];
 
 /* Empurra um ponto para fora de qualquer tronco ou copa. As vistas ao nível
    do solo são escolhidas à mão, mas as árvores são geradas: sem isto, uma
    vista abria com uma palmeira a tapar meio ecrã. */
 function desimpedir(de){
-  for(var passo=0; passo<24; passo++){
+  for(var passo=0; passo<30; passo++){
     var bateu = false;
     for(var i=0;i<OBSTACULOS.length;i++){
       var o = OBSTACULOS[i];
@@ -1500,6 +1242,13 @@ function desimpedir(de){
         var f = (o.r - d + 0.4)/(d || 1);
         de[0] += dx*f; de[2] += dz*f; bateu = true;
       }
+    }
+    for(var k=0;k<FOOTPRINTS.length;k++){          // e de dentro das paredes
+      var fp = FOOTPRINTS[k];
+      if(fp.h <= 0.5) continue;
+      if(!dentroPegada(fp, de[0], de[2], 2.5)) continue;
+      var vx = de[0]-fp.x, vz = de[2]-fp.z, L = Math.hypot(vx,vz) || 1;
+      de[0] += vx/L*2.5; de[2] += vz/L*2.5; bateu = true;
     }
     if(!bateu) break;
   }
@@ -1530,10 +1279,11 @@ function irPara(v, instantaneo){
     ? PONTOS[v.ponto].clone() : new THREE.Vector3(v.alvo[0], v.alvo[1], v.alvo[2]);
   if(v.altura !== undefined) alvo.y = v.altura;
   var destino;
-  if(v.de) desimpedir(v.de);
-  if(v.de){
+  var de = typeof v.de === 'string' ? PONTOS[v.de] : v.de;
+  if(de) desimpedir(de);
+  if(de){
     // a vista é dada pelo sítio onde a câmara está; o resto deduz-se
-    var d = new THREE.Vector3(v.de[0], v.de[1], v.de[2]).sub(alvo);
+    var d = new THREE.Vector3(de[0], de[1], de[2]).sub(alvo);
     var comp = d.length() || 1;
     destino = {alvo:alvo, yaw:Math.atan2(d.x, d.z),
                pitch:Math.asin(clamp(d.y/comp,-1,1)), dist:comp};
@@ -1566,10 +1316,14 @@ function mostrarEtiqueta(txt){
   tEtiqueta = setTimeout(function(){ el.classList.remove('ver'); }, 2600);
 }
 
-/* Altura do chão onde se está: o lote é uma plataforma, o deck outra. */
+/* Altura do chão onde se está: o lote é uma plataforma, o deck outra.
+   O deck está rodado com a implantação — testá-lo com os eixos do mundo
+   dava a cota errada e enterrava quem andasse a pé. */
 function superficie(x,z){
-  var D = IMP.DECK;
-  if(Math.abs(x-D.x) < D.w/2 && Math.abs(z-D.z) < D.d/2) return 0.4;
+  var D = IMP.DECK, r = rad(D.rot);
+  var dx = x-D.x, dz = z-D.z, c = Math.cos(-r), sn = Math.sin(-r);
+  var lx = dx*c - dz*sn, lz = dx*sn + dz*c;
+  if(Math.abs(lx) < D.w/2 && Math.abs(lz) < D.d/2) return 0.4;
   if(dentroPol(LOTE,x,z)) return 0.0;
   return -0.15;
 }
@@ -1606,7 +1360,8 @@ function trocarModo(novo, silencioso){
     p.x -= dir.x * Math.min(orb.dist*0.55, 26);
     p.z -= dir.z * Math.min(orb.dist*0.55, 26);
     for(var t=0;t<40 && !podeEstar(p.x,p.z);t++){ p.x -= dir.x*1.5; p.z -= dir.z*1.5; }
-    pe.pos.set(p.x, superficie(p.x,p.z)+1.7, p.z);
+    var livre = desimpedir([p.x, 0, p.z]);      // fora de troncos e de paredes
+    pe.pos.set(livre[0], superficie(livre[0],livre[2])+1.7, livre[2]);
     pe.yaw = orb.yaw; pe.pitch = Math.max(rad(-20), Math.min(rad(12), orb.pitch*0.3));
     if(!silencioso) mostrarEtiqueta('W A S D para andar · shift para correr');
   } else {
@@ -1795,8 +1550,9 @@ var LEGENDA = [
   ['#3E9BC4','Piscina de 200 m² e bar','Deck, espreguiçadeiras e bar de apoio, ao centro do lote.'],
   ['#86A455','Relvado de eventos','A sul, entre o hotel e o pomar.'],
   ['#4C5E34','Pomar e palmeiras','Plantados na faixa junto ao limite, deixando o centro aberto.'],
-  ['#3B3F3C','Via de acesso','Contorna o construído e liga à estrada pública a nascente.'],
-  ['#B08D3E','Limite do lote','O polígono real, 17.500 m². Liga e desliga na barra de baixo.']
+  ['#3B3F3C','Via de acesso','Contorna o construído e liga à estrada que passa no limite sudeste.'],
+  ['#9C8A6E','Envolvente real','Fotografia aérea classificada: estradas, pista, campo, hípico e parcelas.'],
+  ['#B08D3E','Limite do lote','O polígono medido, 16.288 m². Liga e desliga na barra de baixo.']
 ];
 function montarInterface(linhaLimite){
   var vistas = document.getElementById('vistas');
@@ -1845,10 +1601,8 @@ function marcarVista(i){
 var linhaLimite = null;
 var ETAPAS = [
   ['A abrir o terreno',      function(){ arrancarRenderer(); construirMateriais(); construirCeu(); }],
-  ['A desenhar os campos',   function(){ construirChao(); }],
-  ['A abrir as estradas',    function(){ construirEstradas(); }],
-  ['A levantar o casario',   function(){ construirVizinhanca(gerarVizinhanca()); }],
-  ['A plantar a zona',       function(){ construirVegetacao(); }],
+  ['A assentar a fotografia',function(){ construirChao(); }],
+  ['A levantar a envolvente',function(){ construirEnvolvente(); }],
   ['A implantar o lote',     function(){ linhaLimite = construirLote(); }],
   ['A construir o hotel',    function(){ construirProjeto(); }],
   ['A acender a luz',        function(){
