@@ -6,11 +6,16 @@ projeto e o processo urbanístico à medida que avança.
 
 ## Estado atual
 
-- Branch de trabalho: `claude/site-assistance-pk5n2b` → PR #6 em
-  `davicriaofc-cmd/Site-Terreno` (ver com `git log` se precisares do estado
-  mais recente). O `claude/mano-slfa79` / PR #2 é histórico antigo.
-- Todo o site vive num único `index.html`. Sem framework, sem npm — editar
-  diretamente o ficheiro.
+- Branch de trabalho: `claude/zen-curie-lr4ixr` → PR #8, saído de `main` já
+  com o trabalho do PR #6 integrado (confirmar sempre com `git log`). O #8
+  atualiza-se sozinho a cada push — não abrir PRs novos. Os
+  `claude/site-assistance-pk5n2b` / PR #6 e `claude/mano-slfa79` / PR #2 são
+  histórico.
+- Ficheiros: `index.html` (o site), `precos.html` (as contas), `maquete.html`
+  (a cena 3D — é o Modelo 1), `js/implantacao.js` (lote e volumes),
+  `js/envolvente.js` (o que existe à volta), `images/envolvente/solo.webp`
+  (a fotografia aérea classificada) e `vendor/three.min.js`. Sem framework,
+  sem npm — editar diretamente os ficheiros.
 
 ## Dados reais do projeto (não inventar/alterar sem confirmação do utilizador)
 
@@ -19,17 +24,26 @@ projeto e o processo urbanístico à medida que avança.
   8°12'05"W. **Não é na cidade de Évora** — Évora aparece no site só como
   argumento de mercado (o novo hospital) e como referência de tipologia
   (Hotel Ibis). Não voltar a escrever que o terreno é em Évora.
-- **Área do terreno:** 17.500 m² (não é 1.700 — esse número apareceu numa
-  versão inicial e estava errado). Uma medição do utilizador no Google
-  Earth deu 16.152 m² / 615 m de perímetro, mas o polígono era traçado à
-  mão; o utilizador confirmou que o valor a usar é 17.500 m².
-- **Forma do lote:** polígono irregular, tipo cunha, com o eixo maior a
-  correr NNO–SSE; lado mais largo a norte, a estreitar para sul. Estrada
-  ao longo do limite nascente/sudeste. Terreno praticamente plano
-  em declive (225,18–233,41 m de cota, ~1% ao longo do eixo maior), mas os
-  **8 m de desnível não são irrelevantes**: mandam na cota a partir da qual
-  se mede a altura de fachada, e no que é preciso escavar ou aterrar. A
-  maquete 3D modela o lote plano — é uma simplificação conhecida. Ver o print do Google Earth no histórico da sessão.
+- **Área do terreno: 17.500 m², e a discrepância está resolvida.** O
+  utilizador reafirmou os 17.500 m² como área do projeto. A forma vem do
+  polígono que ele mediu no Google Earth (16/10/2025), com cotas de 225,19 m
+  a 234,02 m. O painel de medição do Google Earth dizia 16.287,82 m² para
+  esse polígono, mas isso depende da escala: a **barra de escala da mesma
+  interface dá 0,606 m/px** e a escala que faz o polígono valer 17.500 m² é
+  **0,60361 m/px** — 0,4% de diferença. Ou seja, **a barra de escala e os
+  17.500 m² concordam; é o número da área do painel que destoa**. Adotou-se
+  0,60361 m/px, e toda a cena (lote, edifícios, árvores, estádio) está a essa
+  escala. Sanidade: o campo de futebol do complexo desportivo dá 120 × 74 m,
+  que é um campo com as folgas laterais.
+- **Forma do lote (medida, não assumida):** cunha com 238 m no eixo
+  norte–sul e 157 m no máximo a nascente–poente. Larga a meio (101 m úteis
+  à latitude do ponto nascente), estreita para norte (29 m) e afila para sul
+  até fechar. Dois limites a direito que mandam na implantação: **nascente,
+  113 m** (é onde vão as moradias) e **poente, 123 m** (é onde vai o hotel).
+  A estrada pública passa encostada ao **limite sudeste** — é por aí que
+  entra o acesso. Desnível de **9 m** (225,19 a 234,02 m): manda na cota a
+  partir da qual se mede a fachada e no que é preciso escavar. **A maquete
+  modela o lote plano** — é a simplificação que falta resolver.
 - **Classificação atual:** Equipamento (não permite hotel).
 - **Classificação prevista:** Serviços e Turismo — já incluída pelo Município
   no novo PDM, precisamente para permitir o hotel.
@@ -60,6 +74,123 @@ Regra importante ao editar conteúdo: distinguir sempre o que está **confirmado
 (índice 40%, 3 pisos, etc.) do que está **em avaliação/pendente** (índice 60%,
 tipologia mista). Não apresentar o cenário pendente como decidido.
 
+## Georreferenciação: tudo assenta na fotografia aérea
+
+A cena 3D não é mais uma paisagem inventada. Está toda sobre a fotografia
+aérea do Google Earth que o utilizador forneceu (16/10/2025, câmara a
+38°38'33.14"N 8°12'00.46"W), à mesma escala e na mesma origem.
+
+**Como se chegou lá** (o guião está no histórico desta sessão; se for preciso
+refazer com uma fotografia nova, é este o caminho):
+
+1. Detetar a linha amarela de medição na imagem, preencher o interior e
+   extrair o contorno ordenado. Simplificar (Douglas–Peucker) e recuar meia
+   espessura da linha, para ficar com o eixo e não com a borda de fora.
+2. **Calibrar em 0,60361 m/px**, que é a escala que dá ao polígono medido os
+   17.500 m² do projeto e coincide com a barra dos 100 m da interface (0,606).
+   O número de área do painel de medição (16.287,82 m²) corresponderia a
+   0,5823 m/px e ficou de fora. Régua independente: o campo de futebol dá
+   120 × 74 m a esta escala.
+3. Origem no centro do polígono. +x nascente, −z norte.
+4. Classificar a fotografia por tipo de ocupação e reduzir a uma **grelha de
+   3 m** → `ENVOLVENTE.TERRENO.g`, uma string com um carácter por célula. O
+   `maquete.html` constrói dela uma **malha com cor por vértice**, juntando
+   células iguais na mesma linha. **Deixou de haver fotografia na cena** — foi
+   requisito explícito do utilizador: "não usar fotografias como substituto
+   de 3D". O `images/envolvente/solo.webp` foi apagado.
+5. Separar estradas de esplanadas **pela largura local** (transformada de
+   distância sobre a grelha): faixas de pavimento com menos de ~13 m são
+   estrada (classe 3), manchas largas ficam esplanada. É o critério objetivo
+   que sobrou — a cor não separa estradas neste sítio, porque está tudo seco
+   e claro. **Não traçar estradas a olho**: o utilizador queixou-se
+   explicitamente de estradas inventadas.
+6. Detetar coberturas e copas → `EDIFICIOS`, `ARVORES`. Medir o campo e a
+   pista do complexo desportivo → `ESTADIO`, que a cena constrói em volume
+   (anel da pista, campo e bancada com pala).
+
+**O que é real e o que não é:** posição, forma em planta e orientação de tudo
+são medidas. **A altura dos volumes da envolvente é estimada** pela área de
+implantação e pelo tipo de cobertura — uma fotografia de cima não dá altura.
+As **cavalariças do centro hípico** aparecem agrupadas em massas: a deteção
+não as separa edifício a edifício a esta resolução.
+
+**A cartografia aberta está bloqueada.** O Overpass (OpenStreetMap) devolve
+403 no proxy de egresso desta sessão — confirmado a 19/09/2026, com o motivo
+registado em `$HTTPS_PROXY/__agentproxy/status`. Seria a via limpa para ter a
+rede de estradas e as pegadas dos edifícios com coordenadas em vez de
+deteção. Não insistir; é política de rede, não avaria.
+
+## A implantação vive num sítio só: `js/implantacao.js`
+
+O polígono do lote e o centro, dimensões e rotação de cada volume estão em
+`js/implantacao.js` (`window.IMPLANTACAO`), com duas funções partilhadas:
+`afastar(pol,d)` (recuo por bissetriz) e `viaDeAcesso(pol,pegadas,d,margem)`
+(a via que contorna o construído em vez de lhe passar por baixo).
+
+**Os volumes foram reencaixados no polígono real** por um solver de relaxação
+(empurra para dentro do lote, separa colisões, o L do hotel e a fila de
+moradias andam como peças rígidas). O resultado, verificado:
+
+- Hotel em L (56×16 + 16×22) ao longo do limite poente, recuo 11 m.
+- Apartamentos (52×14) no lobo norte, recuo 7 m.
+- 10 moradias (8×12) ao longo do limite nascente, espaçadas 11,2 m, recuo 7 m.
+- Deck 34×24 com piscina de 200 m² e bar, ao centro, recuo 20 m.
+- Relvado de eventos (28×20) na cauda sul, recuo 5 m.
+- **Nenhum canto de nenhum volume sai do lote.** Era requisito explícito do
+  utilizador. Se mexeres num volume, revalida os outros — o guião do solver
+  está no histórico.
+
+Nada aqui está alinhado com os eixos: o lote é oblíquo, por isso o deck, a
+piscina, o bar, as espreguiçadeiras e o relvado levam todos a rotação da
+implantação. Esquecer isso foi um erro já cometido.
+
+## Os modelos: o 1 leva o projeto, os 2 a 5 são a base
+
+`maquete.html?base=1` abre a mesma cena **sem o projeto** — só o terreno, as
+estradas, o casario, o hípico, o estádio, as parcelas e as árvores. É o que
+os Modelos 2 a 5 abrem (`MODELO_BASE` no `index.html`), a pedido do
+utilizador: "não quero o hotel nos outros modelos". Nesse modo as vistas do
+projeto são filtradas (`v.projeto`) e ficam quatro: aérea, larga, envolvente
+e estádio.
+
+## O Modelo 1 é a cena 3D
+
+`maquete.html` a ecrã inteiro, aberto **dentro da vista do Modelo 1, num
+iframe**, e daí pelo botão "Abrir em ecrã inteiro". Houve uma entrada de menu
+`07 · Maquete 3D navegável` a apontar para a mesma cena: o utilizador mandou
+apagá-la, por ser rota a dobrar, e a seguir mandou a entrada dos Modelos
+ocupar o 07 que vagou. **O menu é 01 a 07, e os Modelos são o 07.** Em
+conversas anteriores a esta mudança os Modelos eram a "aba 10" — se o
+utilizador lhe chamar isso, é desta que fala. Havia aqui uma segunda maquete
+construída por código dentro do `index.html`: foi removida. Duas cenas com a
+mesma implantação divergem sempre, e só uma tinha o terreno real. Com ela
+foi-se a animação de "crescer ao abrir" — se o utilizador der pela falta,
+passa-se para a cena nova em vez de ressuscitar a antiga.
+
+A cena tem: órbita e modo a pé (WASD, shift, manche no telemóvel, colisão
+contra os volumes), sete vistas nas teclas 1 a 7, dia/noite no N.
+
+**As vistas ao nível do solo saem da implantação, não de coordenadas escritas
+à mão** (`PONTOS.piscina_de`, `hotel_de`, `moradias_de`, `entrada_de`), e
+passam por `desimpedir()`, que afasta a câmara de troncos e de paredes. Já se
+partiram duas vezes por estarem fixas: quando os volumes mudam de sítio, as
+vistas fixas ficam dentro de um edifício.
+
+**Como está feita:** o chão é a fotografia num plano; tudo o que se repete —
+edifícios vizinhos, árvores, palmeiras, espreguiçadeiras, candeeiros — passa
+por `instanciar()`, que é `InstancedMesh`. Os materiais que acendem de noite
+estão em `EMISSIVOS`, os objetos só-de-noite em `LUZES_NOITE`.
+
+Armadilhas já apanhadas, para não voltarem:
+
+- `ShapeGeometry` deitada com `rotateX(+90°)` fica com as normais para baixo
+  e **não se desenha**. Por isso `chapa()` passa o z trocado de sinal e roda
+  −90°.
+- Pintar as estradas na textura do chão **e** desenhá-las em 3D dava bandas
+  ao dobro da largura e desfocadas. Agora só existem na fotografia.
+- A deteção de copas apanha relvado sintético e telhados escuros: o campo de
+  futebol ficou com um bosque em cima. O filtro está no guião de extração.
+
 ## Estrutura do site (ordem das secções)
 
 Confirmar sempre com `grep -n '<section id=' index.html` — esta lista já
@@ -72,7 +203,8 @@ esteve desatualizada.
 5. `#corte` — corte esquemático em SVG (3 pisos, 12 m, cave, explanada)
 6. `#plot` — índice de ocupação atual (40% hotel / 60% livre)
 7. `#expansao` — cenário em avaliação (índice alargado + tipologia mista)
-8. `#modelos` — 5 estudos volumétricos; o Modelo 1 abre a maquete 3D
+8. `#modelos` — 5 estudos volumétricos (menu: `07 · Modelos`, antes `10`);
+   o Modelo 1 abre a maquete 3D
 9. `#porque-agora` — os três argumentos (PDM aberto, hospital, Câmara)
 10. `#proximos-passos` — roteiro
 11. `#concept` — parâmetros confirmados (subsolo, explanada/piscinas, postes)
@@ -106,34 +238,22 @@ textura via `THREE.TextureLoader` em vez de gerar a cena processual em
 canvas. Basta acrescentar `img:'images/tour/nome.jpg'` a uma cena quando
 houver material real — não é preciso mexer no resto do código.
 
-## Maquete 3D do Modelo 1 (`#modelos` → vista de modelo)
+## Maquete do Modelo 1 — onde está agora
 
-O Modelo 1 abre com uma maquete 3D navegável (arrastar para rodar, roda para
-aproximar) que **cresce ao abrir**: o lote espalha-se, a via desenha-se, os
-edifícios sobem do chão, a piscina enche e o pomar nasce — cerca de 3 s no
-total. O botão "Ver crescer outra vez" repete. Script:
-`/* MODELO 1 — MAQUETE 3D (cresce ao abrir) */` no fim do `index.html`.
+Está em `maquete.html` e na secção **"O Modelo 1 é a cena 3D"** acima. O que
+havia aqui descrevia a maquete construída dentro do `index.html`, que foi
+removida. Permanece válido do que aí estava:
 
 - **Biblioteca:** `vendor/three.min.js` (three r160, build UMD), servida do
   próprio repositório — o site continua sem depender de CDNs. Não trocar por
   um CDN sem pedir.
-- **Só arranca quando o Modelo 1 é aberto** (nada de WebGL no carregamento da
-  página) e o `requestAnimationFrame` pára ao fechar. Sem WebGL, a maquete
-  fica escondida e mostra-se só o render — ver `MODELO_RENDERS['1'].maquete3d`.
-- **Lote:** polígono `LOTE`, traçado sobre o print do Google Earth e escalado
-  para dar exatamente 17.500 m². Não mexer sem refazer a escala.
-- **Implantação** (constantes no script, todas validadas por deteção de
-  colisão e recuo de 7 m aos limites — se mudares uma, revalida as outras):
-  hotel em L a sul (ala de 56×16 m + braço de 16×22 m, 3 pisos, fotovoltaico);
-  apartamentos a norte (52×14 m, 3 pisos, fotovoltaico); 10 moradias em banda
-  a nascente (8×12 m, 2 pisos, jacuzzi no rooftop); piscina de 200 m² com deck
-  e bar ao centro; relvado de eventos a sul; pomar em grelha; via perimetral
-  de 8 m entre `VIA_EXT` e `VIA_INT`.
-- **Câmara:** `enquadrar()` afasta-se sozinha até o construído caber, seja qual
-  for a proporção do canvas; `anguloDePartida()` escolhe a vista larga
-  (canvas ao baixo) ou a vista compacta (canvas em retrato).
-- `images/modelos/modelo1.png` passou a ser a **implantação de referência**,
-  mostrada mais pequena por baixo da maquete.
+- **Nada de WebGL no carregamento do `index.html`.** A cena só arranca quando
+  o Modelo 1 é aberto (o iframe só recebe `src` nessa altura) e o `src` é
+  retirado ao fechar, para libertar o contexto.
+- Sem WebGL, a cena mostra um aviso e o Modelo 1 fica só com o render.
+- `images/modelos/modelo1.png` é a **implantação de referência**, mostrada
+  mais pequena por baixo. É a Imagem 2 do pedido: o conceito do hotel saiu
+  dela e não deve ser alterado sem o utilizador pedir.
 
 ## Modelos 3D reais (pendente)
 
@@ -186,7 +306,10 @@ contido, sem emojis.
   continua no rodapé.
 - **Site encurtado: 9 secções → 6, 1.160 → 868 palavras.** Fundidas
   `#plot`+`#expansao` e `#corte`+`#concept` e `#porque-agora`+`#proximos-passos`.
-  No `#modelos` cada estudo ficou com uma linha. Menu refeito com 6 entradas, mais `07 · As contas` a apontar ao `precos.html`.
+  No `#modelos` cada estudo ficou com uma linha. Menu com 6 entradas (01 a 06)
+  mais `07 · Modelos` (que já foi `10`). As outras entradas `07` que
+  existiram — primeiro as contas, depois a maquete — foram ambas removidas a
+  pedido do utilizador.
 - **`three.js` só a pedido** — `carregarThree()` injeta o script quando o
   Modelo 1 abre. Não há pedido nenhum no arranque da página.
 - **Maquete mais realista** — MeshStandardMaterial com rugosidade, sol mais
@@ -231,15 +354,18 @@ contido, sem emojis.
   e desenhadas; falta validar. A pergunta que mais importa é **de que cota se
   mede a altura de fachada** — o lote varia entre 225 e 233 m, e a resposta
   pode valer um piso inteiro.
-- **Envolvente 3D** (Centro Hípico, estádio, pista, armazéns, estradas) —
-  falta um print do Google Earth mais afastado, ou o KML.
+- **Altura dos volumes da envolvente.** As posições e as formas em planta são
+  reais; as alturas são estimadas pela área de implantação. Fotos ao nível do
+  solo (mesmo de telemóvel) chegam para as corrigir.
+- **Relevo do lote.** Os 9 m de desnível continuam por modelar — é a maior
+  simplificação que sobra na cena. Resolve-se com os contornos de elevação do
+  Google Earth (ponto 3 do guia abaixo).
 - **Fotos reais do terreno** — o site não tem uma única. Servem para o hero,
   não para o 3D.
 - **Pormenor fino da maquete** (janelas individuais, varandas, caminhos,
   estacionamento, espreguiçadeiras). O teto sem `.glb` de arquiteto mantém-se.
-- **Envolvente do 3D continua à espera do KML.** Tentei ir buscá-la a
-  cartografia aberta (Overpass/Nominatim) — está bloqueado pelo proxy de rede
-  desta sessão. Tem mesmo de vir do utilizador.
+- **A envolvente já não espera por nada.** Saiu da fotografia aérea. O que
+  falta é altura e relevo, acima.
 
 ## Como tornar o terreno realista (guia para o utilizador)
 
@@ -261,10 +387,10 @@ primeiros são de graça e não dependem de ninguém de fora.
    lote. **Importante:** sem inclinação nenhuma, senão a imagem fica
    deformada e não assenta no polígono.
 
-2. **KML/KMZ do lote.** Substitui o polígono que eu tracei à mão por
-   coordenadas exatas. No Google Earth: **Guardar no projeto** e depois
-   exportar como KML. Resolve de vez a dúvida entre os 16.152 m² medidos e
-   os 17.500 m² assumidos.
+2. **KML/KMZ do lote — continua a valer, por outra razão.** O polígono já
+   não é traçado à mão: foi extraído da imagem que o utilizador mediu e dá
+   16.288 m². Mas o site escreve 17.500 m². O KML resolve qual é o bom, e
+   traz a forma com rigor de coordenadas em vez de rigor de pixel.
 
 3. **Contornos de elevação.** O terreno **não é plano** — 225,18 m no ponto
    mais baixo, 233,41 no mais alto, 8 m de diferença. A maquete modela-o
@@ -273,10 +399,11 @@ primeiros são de graça e não dependem de ninguém de fora.
    contornos dá para modelar o relevo real e ver onde é preciso escavar ou
    aterrar. Isto também interessa ao custo de construção.
 
-4. **Print mais afastado para a envolvente.** Um enquadramento que apanhe o
-   Centro Hípico D. Duarte, o estádio, a pista de atletismo e os armazéns.
-   Serve para construir os volumes à volta — mostra à Câmara que o projeto
-   se integra e ao investidor que o terreno não está isolado.
+4. **Print mais afastado — FEITO, e é o que sustenta a cena.** A fotografia
+   de 16/10/2025 apanha o complexo desportivo, o centro hípico, os armazéns
+   e as parcelas, e é dela que sai toda a envolvente. Cobre cerca de
+   830 × 560 m. Um enquadramento ainda mais largo alargaria a cena; não é
+   urgente.
 
 5. **Fotos do terreno ao nível do solo.** Não servem para geometria (uma
    foto não tem profundidade), mas servem para duas coisas: o hero do site,
@@ -311,13 +438,19 @@ Só deve existir **um PR aberto de cada vez** — o utilizador pediu isso
 explicitamente. Os PRs #1 e #5 foram fechados por essa razão (o #5 levou nota
 a dizer que o commit `4c85888`, "inclinar o hotel com o movimento do rato",
 continua no branch `claude/mano-slfa79` e nunca foi integrado). Não abrir PRs
-novos: o #6 atualiza-se sozinho a cada push.
+novos: o **#8** atualiza-se sozinho a cada push.
 
 ## Fluxo de trabalho
 
-- Commits diretamente para `claude/site-assistance-pk5n2b`, depois `git push`.
-  O PR #6 atualiza-se sozinho a cada push.
+- Commits diretamente para `claude/zen-curie-lr4ixr`, depois `git push`.
+  O PR #8 atualiza-se sozinho a cada push.
 - Antes de dar como concluída qualquer alteração visual, testar com
   Playwright headless (`/opt/pw-browsers/chromium`, `NODE_PATH=/opt/node22/lib/node_modules`)
-  e tirar screenshot — CDNs externos (Google Fonts, cdnjs three.js) podem
-  falhar no sandbox por bloqueio de rede; isso não é regressão do código.
+  e tirar screenshot — o Google Fonts falha no sandbox por bloqueio de rede e
+  isso não é regressão do código.
+- O renderizador de software do sandbox anda a ~3 fps: as transições de
+  câmara, que demoram 1,25 s num ecrã normal, levam lá perto de 10 s. Dar
+  tempo nos testes antes de concluir que uma vista está errada.
+- **Screenshot do `index.html` com o Modelo 1 aberto precisa de timeout
+  generoso** (o iframe com WebGL não estabiliza depressa): passar
+  `timeout` alto e `animations:'disabled'`.
