@@ -130,8 +130,10 @@ implantação. Esquecer isso foi um erro já cometido.
 `maquete.html` a ecrã inteiro, aberto **dentro da vista do Modelo 1, num
 iframe**, e daí pelo botão "Abrir em ecrã inteiro". Houve uma entrada de menu
 `07 · Maquete 3D navegável` a apontar para a mesma cena: o utilizador mandou
-apagá-la, por ser rota a dobrar. **O menu vai de 01 a 06 e depois 10 ·
-Modelos** — não é gralha. Havia aqui uma segunda maquete
+apagá-la, por ser rota a dobrar, e a seguir mandou a entrada dos Modelos
+ocupar o 07 que vagou. **O menu é 01 a 07, e os Modelos são o 07.** Em
+conversas anteriores a esta mudança os Modelos eram a "aba 10" — se o
+utilizador lhe chamar isso, é desta que fala. Havia aqui uma segunda maquete
 construída por código dentro do `index.html`: foi removida. Duas cenas com a
 mesma implantação divergem sempre, e só uma tinha o terreno real. Com ela
 foi-se a animação de "crescer ao abrir" — se o utilizador der pela falta,
@@ -173,7 +175,8 @@ esteve desatualizada.
 5. `#corte` — corte esquemático em SVG (3 pisos, 12 m, cave, explanada)
 6. `#plot` — índice de ocupação atual (40% hotel / 60% livre)
 7. `#expansao` — cenário em avaliação (índice alargado + tipologia mista)
-8. `#modelos` — 5 estudos volumétricos; o Modelo 1 abre a maquete 3D
+8. `#modelos` — 5 estudos volumétricos (menu: `07 · Modelos`, antes `10`);
+   o Modelo 1 abre a maquete 3D
 9. `#porque-agora` — os três argumentos (PDM aberto, hospital, Câmara)
 10. `#proximos-passos` — roteiro
 11. `#concept` — parâmetros confirmados (subsolo, explanada/piscinas, postes)
@@ -276,8 +279,9 @@ contido, sem emojis.
 - **Site encurtado: 9 secções → 6, 1.160 → 868 palavras.** Fundidas
   `#plot`+`#expansao` e `#corte`+`#concept` e `#porque-agora`+`#proximos-passos`.
   No `#modelos` cada estudo ficou com uma linha. Menu com 6 entradas (01 a 06)
-  mais `10 · Modelos`. As entradas `07` que existiram — primeiro as contas,
-  depois a maquete — foram ambas removidas a pedido do utilizador.
+  mais `07 · Modelos` (que já foi `10`). As outras entradas `07` que
+  existiram — primeiro as contas, depois a maquete — foram ambas removidas a
+  pedido do utilizador.
 - **`three.js` só a pedido** — `carregarThree()` injeta o script quando o
   Modelo 1 abre. Não há pedido nenhum no arranque da página.
 - **Maquete mais realista** — MeshStandardMaterial com rugosidade, sol mais
