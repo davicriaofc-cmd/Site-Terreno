@@ -23,22 +23,22 @@
 (function(){
   /* Limite real do lote — 21 vértices, 16 287 m², perímetro 637 m. */
   var LOTE = [
-                [11.8,-129.5],[29.7,-124.1],[31.9,-116.9],[114.1,-39.3],
-                [46.1,17.8],[16.6,55.0],[15.5,63.4],[3.1,73.1],
-                [-6.8,91.5],[-15.7,93.9],[-17.3,105.1],[-28.6,101.5],
-                [-30.3,93.7],[-43.0,83.9],[-43.0,63.5],[-38.0,60.2],
-                [1.4,-56.7],[-5.3,-80.8],[-29.1,-110.7],[-8.5,-118.8],
-                [-4.5,-125.7]];
+                [12.2,-134.3],[30.8,-128.6],[33.1,-121.2],[118.3,-40.8],
+                [47.8,18.4],[17.2,57.0],[16.1,65.8],[3.2,75.7],
+                [-7.0,94.8],[-16.3,97.3],[-18.0,108.9],[-29.7,105.2],
+                [-31.4,97.1],[-44.5,87.0],[-44.5,65.9],[-39.4,62.4],
+                [1.4,-58.8],[-5.5,-83.8],[-30.2,-114.8],[-8.9,-123.2],
+                [-4.7,-130.3]];
 
   /* 10 moradias ao longo do limite nascente, que tem 113 m a direito.
      Espaçadas 11,2 m: 8 m de volume e 3,2 m entre vizinhas. */
   var CASAS = [
-                [22.2,-108.2],[30.4,-100.5],[38.5,-92.8],[46.7,-85.1],[54.8,-77.4],
-                [63.0,-69.7],[71.1,-62.0],[79.2,-54.3],[87.4,-46.6],[95.5,-39.0]];
+                [23.0,-112.2],[31.5,-104.2],[39.9,-96.2],[48.4,-88.2],[56.8,-80.2],
+                [65.3,-72.3],[73.7,-64.3],[82.1,-56.3],[90.6,-48.3],[99.0,-40.4]];
 
   window.IMPLANTACAO = {
-    AREA_M2: 16288,          /* medida no Google Earth; o site diz 17.500 */
-    PERIMETRO_M: 637,
+    AREA_M2: 17500,          /* medida no Google Earth; o site diz 17.500 */
+    PERIMETRO_M: 660,
     LOTE: LOTE,
     CASAS: CASAS,
     CASA_ROT: 43.4,          /* graus — direção da fila, paralela ao limite nascente */
@@ -53,17 +53,17 @@
     /* Centro (x,z), dimensões em planta, rotação em graus.
        Hotel e relvado alinhados com o limite poente (123 m a direito);
        apartamentos, moradias, deck e bar alinhados com o limite nascente. */
-    HOTEL_A: {x:-2.4, z:14.0, w:56, d:16, pisos:3, rot:-71.4},
-    HOTEL_B: {x:22.0, z:1.2, w:16, d:22, pisos:3, rot:-71.4},
-    APART:   {x:11.2, z:-88.4, w:52, d:14, pisos:3, rot:43.4},
-    DECK:    {x:40.0, z:-43.2, w:34, d:24, rot:43.4},
-    PISCINA: {x:40.0, z:-43.2, w:20, d:10, rot:43.4},   /* 200 m² */
-    BAR:     {x:27.0, z:-29.4, w:9,  d:7,  rot:43.4},
-    RELVADO: {x:-22.5, z:61.1, w:28, d:20, rot:-71.4},
+    HOTEL_A:{x:-2.5, z:14.5, w:56, d:16, pisos:3, rot:-71.4},
+    HOTEL_B:{x:22.8, z:1.2, w:16, d:22, pisos:3, rot:-71.4},
+    APART:{x:11.6, z:-91.6, w:52, d:14, pisos:3, rot:43.4},
+    DECK:{x:41.5, z:-44.8, w:34, d:24, rot:43.4},
+    PISCINA:{x:41.5, z:-44.8, w:20, d:10, rot:43.4},   /* 200 m² */
+    BAR:{x:28.0, z:-30.5, w:9,  d:7,  rot:43.4},
+    RELVADO:{x:-23.3, z:63.3, w:28, d:20, rot:-71.4},
 
     /* Portão: no limite sudeste, que é onde a estrada pública passa
        encostada ao lote na fotografia aérea. */
-    ACESSO: {x:80.1, z:-10.7},
+    ACESSO: {x:83.0, z:-11.1},
 
     afastar: afastar,
     viaDeAcesso: viaDeAcesso

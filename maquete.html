@@ -180,8 +180,8 @@
 <div class="topo">
   <a class="voltar mono" href="index.html">‹ Voltar</a>
   <div class="titulo">
-    <h1>Maquete <em>3D</em></h1>
-    <span class="sub mono">16.288 m² medidos · Montemor-o-Novo · visualização conceptual</span>
+    <h1 id="tituloCena">Maquete <em>3D</em></h1>
+    <span class="sub mono">17.500 m² · Montemor-o-Novo · maquete conceptual</span>
   </div>
   <div class="topo-dir">
     <button class="btn" id="btnLuz" type="button">Noite</button>
@@ -199,7 +199,7 @@
     <button class="btn on" id="btnOrbita" type="button">Órbita</button>
     <button class="btn" id="btnPe" type="button">Andar a pé</button>
     <button class="btn" id="btnLimite" type="button">Limite do lote</button>
-    <span class="dica mono" id="dica">Arrasta para rodar · roda do rato para aproximar</span>
+    <span class="dica mono" id="dica">Arrasta para rodar · roda do rato para aproximar · 1 a 8 para as vistas</span>
   </div>
 </div>
 
@@ -207,14 +207,13 @@
   <button class="btn icone fechar" id="btnFechar" type="button" aria-label="Fechar">✕</button>
   <div class="mono" style="opacity:.55">O que estás a ver</div>
   <h2>O hotel no terreno, e o que está à volta</h2>
-  <p>O terreno é o que foi medido no Google Earth: <strong>16.288 m²</strong> e 617 m
-     de perímetro. O chão à volta é essa mesma fotografia aérea, classificada por tipo
-     de ocupação — as estradas, a pista de atletismo, o campo, o centro hípico e as
-     parcelas agrícolas estão onde estão na realidade.</p>
-  <p>Os volumes do projeto foram reencaixados neste polígono, que é mais estreito do
-     que o assumido antes: hotel em L a poente, apartamentos a norte, dez moradias ao
-     longo do limite nascente, piscina e bar ao centro, relvado a sul. Nenhum deles
-     sai do lote — o recuo mínimo é de 7 m nos edifícios.</p>
+  <p>O terreno tem a forma que foi medida no Google Earth e <strong>17.500 m²</strong>.
+     Tudo o que está à volta foi levantado dessa mesma fotografia — mas nada aqui é
+     fotografia: o chão é uma malha classificada célula a célula, e os edifícios, o
+     complexo desportivo e as árvores são volumes.</p>
+  <p>Os volumes do projeto foram encaixados neste polígono: hotel em L a poente,
+     apartamentos a norte, dez moradias ao longo do limite nascente, piscina e bar ao
+     centro, relvado a sul. Nenhum deles sai do lote.</p>
 
   <h3>No lote</h3>
   <div id="legenda"></div>
@@ -225,7 +224,7 @@
     <b>Roda / dois dedos</b><span>Aproximar e afastar</span>
     <b>W A S D</b><span>Andar, no modo a pé</span>
     <b>Shift</b><span>Andar mais depressa</span>
-    <b>1 … 7</b><span>Saltar para cada vista</span>
+    <b>1 … 8</b><span>Saltar para cada vista</span>
     <b>N</b><span>Trocar dia e noite</span>
   </div>
 
@@ -235,13 +234,15 @@
        para se perceber ocupação, distâncias e relação com a envolvente.</p>
     <p><strong>A envolvente é real em planta, estimada em altura.</strong> Posição, forma
        e orientação vêm da fotografia aérea. A altura de cada edifício vizinho não vem —
-       uma fotografia de cima não a dá — e está estimada pela área de implantação.</p>
+       uma fotografia de cima não a dá — e está estimada pela área de implantação. As
+       cavalariças do centro hípico aparecem agrupadas em massas, não uma a uma.</p>
     <p><strong>O lote está modelado plano.</strong> No terreno há cerca de 9 m de desnível
        (225,19 m a 234,02 m). Conta para a cota a partir da qual se mede a fachada e para
        o que é preciso escavar — está por modelar.</p>
-    <p><strong>A área não bate com a do site.</strong> Aqui está o polígono medido,
-       16.288 m². O resto do site escreve 17.500 m², que vem de outra fonte. São 7% de
-       diferença e falta decidir qual prevalece.</p>
+    <p><strong>A escala.</strong> O polígono medido tem 17.500 m² se a escala da
+       fotografia for 0,604 m por pixel, que é a que a barra de escala do Google Earth
+       indica. O painel de medição dá uma área 7% menor. Adotou-se a que dá os
+       17.500 m² do projeto.</p>
   </div>
 </aside>
 
@@ -413,30 +414,23 @@ function distALinha(pts,x,z){
 /* ------------------------------------------- 2. o terreno e o que o rodeia */
 var LOTE = IMP.LOTE;
 var ENV  = window.ENVOLVENTE;
-var TEX  = ENV.TEXTURA;
-/* Extensão coberta pela fotografia aérea. Para lá disto o chão passa a ser
-   terra seca lisa, e o nevoeiro fecha — não se inventa o que não se viu. */
-var EXT_X = TEX.x1 - TEX.x0, EXT_Z = TEX.z1 - TEX.z0;
-var CENTRO_TEX = [(TEX.x0+TEX.x1)/2, (TEX.z0+TEX.z1)/2];
+var TER  = ENV.TERRENO;
+/* Extensão levantada da fotografia. Para lá disto o chão passa a ser terra
+   seca lisa e o nevoeiro fecha — não se inventa o que não se viu. */
+var EXT_X = TER.nx*TER.cel, EXT_Z = TER.nz*TER.cel;
+var CENTRO_TEX = [TER.x0 + EXT_X/2, TER.z0 + EXT_Z/2];
+/* Modelos 2 a 5 abrem a mesma cena sem o projeto: só o terreno e o que lá
+   está. É o que o utilizador pediu para esses modelos. */
+var SO_BASE = /(^|[?&])base=1/.test(location.search);
 
 /* ------------------------------------------------------- 3. texturas */
-/* O chão da envolvente é a própria fotografia aérea, classificada por tipo
-   de ocupação e repintada na paleta do site (ver js/envolvente.js). Não há
-   estradas nem parcelas desenhadas à mão: estão todas na imagem, no sítio
-   onde estão na realidade. */
-function carregarSolo(aoAcabar){
-  var t = new THREE.TextureLoader().load(TEX.ficheiro, aoAcabar, undefined, aoAcabar);
-  t.anisotropy = 8;
-  if(THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace;
-  return t;
-}
-
-/* Grão fino por cima, para o chão não ficar liso quando se anda a pé. */
+/* Grão fino no chão, para não ficar liso quando se anda a pé. É a única
+   textura da cena: a envolvente é toda geometria. */
 function texturaGrao(){
   var S=256, cv=document.createElement('canvas'); cv.width=cv.height=S;
   var g=cv.getContext('2d');
   for(var i=0;i<2600;i++){
-    g.fillStyle = 'rgba('+(R()<0.5?'40,44,30':'190,176,140')+','+(0.03+R()*0.07).toFixed(3)+')';
+    g.fillStyle = 'rgba('+(R()<0.5?'40,44,30':'190,176,140')+','+(0.03+R()*0.06).toFixed(3)+')';
     g.fillRect(R()*S, R()*S, 1+R()*2.5, 1+R()*2.5);
   }
   var t = new THREE.CanvasTexture(cv);
@@ -640,44 +634,70 @@ function chapa(pol, y, material, buraco){
 }
 
 /* ------------------------------------------- 6. chão e envolvente real */
-function construirChao(pronto){
-  // terra seca até ao horizonte, por baixo de tudo
-  var g0 = new THREE.PlaneGeometry(5200,5200); g0.rotateX(-Math.PI/2);
-  var fundo = new THREE.Mesh(g0, mat(TEX.fundo,{roughness:1}));
-  fundo.position.set(CENTRO_TEX[0], -0.28, CENTRO_TEX[1]);
-  fundo.receiveShadow = true; scene.add(fundo);
+/* O chão é uma malha com cor por vértice, construída da grelha de 3 m que
+   classifica a fotografia aérea. Deixou de haver imagem colada: as estradas,
+   os caminhos, as parcelas, a pista e o relvado do estádio são faces da
+   malha, com a forma e a largura que têm no local. Células iguais na mesma
+   linha juntam-se numa só face — de 54.626 células ficam umas poucas
+   milhares de faces. */
+var COR_CEL = [0x9C8C6E, 0xBCAF94, 0x7E6E58, 0x55585A, 0x6E7A50, 0x4E7A46, 0xA85F3E, 0xB0A894];
+function construirTerreno(){
+  var nx=TER.nx, nz=TER.nz, cel=TER.cel, g=TER.g;
+  var pos=[], col=[], nor=[], idx=[], c=new THREE.Color(), v=0;
+  for(var j=0;j<nz;j++){
+    var i=0;
+    while(i<nx){
+      var k = g.charCodeAt(j*nx+i)-48;
+      var i2 = i+1;
+      while(i2<nx && g.charCodeAt(j*nx+i2)-48===k) i2++;
+      var x0=TER.x0+i*cel, x1=TER.x0+i2*cel, z0=TER.z0+j*cel, z1=TER.z0+(j+1)*cel;
+      pos.push(x0,0,z0,  x1,0,z0,  x1,0,z1,  x0,0,z1);
+      c.setHex(COR_CEL[k] === undefined ? COR_CEL[0] : COR_CEL[k]);
+      var t = 0.93 + ((i*7 + j*13) % 7) * 0.021;      // variação, para não ser chapado
+      for(var q=0;q<4;q++){ col.push(c.r*t, c.g*t, c.b*t); nor.push(0,1,0); }
+      idx.push(v, v+2, v+1,  v, v+3, v+2);            // face virada para cima
+      v += 4; i = i2;
+    }
+  }
+  var geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos,3));
+  geo.setAttribute('color',    new THREE.Float32BufferAttribute(col,3));
+  geo.setAttribute('normal',   new THREE.Float32BufferAttribute(nor,3));
+  geo.setIndex(idx);
+  var malha = new THREE.Mesh(geo, mat(0xFFFFFF,{vertexColors:true, roughness:0.97}));
+  malha.receiveShadow = true;
+  scene.add(malha);
 
-  // a fotografia aérea classificada, à escala e no sítio
-  var g = new THREE.PlaneGeometry(EXT_X, EXT_Z); g.rotateX(-Math.PI/2);
-  var chao = new THREE.Mesh(g, mat(0xFFFFFF,{map:carregarSolo(pronto), roughness:0.97, transparent:true}));
-  chao.position.set(CENTRO_TEX[0], -0.18, CENTRO_TEX[1]);
-  chao.receiveShadow = true; scene.add(chao);
+  // terra seca até ao horizonte, por baixo e para lá da zona levantada
+  var g0 = new THREE.PlaneGeometry(5200,5200); g0.rotateX(-Math.PI/2);
+  var fundo = new THREE.Mesh(g0, mat(0x9A8C70,{roughness:1}));
+  fundo.position.set(CENTRO_TEX[0], -0.12, CENTRO_TEX[1]);
+  fundo.receiveShadow = true; scene.add(fundo);
 
   var g2 = new THREE.PlaneGeometry(EXT_X, EXT_Z); g2.rotateX(-Math.PI/2);
   var grao = new THREE.Mesh(g2, new THREE.MeshBasicMaterial({
-    map:texturaGrao(), transparent:true, opacity:0.42, depthWrite:false}));
-  grao.position.set(CENTRO_TEX[0], -0.14, CENTRO_TEX[1]); scene.add(grao);
+    map:texturaGrao(), transparent:true, opacity:0.4, depthWrite:false}));
+  grao.position.set(CENTRO_TEX[0], 0.04, CENTRO_TEX[1]); scene.add(grao);
 }
 
 /* ------------------------------- 7. o que existe à volta, onde existe ----
-   Edifícios e árvores lidos da fotografia: posição, dimensão em planta,
-   orientação e cor de cobertura medidas. A altura é estimada — é a única
-   coisa que uma fotografia de cima não dá. */
+   Edifícios e árvores medidos na fotografia: posição, dimensão em planta,
+   orientação e cor de cobertura. A altura é estimada — é a única coisa que
+   uma fotografia de cima não dá. */
 function construirEnvolvente(){
   var corpos=[], telhados=[], remates=[], troncos=[], copas=[], janelas=[];
-  var perto = function(o){ return Math.hypot(o.x,o.z) < 300; };
+  var perto = function(o){ return Math.hypot(o.x,o.z) < 320; };
 
   ENV.EDIFICIOS.forEach(function(b){
     var ry = rad(b.r);
     corpos.push({x:b.x, y:b.h/2, z:b.z, ry:ry, sx:b.w, sy:b.h, sz:b.d, cor:b.c});
-    if(b.t){                                   // cobertura de telha
+    if(b.t){
       telhados.push({x:b.x, y:b.h, z:b.z, ry:ry,
-                     sx:b.w*1.06, sy:Math.min(2.5, Math.min(b.w,b.d)*0.34), sz:b.d*1.12,
-                     cor:0xA85C3C});
-    } else {                                   // terraço: remate da platibanda
+                     sx:b.w*1.06, sy:Math.min(2.5, Math.min(b.w,b.d)*0.34), sz:b.d*1.12, cor:b.c});
+    } else {
       remates.push({x:b.x, y:b.h+0.25, z:b.z, ry:ry, sx:b.w+0.5, sy:0.5, sz:b.d+0.5, cor:b.c});
     }
-    if(R() < 0.5){                             // luz acesa em parte das janelas
+    if(R() < 0.5){
       var n = 1 + (R()<0.5?1:0);
       for(var k=0;k<n;k++){
         var u = (k-(n-1)/2)*3.0;
@@ -710,6 +730,49 @@ function construirEnvolvente(){
              new THREE.MeshBasicMaterial({color:0xFFC98A, side:THREE.DoubleSide}), janelas,
              {sombra:false, recebe:false});
   if(luz){ luz.visible = false; LUZES_NOITE.push(luz); }
+}
+
+/* --------------------------- 8. o complexo desportivo, em volume --------
+   O campo e a pista estão medidos na fotografia; a bancada é a estrutura
+   comprida encostada ao lado poente da pista. Sem isto o estádio era só
+   mancha no chão e desaparecia assim que a câmara descia. */
+function construirEstadio(){
+  var E = ENV.ESTADIO, ry = rad(E.r);
+  PONTOS.estadio = new THREE.Vector3(E.x, 6, E.z);
+  var grupo = new THREE.Group();
+
+  var anel = new THREE.Shape();
+  anel.absellipse(0,0, E.pista[0]/2, E.pista[1]/2, 0, Math.PI*2, false, 0);
+  var dentro = new THREE.Path();
+  dentro.absellipse(0,0, E.campo[0]/2+1.5, E.campo[1]/2+1.5, 0, Math.PI*2, true, 0);
+  anel.holes.push(dentro);
+  var gp = new THREE.ShapeGeometry(anel, 64); gp.rotateX(-Math.PI/2);
+  var pista = new THREE.Mesh(gp, mat(0xB0603C,{roughness:0.95}));
+  pista.position.y = 0.10; pista.receiveShadow = true; grupo.add(pista);
+
+  var campo = caixa(E.campo[0], 0.16, E.campo[1], mat(0x4A7842,{roughness:0.9}));
+  campo.position.y = 0.14; grupo.add(campo);
+
+  // bancada: três degraus e uma pala, virados ao campo
+  var banc = new THREE.Group();
+  for(var i=0;i<3;i++){
+    var deg = caixa(58, 1.5+i*1.4, 3.6, MAT.pedra);
+    deg.position.set(0, (1.5+i*1.4)/2, -i*3.6);
+    banc.add(deg);
+  }
+  var pala = caixa(60, 0.5, 12, mat(0x8E948F,{roughness:0.5, metalness:0.4}));
+  pala.position.set(0, 8.6, -4.0); banc.add(pala);
+  [-1,1].forEach(function(f){
+    var pil = caixa(0.6, 8.4, 0.6, MAT.metal);
+    pil.position.set(f*27, 4.2, -9.0); banc.add(pil);
+  });
+  banc.position.set(0, 0, -(E.campo[1]/2 + 16));
+  grupo.add(banc);
+
+  grupo.position.set(E.x, 0, E.z);
+  grupo.rotation.y = ry;
+  scene.add(grupo);
+  pegada(E.x, E.z, E.pista[0], E.pista[1], E.r, 0);
 }
 
 /* ================================================== 9. O LOTE E O PROJETO
@@ -1218,15 +1281,17 @@ var VISTAS = [
   {t:'Vista larga',desc:'O lote no meio do que está à volta',
    ponto:'centro',    yaw:-42,  pitch:30, dist:540, altura:6},
   {t:'Entrada',    desc:'Do portão, a olhar para dentro do lote',
-   ponto:'entrada',   de:'entrada_de'},
+   ponto:'entrada',   de:'entrada_de', projeto:true},
   {t:'Hotel',      desc:'O hotel em L, ao longo do limite poente',
-   ponto:'hotel',     de:'hotel_de'},
+   ponto:'hotel',     de:'hotel_de', projeto:true},
   {t:'Piscina',    desc:'Do deck, sobre a piscina de 200 m²',
-   ponto:'piscina',   de:'piscina_de'},
+   ponto:'piscina',   de:'piscina_de', projeto:true},
   {t:'Moradias',   desc:'As dez moradias, ao longo do limite nascente',
-   ponto:'moradias',  de:'moradias_de'},
+   ponto:'moradias',  de:'moradias_de', projeto:true},
   {t:'Envolvente', desc:'O estádio, o centro hípico e os campos à volta',
-   ponto:'centro',    yaw:-96,  pitch:24, dist:880, altura:6}
+   ponto:'centro',    yaw:-96,  pitch:24, dist:880, altura:6},
+  {t:'Estádio',    desc:'O complexo desportivo, a nascente do lote',
+   ponto:'estadio',   yaw:-150, pitch:16, dist:300, altura:6}
 ];
 
 /* Empurra um ponto para fora de qualquer tronco ou copa. As vistas ao nível
@@ -1521,7 +1586,7 @@ function ligarControlos(){
     if(k==='arrowleft') teclas.a = true;
     if(k==='arrowright') teclas.d = true;
     teclas.shift = e.shiftKey;
-    if(k>='1' && k<='7'){ var v = VISTAS[+k-1]; if(v){ irPara(v); marcarVista(+k-1); } }
+    if(k>='1' && k<='9'){ var v = VISTAS[+k-1]; if(v){ irPara(v); marcarVista(+k-1); } }
     if(k==='n'){ nocturno = !nocturno; aplicarLuz(); }
     if(k==='escape') fecharPainel();
   });
@@ -1551,7 +1616,8 @@ var LEGENDA = [
   ['#86A455','Relvado de eventos','A sul, entre o hotel e o pomar.'],
   ['#4C5E34','Pomar e palmeiras','Plantados na faixa junto ao limite, deixando o centro aberto.'],
   ['#3B3F3C','Via de acesso','Contorna o construído e liga à estrada que passa no limite sudeste.'],
-  ['#9C8A6E','Envolvente real','Fotografia aérea classificada: estradas, pista, campo, hípico e parcelas.'],
+  ['#9C8A6E','Envolvente em malha','Estradas, caminhos e parcelas como faces da malha do terreno, não como imagem.'],
+  ['#B0603C','Complexo desportivo','Campo, pista e bancada em volume, medidos na fotografia.'],
   ['#B08D3E','Limite do lote','O polígono medido, 16.288 m². Liga e desliga na barra de baixo.']
 ];
 function montarInterface(linhaLimite){
@@ -1572,6 +1638,11 @@ function montarInterface(linhaLimite){
     leg.appendChild(d);
   });
 
+  if(SO_BASE){
+    document.getElementById('tituloCena').innerHTML = 'O terreno <em>e o que o rodeia</em>';
+    document.querySelector('.titulo .sub').textContent =
+      '17.500 M² · A BASE REAL, SEM O PROJETO';
+  }
   document.getElementById('btnOrbita').addEventListener('click', function(){ trocarModo('orbita'); });
   document.getElementById('btnPe').addEventListener('click', function(){ trocarModo('pe'); });
   document.getElementById('btnLuz').addEventListener('click', function(){ nocturno = !nocturno; aplicarLuz(); });
@@ -1601,10 +1672,19 @@ function marcarVista(i){
 var linhaLimite = null;
 var ETAPAS = [
   ['A abrir o terreno',      function(){ arrancarRenderer(); construirMateriais(); construirCeu(); }],
-  ['A assentar a fotografia',function(){ construirChao(); }],
-  ['A levantar a envolvente',function(){ construirEnvolvente(); }],
+  ['A levantar o terreno',   function(){ construirTerreno(); }],
+  ['A levantar a envolvente',function(){ construirEnvolvente(); construirEstadio(); }],
   ['A implantar o lote',     function(){ linhaLimite = construirLote(); }],
-  ['A construir o hotel',    function(){ construirProjeto(); }],
+  ['A construir o hotel',    function(){
+      if(SO_BASE){
+        // modelos 2 a 5: só o terreno e a envolvente
+        var c = centroide(LOTE);
+        PONTOS.centro = new THREE.Vector3(c[0], 4, c[1]);
+        VISTAS = VISTAS.filter(function(v){ return !v.projeto; });
+      } else {
+        construirProjeto();
+      }
+  }],
   ['A acender a luz',        function(){
       aplicarLuz(); redimensionar(); ligarControlos(); montarInterface(linhaLimite);
       irPara(VISTAS[0], true);

@@ -24,14 +24,17 @@ projeto e o processo urbanístico à medida que avança.
   8°12'05"W. **Não é na cidade de Évora** — Évora aparece no site só como
   argumento de mercado (o novo hospital) e como referência de tipologia
   (Hotel Ibis). Não voltar a escrever que o terreno é em Évora.
-- **Área do terreno: há dois números e falta decidir.** O site escreve
-  **17.500 m²** (hero, menu, contas) — não foi alterado. A maquete usa o
-  polígono que o utilizador mediu no Google Earth a 16/10/2025:
-  **16.287,82 m², 616,77 m de perímetro**, com cotas de 225,19 m a 234,02 m.
-  Uma medição anterior tinha dado 16.152 m². Ou seja, **duas medições
-  independentes dão ~16,2–16,3 mil m² e o número do site é 7% maior**. A
-  maquete assenta no polígono medido porque foi o que o utilizador mandou
-  usar; o resto do site ficou como estava. **Perguntar antes de uniformizar.**
+- **Área do terreno: 17.500 m², e a discrepância está resolvida.** O
+  utilizador reafirmou os 17.500 m² como área do projeto. A forma vem do
+  polígono que ele mediu no Google Earth (16/10/2025), com cotas de 225,19 m
+  a 234,02 m. O painel de medição do Google Earth dizia 16.287,82 m² para
+  esse polígono, mas isso depende da escala: a **barra de escala da mesma
+  interface dá 0,606 m/px** e a escala que faz o polígono valer 17.500 m² é
+  **0,60361 m/px** — 0,4% de diferença. Ou seja, **a barra de escala e os
+  17.500 m² concordam; é o número da área do painel que destoa**. Adotou-se
+  0,60361 m/px, e toda a cena (lote, edifícios, árvores, estádio) está a essa
+  escala. Sanidade: o campo de futebol do complexo desportivo dá 120 × 74 m,
+  que é um campo com as folgas laterais.
 - **Forma do lote (medida, não assumida):** cunha com 238 m no eixo
   norte–sul e 157 m no máximo a nascente–poente. Larga a meio (101 m úteis
   à latitude do ponto nascente), estreita para norte (29 m) e afila para sul
@@ -83,23 +86,39 @@ refazer com uma fotografia nova, é este o caminho):
 1. Detetar a linha amarela de medição na imagem, preencher o interior e
    extrair o contorno ordenado. Simplificar (Douglas–Peucker) e recuar meia
    espessura da linha, para ficar com o eixo e não com a borda de fora.
-2. **Calibrar pela área medida**, não pela barra de escala: 16 287,82 m²
-   sobre a área em pixéis dá **0,5823 m/px**. A barra dos 100 m da interface
-   dá 0,606 m/px, 4% acima. Quem decide é a área, que o Google Earth calcula
-   sobre coordenadas. Confirmado com uma régua independente: o campo de
-   futebol do complexo desportivo mede 115,7 × 71,4 m a esta escala, que é o
-   tamanho de um campo com as folgas laterais.
+2. **Calibrar em 0,60361 m/px**, que é a escala que dá ao polígono medido os
+   17.500 m² do projeto e coincide com a barra dos 100 m da interface (0,606).
+   O número de área do painel de medição (16.287,82 m²) corresponderia a
+   0,5823 m/px e ficou de fora. Régua independente: o campo de futebol dá
+   120 × 74 m a esta escala.
 3. Origem no centro do polígono. +x nascente, −z norte.
-4. Classificar a fotografia por tipo de ocupação (terra clara, terra lavrada,
-   copado, cobertura clara, telha/pista, relva sintética, sombra) e repintar
-   na paleta do site → `images/envolvente/solo.webp`, com alfa a esbater nas
-   bordas. **É por isso que não há estradas desenhadas à mão**: estão na
-   imagem, com a forma e a largura reais.
-5. Detetar coberturas e copas → `js/envolvente.js`.
+4. Classificar a fotografia por tipo de ocupação e reduzir a uma **grelha de
+   3 m** → `ENVOLVENTE.TERRENO.g`, uma string com um carácter por célula. O
+   `maquete.html` constrói dela uma **malha com cor por vértice**, juntando
+   células iguais na mesma linha. **Deixou de haver fotografia na cena** — foi
+   requisito explícito do utilizador: "não usar fotografias como substituto
+   de 3D". O `images/envolvente/solo.webp` foi apagado.
+5. Separar estradas de esplanadas **pela largura local** (transformada de
+   distância sobre a grelha): faixas de pavimento com menos de ~13 m são
+   estrada (classe 3), manchas largas ficam esplanada. É o critério objetivo
+   que sobrou — a cor não separa estradas neste sítio, porque está tudo seco
+   e claro. **Não traçar estradas a olho**: o utilizador queixou-se
+   explicitamente de estradas inventadas.
+6. Detetar coberturas e copas → `EDIFICIOS`, `ARVORES`. Medir o campo e a
+   pista do complexo desportivo → `ESTADIO`, que a cena constrói em volume
+   (anel da pista, campo e bancada com pala).
 
 **O que é real e o que não é:** posição, forma em planta e orientação de tudo
 são medidas. **A altura dos volumes da envolvente é estimada** pela área de
 implantação e pelo tipo de cobertura — uma fotografia de cima não dá altura.
+As **cavalariças do centro hípico** aparecem agrupadas em massas: a deteção
+não as separa edifício a edifício a esta resolução.
+
+**A cartografia aberta está bloqueada.** O Overpass (OpenStreetMap) devolve
+403 no proxy de egresso desta sessão — confirmado a 19/09/2026, com o motivo
+registado em `$HTTPS_PROXY/__agentproxy/status`. Seria a via limpa para ter a
+rede de estradas e as pegadas dos edifícios com coordenadas em vez de
+deteção. Não insistir; é política de rede, não avaria.
 
 ## A implantação vive num sítio só: `js/implantacao.js`
 
@@ -124,6 +143,15 @@ moradias andam como peças rígidas). O resultado, verificado:
 Nada aqui está alinhado com os eixos: o lote é oblíquo, por isso o deck, a
 piscina, o bar, as espreguiçadeiras e o relvado levam todos a rotação da
 implantação. Esquecer isso foi um erro já cometido.
+
+## Os modelos: o 1 leva o projeto, os 2 a 5 são a base
+
+`maquete.html?base=1` abre a mesma cena **sem o projeto** — só o terreno, as
+estradas, o casario, o hípico, o estádio, as parcelas e as árvores. É o que
+os Modelos 2 a 5 abrem (`MODELO_BASE` no `index.html`), a pedido do
+utilizador: "não quero o hotel nos outros modelos". Nesse modo as vistas do
+projeto são filtradas (`v.projeto`) e ficam quatro: aérea, larga, envolvente
+e estádio.
 
 ## O Modelo 1 é a cena 3D
 

@@ -549,7 +549,7 @@
     </div>
     <span class="render-legenda" id="modeloRenderLegenda" hidden>Implantação de referência</span>
     <img class="modelo-render" id="modeloRender" alt="" hidden>
-    <p class="nota-render" id="modeloNota" hidden>Maquete e render ilustrativos. Os volumes estão à escala sobre o polígono real do lote, mas são um estudo de massas — não constituem projeto de arquitetura aprovado.</p>
+    <p class="nota-render" id="modeloNota" hidden>Maquete conceptual. O terreno e a envolvente foram levantados da fotografia aérea e estão à escala; os volumes são um estudo de massas — não constituem projeto de arquitetura aprovado.</p>
     <p id="modeloViewText">Este modelo vai mostrar o terreno construído — hotel, casas, jardim e piscina — com a construção a montar-se à medida que percorres a página, e cada edifício clicável para ver o conceito por dentro.</p>
   </div>
 </div>
@@ -926,6 +926,14 @@
 
   // Renders disponíveis por modelo. Quando houver imagem para um modelo,
   // acrescenta aqui a linha correspondente e o "Em breve" desaparece sozinho.
+  /* O Modelo 1 leva o projeto; os 2 a 5 abrem a mesma cena sem ele, para se
+     ver o terreno e a envolvente reais — foi o que o utilizador pediu. */
+  const MODELO_BASE = {
+    '2': 'A base real do terreno, sem o projeto: o polígono de 17.500 m², as estradas e os caminhos, o casario vizinho, o centro hípico e o complexo desportivo em volume, as parcelas e as árvores. Tudo levantado da fotografia aérea.',
+    '3': 'A mesma base, para ver a relação do lote com o complexo desportivo a nascente.',
+    '4': 'A mesma base, para ver a relação do lote com o centro hípico a poente.',
+    '5': 'A mesma base, vista de longe: onde fica o terreno dentro da zona.'
+  };
   const MODELO_RENDERS = {
     '1': {
       maquete3d: true,
@@ -946,7 +954,18 @@
     const maquete = document.getElementById('modelo3d');
     const legenda = document.getElementById('modeloRenderLegenda');
 
-    if(render){
+    window.__modeloBase = !!MODELO_BASE[n];
+
+    if(MODELO_BASE[n]){
+      // Modelos 2 a 5: a base e a envolvente, sem o projeto
+      img.hidden = true; img.removeAttribute('src'); img.classList.remove('secundaria');
+      legenda.hidden = true; emBreve.hidden = true;
+      document.getElementById('modeloNota').hidden = false;
+      texto.textContent = MODELO_BASE[n];
+      const ok = !!(window.MODELO3D && window.MODELO3D.disponivel());
+      maquete.hidden = !ok;
+      if(ok) requestAnimationFrame(()=> window.MODELO3D.abrir());
+    } else if(render){
       img.src = render.img;
       img.alt = 'Render do Modelo ' + n;
       img.hidden = false;
@@ -1328,7 +1347,8 @@
   window.MODELO3D = {
     abrir: function(){
       caixa.classList.add('a-carregar');
-      if(!quadro.getAttribute('src')) quadro.setAttribute('src','maquete.html');
+      var alvo = window.__modeloBase ? 'maquete.html?base=1' : 'maquete.html';
+      if(quadro.getAttribute('src') !== alvo) quadro.setAttribute('src', alvo);
       return true;
     },
     fechar: function(){
